@@ -5,6 +5,7 @@ import { SigninResponse } from './dto/sigin-response';
 import { SigninUserInput } from './dto/signin-user.input';
 import { SignupResponse } from './dto/signup-response';
 import { GqlAuthGuard } from './guards/auth.guard';
+import { SingUpUserInput } from './dto/signup-user.input';
 
 @Resolver()
 export class AuthResolver {
@@ -12,9 +13,9 @@ export class AuthResolver {
 
   @Mutation(() => SignupResponse)
   async signup(
-    @Args('loginUserInput') loginUserInput: SigninUserInput,
+    @Args('registerUserInput') registerUserInput: SingUpUserInput,
   ): Promise<SignupResponse> {
-    return this.authService.signup(loginUserInput);
+    return this.authService.signup(registerUserInput);
   }
 
   @Mutation(() => SigninResponse)

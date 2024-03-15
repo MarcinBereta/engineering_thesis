@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { simpleUser } from './signup-response';
 
 @ObjectType()
 export class SigninResponse {
@@ -6,5 +7,5 @@ export class SigninResponse {
   access_token: string;
 
   @Field()
-  username: string;
+  user: simpleUser;
 }
