@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-// import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import React, { useContext, useState } from 'react'
 import { AccessToken, LoginManager } from 'react-native-fbsdk-next'
 import { registerUser, loginUser } from '../services/auth/auth'
@@ -279,16 +279,16 @@ export const AuthProvider = ({
     React.useEffect(() => {
         isLoggedIn()
 
-        // GoogleSignin.configure({
-        //     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-        //     webClientId:
-        //         '643554516079-ldjlln52or33c89hsmkvruir4qq7ql1d.apps.googleusercontent.com',
-        //     offlineAccess: true,
-        //     hostedDomain: '',
-        //     forceCodeForRefreshToken: true,
-        //     accountName: '',
-        //     googleServicePlistPath: '',
-        // })
+        GoogleSignin.configure({
+            scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+            webClientId:
+                '192870519203-nu786c0t9cjer7dhltqlgscrf2unp1vv.apps.googleusercontent.com',
+            offlineAccess: true,
+            hostedDomain: '',
+            forceCodeForRefreshToken: true,
+            accountName: '',
+            googleServicePlistPath: '',
+        })
     }, [])
 
     return (
