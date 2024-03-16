@@ -20,6 +20,7 @@ type simpleUser {
   id: String!
   email: String!
   username: String!
+  image: String!
 }
 
 type SignupResponse {

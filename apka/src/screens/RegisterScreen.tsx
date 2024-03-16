@@ -10,6 +10,12 @@ import {
 import {AuthContext} from '../contexts/AuthContext';
 import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 import {fontPixel} from '../utils/Normalize';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useForm} from 'react-hook-form';
+import {z} from 'zod';
+import {LoginSchema} from '../schemas/loginSchema';
+import {RegisterSchema} from '../schemas/registerSchema';
+import {FormTextInput} from '../components/inputs/FormTextInput';
 
 const styles = StyleSheet.create({
   textInput: {
@@ -38,6 +44,25 @@ const RegisterScreen = (props: any) => {
     email: '',
   });
 
+  const {control, handleSubmit} = useForm({
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+    },
+    resolver: zodResolver(RegisterSchema),
+  });
+
+  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
+    console.log('q');
+    authContext.register(
+      'credentials',
+      data.username,
+      data.email,
+      data.password,
+    );
+  };
+
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <View
@@ -57,32 +82,25 @@ const RegisterScreen = (props: any) => {
           }}>
           Register!
         </Text>
-        <TextInput
+        <FormTextInput
+          control={control}
+          name="username"
+          placeholder="username"
           style={styles.textInput}
-          placeholder="Username"
-          value={registerForm.username}
-          onChange={e => {
-            setRegisterForm({...registerForm, username: e.nativeEvent.text});
-          }}
+        />
+        <FormTextInput
+          control={control}
+          name="email"
+          placeholder="email"
+          style={styles.textInput}
+        />
+        <FormTextInput
+          control={control}
+          name="password"
+          placeholder="Password"
+          style={styles.textInput}
         />
 
-        <TextInput
-          style={styles.textInput}
-          placeholder="email"
-          value={registerForm.email}
-          onChange={e => {
-            setRegisterForm({...registerForm, email: e.nativeEvent.text});
-          }}
-        />
-        <TextInput
-          secureTextEntry={true}
-          style={styles.textInput}
-          placeholder="password"
-          value={registerForm.password}
-          onChange={e => {
-            setRegisterForm({...registerForm, password: e.nativeEvent.text});
-          }}
-        />
         <GoogleSigninButton
           style={{width: 192, height: 48}}
           size={GoogleSigninButton.Size.Wide}
@@ -91,14 +109,7 @@ const RegisterScreen = (props: any) => {
         />
         <TouchableOpacity
           style={styles.buttonProps}
-          onPress={() => {
-            authContext.register(
-              'credentials',
-              registerForm.username,
-              registerForm.email,
-              registerForm.password,
-            );
-          }}>
+          onPress={handleSubmit(onSubmit)}>
           <Text style={{color: 'white'}}>Register</Text>
         </TouchableOpacity>
         <TouchableOpacity

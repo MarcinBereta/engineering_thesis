@@ -10,6 +10,12 @@ import {
 import {AuthContext} from '../contexts/AuthContext';
 import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 import {fontPixel} from '../utils/Normalize';
+import {zodResolver} from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {LoginSchema} from '../schemas/loginSchema';
+import {useForm} from 'react-hook-form';
+import {FormTextInput} from '../components/inputs/FormTextInput';
+
 const styles = StyleSheet.create({
   textInput: {
     backgroundColor: 'white',
@@ -31,10 +37,18 @@ const styles = StyleSheet.create({
 
 const LoginScreen = (props: any) => {
   const authContext = useContext(AuthContext);
-  const [loginForm, setLoginForm] = useState({
-    username: '',
-    password: '',
+
+  const {control, handleSubmit} = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+    resolver: zodResolver(LoginSchema),
   });
+
+  const onSubmit = (data: z.infer<typeof LoginSchema>) => {
+    authContext.login('credentials', data.username, data.password);
+  };
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -55,22 +69,17 @@ const LoginScreen = (props: any) => {
           }}>
           Welcome back!
         </Text>
-        <TextInput
-          style={styles.textInput}
+        <FormTextInput
+          control={control}
+          name="username"
           placeholder="Username"
-          value={loginForm.username}
-          onChange={e => {
-            setLoginForm({...loginForm, username: e.nativeEvent.text});
-          }}
-        />
-        <TextInput
-          secureTextEntry={true}
           style={styles.textInput}
-          placeholder="password"
-          value={loginForm.password}
-          onChange={e => {
-            setLoginForm({...loginForm, password: e.nativeEvent.text});
-          }}
+        />
+        <FormTextInput
+          control={control}
+          name="password"
+          placeholder="Password"
+          style={styles.textInput}
         />
         <GoogleSigninButton
           style={{width: 192, height: 48}}
@@ -78,15 +87,10 @@ const LoginScreen = (props: any) => {
           color={GoogleSigninButton.Color.Dark}
           onPress={() => authContext.login('google', '', '')}
         />
+
         <TouchableOpacity
           style={styles.buttonProps}
-          onPress={() => {
-            authContext.login(
-              'credentials',
-              loginForm.username,
-              loginForm.password,
-            );
-          }}>
+          onPress={handleSubmit(onSubmit)}>
           <Text style={{color: 'white'}}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
