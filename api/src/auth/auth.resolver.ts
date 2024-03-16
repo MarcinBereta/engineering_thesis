@@ -16,9 +16,10 @@ export class AuthResolver {
   async signup(
     @Args('registerUserInput') registerUserInput: SingUpUserInput,
   ): Promise<SignupResponse> {
+    console.log('registerUserInput', registerUserInput);
     return this.authService.signup(registerUserInput);
   }
-  
+
   @Mutation(() => SigninResponse)
   async providerLogin(
     @Args('providerUserInput') providerInput: ProviderInput,

@@ -6,4 +6,6 @@ export class ProviderInput {
   email: string;
   @Field()
   username: string;
+  @Field()
+  image: string | null;
 }

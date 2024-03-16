@@ -30,7 +30,7 @@ export class AuthService {
         username: user.username,
       },
     });
-    const username = user.username
+    const username = user.username;
     const access_token = await this.jwtService.sign({
       username,
       sub: newUser.id,
@@ -43,32 +43,32 @@ export class AuthService {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
+        image: newUser.image,
       },
-      access_token: access_token
-    }
+      access_token: access_token,
+    };
   }
 
-  async providerLogin(input:ProviderInput) {
-
+  async providerLogin(input: ProviderInput) {
     const accountExists = await this.Prisma.user.findUnique({
-      where:{
+      where: {
         email: input.email,
-        password:{
-          not:null
-        }
-      }
-    })
-    if(accountExists){
-      throw new GraphQLError("Account already exists")
+        password: {
+          not: null,
+        },
+      },
+    });
+    if (accountExists) {
+      throw new GraphQLError('Account already exists');
     }
     const userInDb = await this.Prisma.user.findUnique({
-      where:{
+      where: {
         email: input.email,
-        password:null
-      }
-    })
-    if(userInDb){
-      const username = userInDb.username
+        password: null,
+      },
+    });
+    if (userInDb) {
+      const username = userInDb.username;
       const access_token = await this.jwtService.sign({
         username,
         sub: userInDb.id,
@@ -81,17 +81,19 @@ export class AuthService {
           id: userInDb.id,
           email: userInDb.email,
           username: userInDb.username,
+          image: userInDb.image,
         },
-        access_token: access_token
-      }
+        access_token: access_token,
+      };
     }
     const newUser = await this.Prisma.user.create({
       data: {
         email: input.email,
         username: input.username,
+        image: input.image,
       },
     });
-    const username = input.username
+    const username = input.username;
     const access_token = await this.jwtService.sign({
       username,
       sub: newUser.id,
@@ -104,9 +106,10 @@ export class AuthService {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
+        image: newUser.image,
       },
-      access_token: access_token
-    }
+      access_token: access_token,
+    };
   }
 
   async signin(user: User) {
@@ -119,18 +122,19 @@ export class AuthService {
       throw new InternalServerErrorException();
     }
     const newUser = await this.Prisma.user.findUnique({
-      where:{
-        id:user.id
-      }
-    })
+      where: {
+        id: user.id,
+      },
+    });
 
     return {
       user: {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
+        image: newUser.image,
       },
-      access_token: access_token
+      access_token: access_token,
     };
   }
 
