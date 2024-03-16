@@ -9,6 +9,9 @@ import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { SingUpUserInput } from './dto/signup-user.input';
+import { ProviderInput } from './dto/provider.input';
+import { SigninUserInput } from './dto/signin-user.input';
+import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +31,67 @@ export class AuthService {
       },
     });
     const username = user.username
+    const access_token = await this.jwtService.sign({
+      username,
+      sub: newUser.id,
+    });
+    if (!access_token) {
+      throw new InternalServerErrorException();
+    }
+    return {
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+      },
+      access_token: access_token
+    }
+  }
+
+  async providerLogin(input:ProviderInput) {
+
+    const accountExists = await this.Prisma.user.findUnique({
+      where:{
+        email: input.email,
+        password:{
+          not:null
+        }
+      }
+    })
+    if(accountExists){
+      throw new GraphQLError("Account already exists")
+    }
+    const userInDb = await this.Prisma.user.findUnique({
+      where:{
+        email: input.email,
+        password:null
+      }
+    })
+    if(userInDb){
+      const username = userInDb.username
+      const access_token = await this.jwtService.sign({
+        username,
+        sub: userInDb.id,
+      });
+      if (!access_token) {
+        throw new InternalServerErrorException();
+      }
+      return {
+        user: {
+          id: userInDb.id,
+          email: userInDb.email,
+          username: userInDb.username,
+        },
+        access_token: access_token
+      }
+    }
+    const newUser = await this.Prisma.user.create({
+      data: {
+        email: input.email,
+        username: input.username,
+      },
+    });
+    const username = input.username
     const access_token = await this.jwtService.sign({
       username,
       sub: newUser.id,

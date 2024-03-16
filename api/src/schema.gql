@@ -40,6 +40,7 @@ type Query {
 
 type Mutation {
   signup(registerUserInput: SingUpUserInput!): SignupResponse!
+  providerLogin(providerUserInput: ProviderInput!): SigninResponse!
   signin(loginUserInput: SigninUserInput!): SigninResponse!
 }
 
@@ -47,6 +48,11 @@ input SingUpUserInput {
   username: String!
   password: String!
   email: String!
+}
+
+input ProviderInput {
+  email: String!
+  username: String!
 }
 
 input SigninUserInput {
