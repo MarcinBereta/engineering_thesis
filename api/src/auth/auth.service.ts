@@ -43,7 +43,7 @@ export class AuthService {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
-        image: newUser.image,
+        image: newUser.image == null ? '' : newUser.image,
       },
       access_token: access_token,
     };
@@ -81,7 +81,7 @@ export class AuthService {
           id: userInDb.id,
           email: userInDb.email,
           username: userInDb.username,
-          image: userInDb.image,
+          image: userInDb.image == null ? '' : userInDb.image,
         },
         access_token: access_token,
       };
@@ -106,7 +106,7 @@ export class AuthService {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
-        image: newUser.image,
+        image: newUser.image == null ? '' : newUser.image,
       },
       access_token: access_token,
     };
@@ -132,7 +132,7 @@ export class AuthService {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
-        image: newUser.image,
+        image: newUser.image == null ? '' : newUser.image,
       },
       access_token: access_token,
     };
