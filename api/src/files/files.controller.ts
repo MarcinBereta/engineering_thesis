@@ -1,0 +1,39 @@
+import {
+  Controller,
+  Post,
+  UseInterceptors,
+  UploadedFiles,
+  Body,
+  Param,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+
+export const checkIfFileOrDirectoryExists = (path: string): boolean => {
+  return existsSync(path);
+};
+
+const storage = diskStorage({
+  destination: './public/files/courses',
+  filename: (req, file, cb) => {
+    const name = file.originalname.split('.')[0];
+    const extension = extname(file.originalname);
+    const randomName = Array(32)
+      .fill(null)
+      .map(() => Math.round(Math.random() * 16).toString(16))
+      .join('');
+    cb(null, `${name}-${randomName}${extension}`);
+  },
+});
+
+@Controller('files')
+export class FilesController {
+  @Post(':id')
+  @UseInterceptors(FilesInterceptor('files[]', 10, { storage }))
+  uploadFile(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Param('id') id: string,
+  ) {}
+}

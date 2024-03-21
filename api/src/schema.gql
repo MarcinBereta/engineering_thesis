@@ -33,16 +33,30 @@ type SigninResponse {
   user: simpleUser!
 }
 
+type Course {
+  id: String!
+  name: String!
+  text: [CourseItem!]!
+}
+
+type CourseItem {
+  id: String!
+  type: String!
+  value: String!
+}
+
 type Query {
   users: [User!]!
   getUser(name: String!): User!
   getAllUsers: [User!]!
+  course: Course!
 }
 
 type Mutation {
   signup(registerUserInput: SingUpUserInput!): SignupResponse!
   providerLogin(providerUserInput: ProviderInput!): SigninResponse!
   signin(loginUserInput: SigninUserInput!): SigninResponse!
+  addCourse(newCourse: CourseInput!): Course!
 }
 
 input SingUpUserInput {
@@ -60,4 +74,15 @@ input ProviderInput {
 input SigninUserInput {
   username: String!
   password: String!
+}
+
+input CourseInput {
+  name: String!
+  text: [CourseItemInput!]!
+}
+
+input CourseItemInput {
+  id: String!
+  type: String!
+  value: String!
 }

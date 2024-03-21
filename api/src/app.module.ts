@@ -11,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import { AuthResolver } from './auth/auth.resolver';
 import { AuthService } from './auth/auth.service';
 import { ConfigModule } from '@nestjs/config';
+import { CoursesModule } from './courses/courses.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
     PrismaModule,
     AuthModule,
+    CoursesModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, AuthResolver, AuthService],
