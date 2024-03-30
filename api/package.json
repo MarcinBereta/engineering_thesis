@@ -29,7 +29,8 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
-    "@prisma/client": "^5.10.1",
+    "@nestjs/serve-static": "^4.0.1",
+    "@prisma/client": "^5.11.0",
     "@types/passport-jwt": "^4.0.1",
     "bcrpyt": "^2.0.0",
     "bcrypt": "^5.1.1",
@@ -39,9 +40,10 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "prisma": "^5.10.1",
+    "prisma": "^5.11.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "studio": "^0.13.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

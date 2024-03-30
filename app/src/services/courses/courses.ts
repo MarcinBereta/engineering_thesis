@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {apiCall} from '../graphqlHandler';
 import constants from '../../../constants';
+import {course} from '../../screens/DashboardScreen';
 
 export type CourseItem = {
   id: string;
@@ -46,6 +47,30 @@ export const newCourse = (
     `;
   //@ts-ignore
   return apiCall(call, {CourseInput: data}, token);
+};
+
+export const getCourses = (
+  token: string,
+): Promise<{
+  data: {
+    course: course[];
+  };
+}> => {
+  console.log(token);
+  const call = `
+  query getCourses{
+  course{
+    name
+    text{
+      id
+      type
+      value
+    }
+  }
+}
+  `;
+  //@ts-ignore
+  return apiCall(call, {}, token);
 };
 
 export const addPhotos = async (photos: File[], id: string) => {

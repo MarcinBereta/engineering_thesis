@@ -71,7 +71,6 @@ export const AuthProvider = ({
             email: email,
             password: password,
           });
-          console.log(data);
           if (data != null) {
             const userInfo = {
               username: data.signup.user.username,

@@ -7,6 +7,8 @@ import {RegisterScreen} from './RegisterScreen';
 import {SplashScreen} from './SplashScreen';
 import {useContext} from 'react';
 import {AuthContext} from '../contexts/AuthContext';
+import {CourseForm} from '../components/courses/CourseForm/CourseForm';
+import Course from '../components/courses/course/CourseItem';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +24,11 @@ const Navigator = ({socket}: {socket: Socket}) => {
         {splashLoading ? (
           <Stack.Screen component={SplashScreen} name="SplashScreen" />
         ) : userInfo != null ? (
-          <Stack.Screen component={DashboardScreen} name="DashboardScreen" />
+          <>
+            <Stack.Screen component={DashboardScreen} name="DashboardScreen" />
+            <Stack.Screen component={CourseForm} name="createCourse" />
+            <Stack.Screen component={Course} name="course" />
+          </>
         ) : (
           <>
             <Stack.Screen component={LoginScreen} name="LoginScreen" />

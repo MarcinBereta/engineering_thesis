@@ -1,21 +1,17 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Course, CourseInput } from './dto/CourseDTO';
 import { CoursesService } from './courses.service';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @Resolver((of) => Course)
+@UseGuards(JwtAuthGuard)
 export class CoursesResolver {
   constructor(private courseService: CoursesService) {}
 
-  @Query((returns) => Course)
+  @Query((returns) => [Course])
   async course() {
-    return {
-      name: 'Course Name',
-      description: 'Course Description',
-      text: [
-        { type: 'text', value: 'Text 1' },
-        { type: 'photo', value: 'Photo 1' },
-      ],
-    };
+    return await this.courseService.getAllCourses();
   }
 
   @Mutation(() => Course)

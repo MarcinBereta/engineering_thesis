@@ -22,22 +22,21 @@ export class CoursesService {
         name: course.name,
       },
     });
+    console.log(course);
     const courseItemsToAdd = [];
     for (let i = 0; i < course.text.length; i++) {
       const src = course.text[i];
       if (src.type == 'photo') {
-        const fileName = join(`public/${newCourse.id}`, `image-${i}.png`);
+        console.log(src);
+        const fileName = join(
+          `public/${newCourse.id}`,
+          `image-${i}.${course.text[i].value == 'jpg' ? 'jpeg' : course.text[i].value}`,
+        );
 
         courseItemsToAdd.push({
           type: 'photo',
           value: fileName,
         });
-
-        // if (!checkIfFileOrDirectoryExists(`public/${newCourse.id}`)) {
-        //   mkdirSync(`public/${newCourse.id}`);
-        // }
-        // const writeToFile = promisify(writeFile);
-        // console.log(src.value);
       } else {
         courseItemsToAdd.push({
           type: 'text',
@@ -47,7 +46,7 @@ export class CoursesService {
     }
 
     for (let courseItem of courseItemsToAdd) {
-      await this.prismaService.courseItem.create({
+      const course = await this.prismaService.courseItem.create({
         data: {
           type: courseItem.type,
           value: courseItem.value,
@@ -58,11 +57,30 @@ export class CoursesService {
           },
         },
       });
+      if (course.type == 'photo') {
+        await this.prismaService.courseItem.update({
+          where: {
+            id: course.id,
+          },
+          data: {
+            value:
+              'files/courses/' + course.id + '.' + course.value.split('.')[1],
+          },
+        });
+      }
     }
     return await this.prismaService.course.findUnique({
       where: {
         id: newCourse.id,
       },
+      include: {
+        text: true,
+      },
+    });
+  }
+
+  async getAllCourses() {
+    return await this.prismaService.course.findMany({
       include: {
         text: true,
       },
