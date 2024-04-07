@@ -5,6 +5,7 @@ import {
 } from 'react-native-draggable-flatlist';
 import {CourseItem} from './CourseForm';
 import {TextInput} from 'react-native-gesture-handler';
+import constants from '../../../../constants';
 
 export type RenderItemType = RenderItemParams<CourseItem> & {
   handleChange: (index: string, value: string) => void;
@@ -35,7 +36,11 @@ export const DragItem = ({
           <Image
             style={{width: '80%', height: 300}}
             resizeMethod="resize"
-            source={{uri: item.value}}
+            source={{
+              uri: (item.value as string).includes('files/courses/')
+                ? constants.url + '/' + item.value
+                : item.value,
+            }}
           />
         )}
         <TouchableOpacity

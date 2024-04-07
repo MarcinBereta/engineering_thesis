@@ -44,6 +44,8 @@ export class AuthService {
         email: newUser.email,
         username: newUser.username,
         image: newUser.image == null ? '' : newUser.image,
+        verified: newUser.verified,
+        role: newUser.role,
       },
       access_token: access_token,
     };
@@ -82,6 +84,8 @@ export class AuthService {
           email: userInDb.email,
           username: userInDb.username,
           image: userInDb.image == null ? '' : userInDb.image,
+          verified: userInDb.verified,
+          role: userInDb.role,
         },
         access_token: access_token,
       };
@@ -107,6 +111,8 @@ export class AuthService {
         email: newUser.email,
         username: newUser.username,
         image: newUser.image == null ? '' : newUser.image,
+        verified: newUser.verified,
+        role: newUser.role,
       },
       access_token: access_token,
     };
@@ -133,6 +139,8 @@ export class AuthService {
         email: newUser.email,
         username: newUser.username,
         image: newUser.image == null ? '' : newUser.image,
+        verified: newUser.verified,
+        role: newUser.role,
       },
       access_token: access_token,
     };
@@ -144,5 +152,9 @@ export class AuthService {
       return user;
     }
     throw new UnauthorizedException();
+  }
+
+  async getUserById(id: string): Promise<User> {
+    return await this.UserService.getUserById(id);
   }
 }

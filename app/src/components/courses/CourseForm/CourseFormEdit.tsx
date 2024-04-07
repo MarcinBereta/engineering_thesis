@@ -1,10 +1,10 @@
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {Button, FlatList, Text, View} from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import {DragItem} from './CourseDragItem';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
-import {Course, newCourse, addPhotos} from '../../../services/courses/courses';
+import {Course, courseEdit, addPhotos} from '../../../services/courses/courses';
 import {AuthContext} from '../../../contexts/AuthContext';
 import DocumentPicker from 'react-native-document-picker';
 import {fontPixel} from '../../../utils/Normalize';
@@ -19,11 +19,15 @@ const generateRandomId = () => {
   return Math.random().toString(36).substring(7);
 };
 
-export const CourseForm = (props: any) => {
+export const CourseEditForm = ({route, navigation}: any) => {
+  const {course} = route.params;
+
   const {userInfo} = useContext(AuthContext);
-  const [dragData, setData] = useState<CourseItem[]>([]);
-  const [courseName, setCourseName] = useState<string>('');
+  const [dragData, setData] = useState<CourseItem[]>(course.text);
+  const [courseName, setCourseName] = useState<string>(course.name);
   const [items, setItems] = useState<File[]>([]);
+
+  useEffect(() => {}, []);
 
   const updateItemValue = (index: string, value: string) => {
     const newData = dragData.map(item => {
@@ -78,13 +82,17 @@ export const CourseForm = (props: any) => {
         return {
           id: item.id,
           type: item.type,
-          value: item.imageType || '',
+          value: (item.value as string).includes('files/courses/')
+            ? item.value
+            : item.imageType || '',
         };
       }
     });
+    console.log(data);
     return {
       name: courseName,
       text: data,
+      id: course.id,
     };
   };
 
@@ -113,13 +121,17 @@ export const CourseForm = (props: any) => {
     }
     const res: any = await addPhotos(newPhotos, course.id);
     if (res.status == 201) {
-      props.navigation.push('CoursesList');
+      navigation.push('CoursesList');
     }
   };
 
   const uploadCourse = async () => {
-    const {data: addCourse} = await newCourse(parseData(), userInfo?.token);
-    uploadPhotos(addCourse.addCourse);
+    const {data: editCourse}: any = await courseEdit(
+      parseData(),
+      userInfo?.token,
+    );
+    // console.log(editCourse);
+    uploadPhotos(editCourse.editCourse);
   };
 
   return (
@@ -129,7 +141,7 @@ export const CourseForm = (props: any) => {
           fontSize: fontPixel(30),
           textAlign: 'center',
         }}>
-        Create a new Course
+        Edit a Course
       </Text>
       <Text style={{textAlign: 'center', color: 'gray'}}>
         All the texts will be full size once created, you can drag and drop all
@@ -194,7 +206,7 @@ export const CourseForm = (props: any) => {
         onPress={() => {
           uploadCourse();
         }}
-        title="Create Course"
+        title="Edit Course"
       />
     </ScrollView>
   );

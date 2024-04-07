@@ -18,17 +18,22 @@ model User{
   id        String @id @default(uuid())
   email     String @unique
   username  String @unique
+  verified  Boolean @default(false)
+  role      Role @default(USER)
   image     String?
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  courses   Course[]
 }
 
 model Course{
   id        String @id @default(uuid())
-  name     String
+  name      String
+  creatorId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  creator   User @relation(fields: [creatorId], references: [id])
   text CourseItem[]
 }
 
@@ -45,4 +50,9 @@ model CourseItem{
 enum CourseItemType {
   photo
   text
+}
+
+enum Role {
+  ADMIN
+  USER
 }

@@ -4,7 +4,6 @@ import {CourseListItem} from './CourseListItem';
 import {fontPixel} from '../../../utils/Normalize';
 
 const Course = ({route, navigation}: any) => {
-  console.log(route.params);
   const {course} = route.params;
   return (
     <View>

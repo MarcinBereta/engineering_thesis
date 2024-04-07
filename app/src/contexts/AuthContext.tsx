@@ -1,7 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import React, {useContext, useState} from 'react';
-import {registerUser, loginUser, googleLogin} from '../services/auth/auth';
+import {
+  registerUser,
+  loginUser,
+  googleLogin,
+  refreshUser,
+} from '../services/auth/auth';
 interface AuthContext {
   isLoading: boolean;
   userInfo: any;
@@ -23,21 +28,18 @@ interface AuthContext {
 
 export const AuthContext = React.createContext<AuthContext>({} as any);
 
-interface UserInfo {
+export type UserInfo = {
   username: string;
   email: string;
   id: string;
   token: string;
   image: string | null;
-}
+  role: string;
+  verified: boolean;
+};
 export type signInResponse = {
   access_token: string;
-  user: {
-    username: string;
-    email: string;
-    id: string;
-    image: string | null;
-  };
+  user: UserInfo;
 };
 
 export const AuthProvider = ({
@@ -78,6 +80,8 @@ export const AuthProvider = ({
               id: data.signup.user.id,
               token: data.signup.access_token,
               image: data.signup.user.image,
+              role: data.signup.user.role,
+              verified: data.signup.user.verified,
             };
             await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
             setUserInfo(userInfo);
@@ -121,6 +125,8 @@ export const AuthProvider = ({
               id: data.signin.user.id,
               token: data.signin.access_token,
               image: data.signin.user.image,
+              role: data.signin.user.role,
+              verified: data.signin.user.verified,
             };
             await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
             setUserInfo(userInfo);
@@ -157,6 +163,8 @@ export const AuthProvider = ({
               id: data.providerLogin.user.id,
               token: data.providerLogin.access_token,
               image: data.providerLogin.user.image,
+              role: data.providerLogin.user.role,
+              verified: data.providerLogin.user.verified,
             };
             await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
             setUserInfo(userInfo);
@@ -266,11 +274,22 @@ export const AuthProvider = ({
   const isLoggedIn = async () => {
     try {
       setSplashLoading(true);
-
       let userInfo = await AsyncStorage.getItem('userInfo');
       const parsedUserInfo = JSON.parse(userInfo as string) as UserInfo;
+
       if (userInfo != null && userInfo != undefined) {
-        setUserInfo(parsedUserInfo);
+        const refreshedData: any = await refreshUser(parsedUserInfo.token);
+        const user = {
+          ...refreshedData.data.refreshUserData,
+          image:
+            refreshedData.data.refreshUserData.image == ''
+              ? null
+              : refreshedData.data.refreshUserData.image,
+          token: parsedUserInfo.token,
+        };
+
+        await AsyncStorage.setItem('userInfo', JSON.stringify(user));
+        setUserInfo(user);
       }
 
       setSplashLoading(false);

@@ -20,7 +20,6 @@ const storage = diskStorage({
   filename: (req, file, cb) => {
     const name = file.originalname.split('.')[0];
     const extension = extname(file.originalname);
-    console.log(name, extension);
 
     cb(null, `${name}${extension}`);
   },

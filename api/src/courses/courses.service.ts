@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Course, CourseInput } from './dto/CourseDTO';
+import { Course, CourseInput, EditCourseInput } from './dto/CourseDTO';
 import path, { extname, join } from 'path';
 import {
   writeFileSync,
@@ -16,27 +16,29 @@ import { promisify } from 'util';
 export class CoursesService {
   constructor(private prismaService: PrismaService) {}
 
-  async addCourse(course: CourseInput, user: simpleUser) {
-    const newCourse = await this.prismaService.course.create({
-      data: {
-        name: course.name,
-      },
-    });
-    console.log(course);
+  async processCourse(course: EditCourseInput | CourseInput, id: string) {
     const courseItemsToAdd = [];
     for (let i = 0; i < course.text.length; i++) {
       const src = course.text[i];
       if (src.type == 'photo') {
-        console.log(src);
-        const fileName = join(
-          `public/${newCourse.id}`,
-          `image-${i}.${course.text[i].value == 'jpg' ? 'jpeg' : course.text[i].value}`,
-        );
+        if (src.value.includes('files/courses/')) {
+          console.log('HEREREEEEEEEEE !!!');
+          courseItemsToAdd.push({
+            type: 'photo',
+            value: src.value,
+            id: src.id,
+          });
+        } else {
+          const fileName = join(
+            `public/${id}`,
+            `image-${i}.${course.text[i].value == 'jpg' ? 'jpeg' : course.text[i].value}`,
+          );
 
-        courseItemsToAdd.push({
-          type: 'photo',
-          value: fileName,
-        });
+          courseItemsToAdd.push({
+            type: 'photo',
+            value: fileName,
+          });
+        }
       } else {
         courseItemsToAdd.push({
           type: 'text',
@@ -46,29 +48,65 @@ export class CoursesService {
     }
 
     for (let courseItem of courseItemsToAdd) {
-      const course = await this.prismaService.courseItem.create({
-        data: {
-          type: courseItem.type,
-          value: courseItem.value,
-          course: {
-            connect: {
-              id: newCourse.id,
+      if (
+        courseItem.type == 'photo' &&
+        courseItem.value.includes('files/courses/')
+      ) {
+        await this.prismaService.courseItem.create({
+          data: {
+            type: courseItem.type,
+            value: courseItem.value,
+            id: courseItem.id,
+            course: {
+              connect: {
+                id: id,
+              },
             },
           },
-        },
-      });
-      if (course.type == 'photo') {
-        await this.prismaService.courseItem.update({
-          where: {
-            id: course.id,
-          },
+        });
+      } else {
+        const addedCourseItem = await this.prismaService.courseItem.create({
           data: {
-            value:
-              'files/courses/' + course.id + '.' + course.value.split('.')[1],
+            type: courseItem.type,
+            value: courseItem.value,
+            course: {
+              connect: {
+                id: id,
+              },
+            },
           },
         });
+        if (addedCourseItem.type == 'photo') {
+          await this.prismaService.courseItem.update({
+            where: {
+              id: addedCourseItem.id,
+            },
+            data: {
+              value:
+                'files/courses/' +
+                addedCourseItem.id +
+                '.' +
+                addedCourseItem.value.split('.')[1],
+            },
+          });
+        }
       }
     }
+  }
+
+  async addCourse(course: CourseInput, user: simpleUser) {
+    if (!user.verified) {
+      throw new Error('User is not verified');
+    }
+    const newCourse = await this.prismaService.course.create({
+      data: {
+        name: course.name,
+        creatorId: user.id,
+      },
+    });
+
+    await this.processCourse(course, newCourse.id);
+
     return await this.prismaService.course.findUnique({
       where: {
         id: newCourse.id,
@@ -79,8 +117,59 @@ export class CoursesService {
     });
   }
 
+  async editCourse(course: EditCourseInput, user: simpleUser) {
+    if (!user.verified) {
+      throw new Error('User is not verified');
+    }
+    const courseToEdit = await this.prismaService.course.findUnique({
+      where: {
+        id: course.id,
+      },
+    });
+
+    if (courseToEdit.creatorId !== user.id) {
+      throw new Error('User is not the creator of the course');
+    }
+
+    await this.prismaService.course.update({
+      where: {
+        id: course.id,
+      },
+      data: {
+        name: course.name,
+      },
+    });
+
+    await this.prismaService.courseItem.deleteMany({
+      where: {
+        courseId: course.id,
+      },
+    });
+    await this.processCourse(course, course.id);
+
+    return await this.prismaService.course.findUnique({
+      where: {
+        id: course.id,
+      },
+      include: {
+        text: true,
+      },
+    });
+  }
+
   async getAllCourses() {
     return await this.prismaService.course.findMany({
+      include: {
+        text: true,
+      },
+    });
+  }
+
+  async getMyCourses(id: string) {
+    return await this.prismaService.course.findMany({
+      where: {
+        creatorId: id,
+      },
       include: {
         text: true,
       },

@@ -29,6 +29,16 @@ export class CourseInput {
 }
 
 @InputType()
+export class EditCourseInput {
+  @Field()
+  name: string;
+  @Field((type) => [CourseItemInput])
+  text: CourseItemInput[];
+  @Field()
+  id: string;
+}
+
+@InputType()
 export class CourseItemInput {
   @Field()
   id: string;

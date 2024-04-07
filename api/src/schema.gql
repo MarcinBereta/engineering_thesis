@@ -9,6 +9,9 @@ type User {
   password: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  role: String!
+  verified: Boolean!
+  image: String
 }
 
 """
@@ -21,6 +24,8 @@ type simpleUser {
   email: String!
   username: String!
   image: String!
+  verified: Boolean!
+  role: String!
 }
 
 type SignupResponse {
@@ -49,14 +54,18 @@ type Query {
   users: [User!]!
   getUser(name: String!): User!
   getAllUsers: [User!]!
+  refreshUserData: User!
   course: [Course!]!
+  MyCourses: [Course!]!
 }
 
 type Mutation {
   signup(registerUserInput: SingUpUserInput!): SignupResponse!
   providerLogin(providerUserInput: ProviderInput!): SigninResponse!
   signin(loginUserInput: SigninUserInput!): SigninResponse!
+  updateUser(UserEdit: UserEdit!): User!
   addCourse(newCourse: CourseInput!): Course!
+  editCourse(editCourse: EditCourseInput!): Course!
 }
 
 input SingUpUserInput {
@@ -76,6 +85,12 @@ input SigninUserInput {
   password: String!
 }
 
+input UserEdit {
+  id: String!
+  role: String!
+  verified: Boolean!
+}
+
 input CourseInput {
   name: String!
   text: [CourseItemInput!]!
@@ -85,4 +100,10 @@ input CourseItemInput {
   id: String!
   type: String!
   value: String!
+}
+
+input EditCourseInput {
+  name: String!
+  text: [CourseItemInput!]!
+  id: String!
 }

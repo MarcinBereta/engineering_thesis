@@ -9,6 +9,12 @@ import {useContext} from 'react';
 import {AuthContext} from '../contexts/AuthContext';
 import {CourseForm} from '../components/courses/CourseForm/CourseForm';
 import Course from '../components/courses/course/CourseItem';
+import {CoursesList} from './CoursesList';
+import {MyCourses} from './MyCourses';
+import {CourseEditForm} from '../components/courses/CourseForm/CourseFormEdit';
+import {UserList} from './UserList';
+import {AdminPanel} from './AdminPanel';
+import {User} from './User';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
@@ -26,8 +32,14 @@ const Navigator = ({socket}: {socket: Socket}) => {
         ) : userInfo != null ? (
           <>
             <Stack.Screen component={DashboardScreen} name="DashboardScreen" />
+            <Stack.Screen component={CoursesList} name="CoursesList" />
+            <Stack.Screen component={MyCourses} name="MyCourses" />
+            <Stack.Screen component={CourseEditForm} name="EditCourse" />
             <Stack.Screen component={CourseForm} name="createCourse" />
             <Stack.Screen component={Course} name="course" />
+            <Stack.Screen component={User} name="User" />
+            <Stack.Screen component={UserList} name="UserList" />
+            <Stack.Screen component={AdminPanel} name="AdminPanel" />
           </>
         ) : (
           <>

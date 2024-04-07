@@ -1,4 +1,4 @@
-import {signInResponse} from '../../contexts/AuthContext';
+import {UserInfo, signInResponse} from '../../contexts/AuthContext';
 import {apiCall, apiCallNoToken} from '../graphqlHandler';
 
 const registerUser = (data: {
@@ -18,6 +18,8 @@ const registerUser = (data: {
             email
             username
             image
+            role 
+            verified
           }
             access_token
         }
@@ -43,6 +45,8 @@ const loginUser = (data: {
 				email
 				username
         image
+        role 
+        verified
 			}
 				access_token
 		}
@@ -69,6 +73,8 @@ const googleLogin = (data: {
                 email
                 username
                 image
+                role 
+                verified
             }
                 access_token
         }
@@ -76,6 +82,29 @@ const googleLogin = (data: {
     `;
   //@ts-ignore
   return apiCallNoToken(call, {loginInput: data});
+};
+
+export const refreshUser = (
+  token: string,
+): Promise<{
+  data: {
+    user: UserInfo;
+  };
+}> => {
+  const call = `
+      query getUserData{
+      refreshUserData{
+        id
+        email
+        username
+        role
+        verified
+        image
+      }
+    }
+  `;
+  //@ts-ignore
+  return apiCall(call, {}, token);
 };
 
 export {registerUser, loginUser, googleLogin};
