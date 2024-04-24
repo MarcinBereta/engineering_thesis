@@ -40,6 +40,14 @@ const DashboardScreen = (props: any) => {
           }}
         />
       ) : null}
+      {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
+        <Button
+          title="Verify courses"
+          onPress={() => {
+            props.navigation.push('UnVerifiedCourses');
+          }}
+        />
+      ) : null}
       {userInfo?.role == 'ADMIN' ? (
         <Button
           title="Go to admin"

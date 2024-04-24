@@ -13,38 +13,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User{
-  id        String @id @default(uuid())
-  email     String @unique
-  username  String @unique
-  verified  Boolean @default(false)
-  role      Role @default(USER)
+model User {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  username  String       @unique
+  verified  Boolean      @default(false)
+  role      Role         @default(USER)
   image     String?
   password  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   courses   Course[]
+  scores    UserScores[]
+  Friends   Friends[]
 }
 
-model Course{
-  id        String @id @default(uuid())
+model Course {
+  id        String       @id @default(uuid())
   name      String
   creatorId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  creator   User @relation(fields: [creatorId], references: [id])
-  text CourseItem[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  verified  Boolean @default(false)
+  creator   User         @relation(fields: [creatorId], references: [id])
+  text      CourseItem[]
+  Quiz      Quiz[]
 }
 
-model CourseItem{
-  id        String @id @default(uuid())
-  courseId String 
-  type CourseItemType
-  value String
-  course    Course @relation(fields: [courseId], references: [id])
+model CourseItem {
+  id        String         @id @default(uuid())
+  courseId  String
+  type      CourseItemType
+  value     String
+  course    Course         @relation(fields: [courseId], references: [id])
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model Quiz {
+  id         String       @id @default(uuid())
+  courseId   String
+  questions  Question[]
+  UserScores UserScores[]
+  course     Course       @relation(fields: [courseId], references: [id])
+}
+
+model Question {
+  id       String   @id @default(uuid())
+  quizId   String
+  question String
+  answers  String[]
+  correct  String
+
+  Quiz Quiz @relation(fields: [quizId], references: [id])
+}
+
+model UserScores {
+  id        String   @id @default(uuid())
+  userId    String
+  quizId    String
+  score     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
+  Quiz      Quiz     @relation(fields: [quizId], references: [id])
+}
+
+model Friends {
+  id        String   @id @default(uuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 enum CourseItemType {
@@ -54,5 +95,6 @@ enum CourseItemType {
 
 enum Role {
   ADMIN
+  MODERATOR
   USER
 }

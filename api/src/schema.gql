@@ -56,6 +56,7 @@ type Query {
   getAllUsers: [User!]!
   refreshUserData: User!
   course: [Course!]!
+  unVerifiedCourses: [Course!]!
   MyCourses: [Course!]!
 }
 
@@ -66,6 +67,7 @@ type Mutation {
   updateUser(UserEdit: UserEdit!): User!
   addCourse(newCourse: CourseInput!): Course!
   editCourse(editCourse: EditCourseInput!): Course!
+  verifyCourse(verifyCourse: VerifyCourseDto!): Course!
 }
 
 input SingUpUserInput {
@@ -106,4 +108,8 @@ input EditCourseInput {
   name: String!
   text: [CourseItemInput!]!
   id: String!
+}
+
+input VerifyCourseDto {
+  courseId: String!
 }

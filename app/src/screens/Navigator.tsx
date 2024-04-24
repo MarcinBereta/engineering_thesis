@@ -15,6 +15,7 @@ import {CourseEditForm} from '../components/courses/CourseForm/CourseFormEdit';
 import {UserList} from './UserList';
 import {AdminPanel} from './AdminPanel';
 import {User} from './User';
+import {UnVerifiedCoursesList} from './UnVerifiedCoursesList';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,10 @@ const Navigator = ({socket}: {socket: Socket}) => {
           <>
             <Stack.Screen component={DashboardScreen} name="DashboardScreen" />
             <Stack.Screen component={CoursesList} name="CoursesList" />
+            <Stack.Screen
+              component={UnVerifiedCoursesList}
+              name="UnVerifiedCourses"
+            />
             <Stack.Screen component={MyCourses} name="MyCourses" />
             <Stack.Screen component={CourseEditForm} name="EditCourse" />
             <Stack.Screen component={CourseForm} name="createCourse" />

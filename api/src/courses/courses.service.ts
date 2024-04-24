@@ -22,7 +22,6 @@ export class CoursesService {
       const src = course.text[i];
       if (src.type == 'photo') {
         if (src.value.includes('files/courses/')) {
-          console.log('HEREREEEEEEEEE !!!');
           courseItemsToAdd.push({
             type: 'photo',
             value: src.value,
@@ -162,6 +161,9 @@ export class CoursesService {
       include: {
         text: true,
       },
+      where: {
+        verified: true,
+      },
     });
   }
 
@@ -172,6 +174,29 @@ export class CoursesService {
       },
       include: {
         text: true,
+      },
+    });
+  }
+
+  async getUnVerifiedCourses() {
+    return await this.prismaService.course.findMany({
+      where: {
+        verified: false,
+      },
+      include: {
+        text: true,
+      },
+    });
+  }
+
+  async verifyCourse(courseId: string) {
+    console.log(courseId);
+    return await this.prismaService.course.update({
+      where: {
+        id: courseId,
+      },
+      data: {
+        verified: true,
       },
     });
   }

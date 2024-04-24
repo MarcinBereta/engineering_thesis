@@ -47,3 +47,9 @@ export class CourseItemInput {
   @Field()
   value: string;
 }
+
+@InputType()
+export class VerifyCourseDto {
+  @Field()
+  courseId: string;
+}

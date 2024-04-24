@@ -49,6 +49,33 @@ export const newCourse = async (
   return apiCall(call, {CourseInput: data}, token);
 };
 
+export const verifyCourse = async (
+  data: {
+    courseId: string;
+  },
+  token: string,
+): Promise<{
+  data: {
+    verifyCourse: Course;
+  };
+}> => {
+  const call = `
+        mutation verifyCourse($verifyCourse:VerifyCourseDto!){
+            verifyCourse(verifyCourse:$verifyCourse){
+                id
+                name
+                text{
+                id
+                type
+                value
+                }
+            }
+        }
+    `;
+  //@ts-ignore
+  return apiCall(call, {verifyCourse: data}, token);
+};
+
 export const courseEdit = async (
   data: CourseInput,
   token: string,
@@ -57,7 +84,6 @@ export const courseEdit = async (
     editCourse: Course;
   };
 }> => {
-  console.log(data);
   const call = `
         mutation EditCourse($EditCourseInput:EditCourseInput!){
             editCourse(editCourse:$EditCourseInput){
@@ -81,10 +107,34 @@ export const getCourses = (
     course: course[];
   };
 }> => {
-  console.log(token);
   const call = `
   query getCourses{
   course{
+    name
+    text{
+      id
+      type
+      value
+    }
+  }
+}
+  `;
+  //@ts-ignore
+  return apiCall(call, {}, token);
+};
+
+export const getUnVerifiedCourses = (
+  token: string,
+): Promise<{
+  data: {
+    unVerifiedCourses: course[];
+  };
+}> => {
+  console.log(token);
+  const call = `
+  query getCourses{
+  unVerifiedCourses{
+    id
     name
     text{
       id

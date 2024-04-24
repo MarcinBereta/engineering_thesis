@@ -1,9 +1,7 @@
 import {View, Text, Button, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
 import {useContext, useEffect, useState} from 'react';
-import {fontPixel} from '../utils/Normalize';
-import {CourseForm} from '../components/courses/CourseForm/CourseForm';
-import {getCourses} from '../services/courses/courses';
+import {getUnVerifiedCourses, verifyCourse} from '../services/courses/courses';
 import {FlatList} from 'react-native-gesture-handler';
 
 export type courseItem = {
@@ -16,7 +14,7 @@ export type course = {
   name: string;
   text: courseItem[];
 };
-const CoursesList = (props: any) => {
+const UnVerifiedCoursesList = (props: any) => {
   const {userInfo} = useContext(AuthContext);
   const [courses, setCourses] = useState<course[]>([]);
   const getCoursesAsync = async () => {
@@ -24,10 +22,10 @@ const CoursesList = (props: any) => {
       data,
     }: {
       data: {
-        course: course[];
+        unVerifiedCourses: course[];
       };
-    } = await getCourses(userInfo?.token);
-    setCourses(data.course);
+    } = await getUnVerifiedCourses(userInfo?.token);
+    setCourses(data.unVerifiedCourses);
   };
 
   useEffect(() => {
@@ -36,6 +34,15 @@ const CoursesList = (props: any) => {
       console.log('DashboardScreen unmounted');
     };
   }, []);
+
+  const handleVerify = async (courseId: string) => {
+    const {
+      data,
+    }: {
+      data: {verifyCourse: course};
+    } = await verifyCourse({courseId: courseId}, userInfo?.token);
+    if (data.verifyCourse) props.navigation.push('CoursesList');
+  };
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
@@ -56,6 +63,13 @@ const CoursesList = (props: any) => {
                 props.navigation.push('course', {course: item});
               }}>
               <Text>{item.name}</Text>
+              <Button
+                onPress={() => {
+                  console.log(item);
+                  handleVerify(item?.id || '');
+                }}
+                title="Verify"
+              />
             </TouchableOpacity>
           </View>
         )}
@@ -73,4 +87,4 @@ const CoursesList = (props: any) => {
   );
 };
 
-export {CoursesList};
+export {UnVerifiedCoursesList};

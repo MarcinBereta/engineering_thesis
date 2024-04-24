@@ -1,11 +1,8 @@
-import {View, Text, Button, TouchableOpacity} from 'react-native';
+import {View, Text, Button} from 'react-native';
 import {AuthContext, UserInfo} from '../contexts/AuthContext';
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useState} from 'react';
 import {fontPixel} from '../utils/Normalize';
-import {CourseForm} from '../components/courses/CourseForm/CourseForm';
-import {getCourses} from '../services/courses/courses';
-import {FlatList} from 'react-native-gesture-handler';
-import {getUsers, updateUserData} from '../services/admin/admin';
+import {updateUserData} from '../services/admin/admin';
 import RNPickerSelect from 'react-native-picker-select';
 
 const User = ({route, navigation}: any) => {
@@ -50,6 +47,8 @@ const User = ({route, navigation}: any) => {
         }}
         items={[
           {label: 'ADMIN', value: 'ADMIN'},
+          {label: 'MODERATOR', value: 'MODERATOR'},
+
           {label: 'USER', value: 'USER'},
         ]}
         value={userData.role}
