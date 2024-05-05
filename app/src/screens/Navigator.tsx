@@ -16,6 +16,9 @@ import {UserList} from './UserList';
 import {AdminPanel} from './AdminPanel';
 import {User} from './User';
 import {UnVerifiedCoursesList} from './UnVerifiedCoursesList';
+import { QuizesList } from '../components/quiz/QuizList';
+import QuizMain from '../components/quiz/QuizMain';
+import QuizSocket from '../components/quiz/QuizSocket';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +37,8 @@ const Navigator = ({socket}: {socket: Socket}) => {
           <>
             <Stack.Screen component={DashboardScreen} name="DashboardScreen" />
             <Stack.Screen component={CoursesList} name="CoursesList" />
+            <Stack.Screen component={QuizesList} name="QuizesList" />
+
             <Stack.Screen
               component={UnVerifiedCoursesList}
               name="UnVerifiedCourses"
@@ -42,6 +47,10 @@ const Navigator = ({socket}: {socket: Socket}) => {
             <Stack.Screen component={CourseEditForm} name="EditCourse" />
             <Stack.Screen component={CourseForm} name="createCourse" />
             <Stack.Screen component={Course} name="course" />
+            <Stack.Screen component={QuizMain} name="quiz" />
+            <Stack.Screen component={QuizSocket} name="QuizSearch" />
+
+
             <Stack.Screen component={User} name="User" />
             <Stack.Screen component={UserList} name="UserList" />
             <Stack.Screen component={AdminPanel} name="AdminPanel" />

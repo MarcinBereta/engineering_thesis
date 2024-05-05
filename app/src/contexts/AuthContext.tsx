@@ -7,11 +7,15 @@ import {
   googleLogin,
   refreshUser,
 } from '../services/auth/auth';
+import { Socket, io } from "socket.io-client";
+import constants from '../../constants';
+
 interface AuthContext {
   isLoading: boolean;
   userInfo: any;
   splashLoading: boolean;
   error: string;
+  socket: null | Socket;
   register: (
     provider: 'credentials' | 'google' | 'facebook',
     username: string,
@@ -51,7 +55,7 @@ export const AuthProvider = ({
   const [isLoading, setIsLoading] = useState(false);
   const [splashLoading, setSplashLoading] = useState(true);
   const [error, setError] = useState('');
-
+  const [socket, setSocket] = useState<null|Socket>(null);
   const register = async (
     provider: 'credentials' | 'google' | 'facebook' | 'apple',
     username: string,
@@ -83,6 +87,12 @@ export const AuthProvider = ({
               role: data.signup.user.role,
               verified: data.signup.user.verified,
             };
+            const socket = io(constants.url, {
+              auth: {
+                token: 'Bearer '+userInfo.token,
+              },
+            });
+            setSocket(socket);
             await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
             setUserInfo(userInfo);
           }
@@ -128,6 +138,12 @@ export const AuthProvider = ({
               role: data.signin.user.role,
               verified: data.signin.user.verified,
             };
+            const socket = io(constants.url, {
+              auth: {
+                token: 'Bearer '+userInfo.token,
+              },
+            });
+            setSocket(socket);
             await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
             setUserInfo(userInfo);
           }
@@ -166,6 +182,12 @@ export const AuthProvider = ({
               role: data.providerLogin.user.role,
               verified: data.providerLogin.user.verified,
             };
+            const socket = io(constants.url, {
+              auth: {
+                token: 'Bearer '+userInfo.token,
+              },
+            });
+            setSocket(socket);
             await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
             setUserInfo(userInfo);
           }
@@ -174,86 +196,7 @@ export const AuthProvider = ({
           console.error(err);
         }
         break;
-      // case 'facebook':
-      //     try {
-      //         LoginManager.logInWithPermissions(['email']).then(
-      //             (result: any) => {
-      //                 if (!result.isCancelled) {
-      //                     AccessToken.getCurrentAccessToken().then(
-      //                         (data: any) => {
-      //                             const { accessToken } = data
-      //                             fetch(
-      //                                 'https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=' +
-      //                                     accessToken
-      //                             )
-      //                                 .then((response) => response.json())
-      //                                 .then(async (json) => {
-      //                                     let result2: any =
-      //                                         await facebookLogin({
-      //                                             email: json.email,
-      //                                         })
-      //                                     if (result2.status == 'OK') {
-      //                                         await AsyncStorage.setItem(
-      //                                             '@facebookToken',
-      //                                             accessToken
-      //                                         )
-      //                                         await AsyncStorage.setItem(
-      //                                             '@token',
-      //                                             result2.data.token
-      //                                         )
-      //                                         setUserInfo(result2.data)
-      //                                     } else {
-      //                                         if (
-      //                                             result2.err ==
-      //                                             'NOT_FOUND'
-      //                                         ) {
-      //                                             setError(
-      //                                                 t('not_found_lg')
-      //                                             )
-      //                                         } else if (
-      //                                             result2.err ==
-      //                                             'INVALID_INPUT_TOO_LONG'
-      //                                         ) {
-      //                                             setError(
-      //                                                 t('too_long_mail')
-      //                                             )
-      //                                         } else if (
-      //                                             result2.err ==
-      //                                             'MAIL_INVALID'
-      //                                         ) {
-      //                                             setError(
-      //                                                 t('mail_invalid')
-      //                                             )
-      //                                         } else if (
-      //                                             result2.err ==
-      //                                             'INVALID_CREDENTIALS'
-      //                                         ) {
-      //                                             setError(
-      //                                                 t(
-      //                                                     'invalid_credentials'
-      //                                                 )
-      //                                             )
-      //                                         } else {
-      //                                             setError(
-      //                                                 t('strange_error')
-      //                                             )
-      //                                         }
-      //                                     }
-      //                                 })
-      //                         }
-      //                     )
-      //                 }
-      //             },
-      //             (error: string) => {
-      //                 setError('Fb_error2' + JSON.stringify(error))
-      //             }
-      //         )
-      //     } catch (err) {
-      //         console.error(err)
-      //     }
-      //     break
-      // case 'apple':
-      //     break
+      
     }
   };
 
@@ -263,10 +206,12 @@ export const AuthProvider = ({
     try {
       AsyncStorage.removeItem('userInfo');
       setUserInfo(null);
-
       setIsLoading(false);
+      setSocket(null);
+
     } catch (err) {
       setIsLoading(false);
+      setSocket(null);
       console.error('logout error: ', err);
     }
   };
@@ -287,7 +232,12 @@ export const AuthProvider = ({
               : refreshedData.data.refreshUserData.image,
           token: parsedUserInfo.token,
         };
-
+        const socket = io(constants.url, {
+          auth: {
+            token: 'Bearer '+user.token,
+          },
+        });
+        setSocket(socket);
         await AsyncStorage.setItem('userInfo', JSON.stringify(user));
         setUserInfo(user);
       }
@@ -321,6 +271,7 @@ export const AuthProvider = ({
         userInfo,
         splashLoading,
         error,
+        socket,
         register,
         login,
         logout,
