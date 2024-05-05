@@ -5,6 +5,11 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CurrentUser } from 'src/auth/get-current-user.decorator';
 import { UserEdit } from './edit-user-input';
+import {
+  VerificationForm,
+  VerificationFormData,
+  VerifyUser,
+} from './verification-form';
 
 @Resolver((of) => User)
 @UseGuards(JwtAuthGuard)
@@ -35,5 +40,33 @@ export class UsersResolver {
   @Query((returns) => User)
   async refreshUserData(@Context() context): Promise<User> {
     return this.UsersService.getUserById(context.req.user.id);
+  }
+
+  @Mutation((returns) => User)
+  async addVerificationForm(
+    @Args('VerificationForm') VerificationForm: VerificationForm,
+    @Context() context,
+  ): Promise<User> {
+    return this.UsersService.addVerificationForm(
+      VerificationForm.text,
+      context.req.user.id,
+    );
+  }
+
+  @Mutation((returns) => User)
+  async verifyUser(
+    @Args('VerifyUser') VerifyUser: VerifyUser,
+    @Context() context,
+  ): Promise<User> {
+    const user = context.req.user;
+    if (user.role != 'ADMIN' && user.role != 'MODERATOR') {
+      throw new Error('You are not allowed to verify users');
+    }
+    return this.UsersService.verifyUser(VerifyUser.requestId);
+  }
+
+  @Query((returns) => [VerificationFormData])
+  async getVerifyRequests(@Context() context): Promise<VerificationFormData[]> {
+    return this.UsersService.getVerificationForms();
   }
 }

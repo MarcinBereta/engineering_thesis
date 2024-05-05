@@ -16,6 +16,8 @@ import {UserList} from './UserList';
 import {AdminPanel} from './AdminPanel';
 import {User} from './User';
 import {UnVerifiedCoursesList} from './UnVerifiedCoursesList';
+import {VerifyAccount} from '../components/users/VerifyAccount';
+import {VerifyUsers} from '../components/users/VerifyUsers';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,9 @@ const Navigator = ({socket}: {socket: Socket}) => {
             <Stack.Screen component={User} name="User" />
             <Stack.Screen component={UserList} name="UserList" />
             <Stack.Screen component={AdminPanel} name="AdminPanel" />
+            <Stack.Screen component={VerifyUsers} name="VerifyUsers" />
+
+            <Stack.Screen component={VerifyAccount} name="VerifyAccount" />
           </>
         ) : (
           <>

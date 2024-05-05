@@ -8,6 +8,8 @@ import {Course, newCourse, addPhotos} from '../../../services/courses/courses';
 import {AuthContext} from '../../../contexts/AuthContext';
 import DocumentPicker from 'react-native-document-picker';
 import {fontPixel} from '../../../utils/Normalize';
+import RNPickerSelect from 'react-native-picker-select';
+
 export type CourseItem = {
   type: 'text' | 'photo';
   value: string;
@@ -24,7 +26,7 @@ export const CourseForm = (props: any) => {
   const [dragData, setData] = useState<CourseItem[]>([]);
   const [courseName, setCourseName] = useState<string>('');
   const [items, setItems] = useState<File[]>([]);
-
+  const [category, setCategory] = useState('');
   const updateItemValue = (index: string, value: string) => {
     const newData = dragData.map(item => {
       if (item.id === index) {
@@ -85,6 +87,7 @@ export const CourseForm = (props: any) => {
     return {
       name: courseName,
       text: data,
+      category: category,
     };
   };
 
@@ -142,6 +145,23 @@ export const CourseForm = (props: any) => {
         value={courseName}
         onChangeText={text => setCourseName(text)}
       />
+      <RNPickerSelect
+        onValueChange={value => {
+          setCategory(value);
+        }}
+        items={[
+          {label: 'MATH', value: 'MATH'},
+          {label: 'SCIENCE', value: 'SCIENCE'},
+          {label: 'HISTORY', value: 'HISTORY'},
+          {label: 'GEOGRAPHY', value: 'GEOGRAPHY'},
+          {label: 'ENGLISH', value: 'ENGLISH'},
+          {label: 'ART', value: 'ART'},
+          {label: 'MUSIC', value: 'MUSIC'},
+          {label: 'SPORTS', value: 'SPORTS'},
+          {label: 'OTHER', value: ''},
+        ]}
+        value={category}
+      />
       <DraggableFlatList
         data={dragData}
         keyExtractor={(item, index) => `item-${item.type} - ${index}`}
@@ -176,20 +196,7 @@ export const CourseForm = (props: any) => {
         }
         title="Add new text field"
       />
-      <Button
-        onPress={() =>
-          // setData([
-          //   ...dragData,
-          //   {
-          //     id: generateRandomId(),
-          //     type: 'photo',
-          //     value: 'New Photo',
-          //   },
-          // ])
-          uploadFile()
-        }
-        title="Add new photo"
-      />
+      <Button onPress={() => uploadFile()} title="Add new photo" />
       <Button
         onPress={() => {
           uploadCourse();

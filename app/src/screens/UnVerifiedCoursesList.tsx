@@ -41,7 +41,7 @@ const UnVerifiedCoursesList = (props: any) => {
     }: {
       data: {verifyCourse: course};
     } = await verifyCourse({courseId: courseId}, userInfo?.token);
-    if (data.verifyCourse) props.navigation.push('CoursesList');
+    props.navigation.push('CoursesList');
   };
 
   return (
@@ -57,6 +57,7 @@ const UnVerifiedCoursesList = (props: any) => {
               width: '90%',
               marginLeft: '5%',
               borderRadius: 20,
+              marginTop: 10,
             }}>
             <TouchableOpacity
               onPress={() => {

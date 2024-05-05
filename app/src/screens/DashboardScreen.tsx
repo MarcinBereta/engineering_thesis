@@ -39,12 +39,27 @@ const DashboardScreen = (props: any) => {
             props.navigation.push('createCourse');
           }}
         />
-      ) : null}
+      ) : (
+        <Button
+          title="Verify account"
+          onPress={() => {
+            props.navigation.push('VerifyAccount');
+          }}
+        />
+      )}
       {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
         <Button
           title="Verify courses"
           onPress={() => {
             props.navigation.push('UnVerifiedCourses');
+          }}
+        />
+      ) : null}
+      {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
+        <Button
+          title="Verify users"
+          onPress={() => {
+            props.navigation.push('VerifyUsers');
           }}
         />
       ) : null}

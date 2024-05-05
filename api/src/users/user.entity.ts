@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Role } from '@prisma/client';
+import { Category, Role } from '@prisma/client';
 
 @ObjectType()
 export class User {
@@ -21,4 +21,20 @@ export class User {
   verified: boolean;
   @Field({ nullable: true })
   image: string | null;
+  @Field((type) => [SimpleModerator])
+  Moderator?: SimpleModerator[];
+}
+
+@ObjectType()
+export class SimpleModerator {
+  @Field()
+  id: String;
+  @Field()
+  userId: String;
+  @Field()
+  createdAt: Date;
+  @Field()
+  updatedAt: Date;
+  @Field((type) => [String])
+  categories: String[];
 }

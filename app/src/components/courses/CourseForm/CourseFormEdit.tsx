@@ -8,6 +8,8 @@ import {Course, courseEdit, addPhotos} from '../../../services/courses/courses';
 import {AuthContext} from '../../../contexts/AuthContext';
 import DocumentPicker from 'react-native-document-picker';
 import {fontPixel} from '../../../utils/Normalize';
+import RNPickerSelect from 'react-native-picker-select';
+
 export type CourseItem = {
   type: 'text' | 'photo';
   value: string;
@@ -25,6 +27,8 @@ export const CourseEditForm = ({route, navigation}: any) => {
   const {userInfo} = useContext(AuthContext);
   const [dragData, setData] = useState<CourseItem[]>(course.text);
   const [courseName, setCourseName] = useState<string>(course.name);
+  const [category, setCategory] = useState(course.category);
+
   const [items, setItems] = useState<File[]>([]);
 
   useEffect(() => {}, []);
@@ -93,6 +97,7 @@ export const CourseEditForm = ({route, navigation}: any) => {
       name: courseName,
       text: data,
       id: course.id,
+      category: category,
     };
   };
 
@@ -153,6 +158,23 @@ export const CourseEditForm = ({route, navigation}: any) => {
         placeholder="Course Name"
         value={courseName}
         onChangeText={text => setCourseName(text)}
+      />
+      <RNPickerSelect
+        onValueChange={value => {
+          setCategory(value);
+        }}
+        items={[
+          {label: 'MATH', value: 'MATH'},
+          {label: 'SCIENCE', value: 'SCIENCE'},
+          {label: 'HISTORY', value: 'HISTORY'},
+          {label: 'GEOGRAPHY', value: 'GEOGRAPHY'},
+          {label: 'ENGLISH', value: 'ENGLISH'},
+          {label: 'ART', value: 'ART'},
+          {label: 'MUSIC', value: 'MUSIC'},
+          {label: 'SPORTS', value: 'SPORTS'},
+          {label: 'OTHER', value: ''},
+        ]}
+        value={category}
       />
       <DraggableFlatList
         data={dragData}

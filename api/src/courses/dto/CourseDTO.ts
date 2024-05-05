@@ -1,4 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Category } from '@prisma/client';
 
 @ObjectType()
 export class Course {
@@ -26,12 +27,16 @@ export class CourseInput {
   name: string;
   @Field((type) => [CourseItemInput])
   text: CourseItemInput[];
+  @Field()
+  category: Category;
 }
 
 @InputType()
 export class EditCourseInput {
   @Field()
   name: string;
+  @Field()
+  category: Category;
   @Field((type) => [CourseItemInput])
   text: CourseItemInput[];
   @Field()

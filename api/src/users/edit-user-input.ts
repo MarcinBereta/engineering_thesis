@@ -9,4 +9,6 @@ export class UserEdit {
   role: Role;
   @Field()
   verified: boolean;
+  @Field((type) => [String])
+  categories: string[];
 }

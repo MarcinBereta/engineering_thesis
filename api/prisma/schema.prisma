@@ -14,30 +14,35 @@ datasource db {
 }
 
 model User {
-  id        String       @id @default(uuid())
-  email     String       @unique
-  username  String       @unique
-  verified  Boolean      @default(false)
-  role      Role         @default(USER)
-  image     String?
-  password  String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  courses   Course[]
-  scores    UserScores[]
-  Friends   Friends[]
+  id               String             @id @default(uuid())
+  email            String             @unique
+  username         String             @unique
+  verified         Boolean            @default(false)
+  role             Role               @default(USER)
+  image            String?
+  password         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  courses          Course[]
+  scores           UserScores[]
+  Friends          Friends[]
+  VerificationForm VerificationForm[]
+  Moderator        Moderator[]
 }
 
 model Course {
-  id        String       @id @default(uuid())
-  name      String
-  creatorId String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  verified  Boolean @default(false)
-  creator   User         @relation(fields: [creatorId], references: [id])
-  text      CourseItem[]
-  Quiz      Quiz[]
+  id          String       @id @default(uuid())
+  name        String
+  creatorId   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  verified    Boolean      @default(false)
+  category    Category
+  creator     User         @relation(fields: [creatorId], references: [id])
+  text        CourseItem[]
+  Quiz        Quiz[]
+  moderator   Moderator    @relation(fields: [moderatorId], references: [id])
+  moderatorId String
 }
 
 model CourseItem {
@@ -88,6 +93,25 @@ model Friends {
   User      User     @relation(fields: [userId], references: [id])
 }
 
+model VerificationForm {
+  id        String   @id @default(uuid())
+  userId    String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+model Moderator {
+  id        String   @id @default(uuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  categories Category[]
+  User      User     @relation(fields: [userId], references: [id])
+  Course    Course[]
+}
+
 enum CourseItemType {
   photo
   text
@@ -97,4 +121,16 @@ enum Role {
   ADMIN
   MODERATOR
   USER
+}
+
+enum Category {
+  MATH
+  SCIENCE
+  HISTORY
+  GEOGRAPHY
+  ENGLISH
+  ART
+  MUSIC
+  SPORTS
+  OTHER
 }

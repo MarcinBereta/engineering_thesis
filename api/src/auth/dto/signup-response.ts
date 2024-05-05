@@ -8,8 +8,8 @@ export class simpleUser {
   email: string;
   @Field()
   username: string;
-  @Field()
-  image: string | null;
+  @Field({ nullable: true })
+  image: string;
   @Field()
   verified: boolean;
   @Field()
