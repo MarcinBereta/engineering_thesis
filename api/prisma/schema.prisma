@@ -34,7 +34,7 @@ model Course {
   creatorId String
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-  verified  Boolean @default(false)
+  verified  Boolean      @default(false)
   creator   User         @relation(fields: [creatorId], references: [id])
   text      CourseItem[]
   Quiz      Quiz[]
@@ -53,6 +53,7 @@ model CourseItem {
 model Quiz {
   id         String       @id @default(uuid())
   courseId   String
+  name       String
   questions  Question[]
   UserScores UserScores[]
   course     Course       @relation(fields: [courseId], references: [id])

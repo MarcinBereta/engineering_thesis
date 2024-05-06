@@ -14,12 +14,17 @@ import { ConfigModule } from '@nestjs/config';
 import { CoursesModule } from './courses/courses.module';
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { QuizModule } from './quiz/quiz.module';
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+       playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -30,6 +35,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     AuthModule,
     CoursesModule,
     FilesModule,
+    QuizModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, AuthResolver, AuthService],

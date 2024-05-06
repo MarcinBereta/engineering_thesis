@@ -7,7 +7,7 @@ import {getCourses} from '../services/courses/courses';
 import {FlatList} from 'react-native-gesture-handler';
 
 const DashboardScreen = (props: any) => {
-  const {logout, userInfo} = useContext(AuthContext);
+  const {logout, userInfo, socket} = useContext(AuthContext);
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
@@ -26,6 +26,12 @@ const DashboardScreen = (props: any) => {
           props.navigation.push('CoursesList');
         }}
       />
+       <Button
+        title="View quizes"
+        onPress={() => {
+          props.navigation.push('QuizesList');
+        }}
+      />
       <Button
         title="My courses"
         onPress={() => {
@@ -40,6 +46,10 @@ const DashboardScreen = (props: any) => {
           }}
         />
       ) : null}
+      <Button title="Socket test" onPress={() => {
+        if(socket != null )
+          socket.emit('joinQueue')}}
+         />
       {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
         <Button
           title="Verify courses"

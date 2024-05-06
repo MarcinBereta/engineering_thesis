@@ -50,6 +50,29 @@ type CourseItem {
   value: String!
 }
 
+type Quiz {
+  id: String!
+  courseId: String!
+  name: String!
+  questions: [Question!]!
+  UserScores: [UserScore!]!
+}
+
+type Question {
+  id: String!
+  quizId: String!
+  question: String!
+  answers: [String!]!
+  correct: String!
+}
+
+type UserScore {
+  userId: String!
+  quizId: String!
+  score: Float!
+  createdAt: DateTime!
+}
+
 type Query {
   users: [User!]!
   getUser(name: String!): User!
@@ -58,6 +81,8 @@ type Query {
   course: [Course!]!
   unVerifiedCourses: [Course!]!
   MyCourses: [Course!]!
+  getQuizById: Quiz!
+  getAllQuizzes: [Quiz!]!
 }
 
 type Mutation {
@@ -68,6 +93,7 @@ type Mutation {
   addCourse(newCourse: CourseInput!): Course!
   editCourse(editCourse: EditCourseInput!): Course!
   verifyCourse(verifyCourse: VerifyCourseDto!): Course!
+  addUserScore(addScore: AddScore!): Quiz!
 }
 
 input SingUpUserInput {
@@ -112,4 +138,10 @@ input EditCourseInput {
 
 input VerifyCourseDto {
   courseId: String!
+}
+
+input AddScore {
+  userId: String!
+  quizId: String!
+  score: Float!
 }
