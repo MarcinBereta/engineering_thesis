@@ -50,6 +50,7 @@ const CoursesList = (props: any) => {
               width: '90%',
               marginLeft: '5%',
               borderRadius: 20,
+              marginTop: 10,
             }}>
             <TouchableOpacity
               onPress={() => {

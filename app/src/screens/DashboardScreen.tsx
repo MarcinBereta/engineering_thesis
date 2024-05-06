@@ -45,7 +45,14 @@ const DashboardScreen = (props: any) => {
             props.navigation.push('createCourse');
           }}
         />
-      ) : null}
+      ) : (
+        <Button
+          title="Verify account"
+          onPress={() => {
+            props.navigation.push('VerifyAccount');
+          }}
+        />
+      )}
       <Button title="Socket test" onPress={() => {
         if(socket != null )
           socket.emit('joinQueue')}}
@@ -55,6 +62,14 @@ const DashboardScreen = (props: any) => {
           title="Verify courses"
           onPress={() => {
             props.navigation.push('UnVerifiedCourses');
+          }}
+        />
+      ) : null}
+      {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
+        <Button
+          title="Verify users"
+          onPress={() => {
+            props.navigation.push('VerifyUsers');
           }}
         />
       ) : null}

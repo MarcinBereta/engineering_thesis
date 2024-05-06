@@ -14,7 +14,9 @@ const UserList = (props: any) => {
   useEffect(() => {
     const getUsersList = async () => {
       const {data: getAllUsers}: any = await getUsers(userInfo?.token);
-      console.log(getAllUsers);
+      // const res: any = await getUsers(userInfo?.token);
+
+      // console.log(res);
       setUsers(getAllUsers.getAllUsers);
     };
     getUsersList();

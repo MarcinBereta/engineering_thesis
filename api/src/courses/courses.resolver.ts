@@ -26,7 +26,7 @@ export class CoursesResolver {
       context.req.user.role != 'MODERATOR'
     )
       throw new Error('You are not allowed to do this action');
-    return await this.courseService.getUnVerifiedCourses();
+    return await this.courseService.getUnVerifiedCourses(context.req.user.id);
   }
 
   @Query((returns) => [Course])
@@ -60,7 +60,6 @@ export class CoursesResolver {
       context.req.user.role != 'MODERATOR'
     )
       throw new Error('You are not allowed to do this action');
-    console.log(verifyCourse);
     return await this.courseService.verifyCourse(verifyCourse.courseId);
   }
 }

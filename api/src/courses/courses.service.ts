@@ -11,6 +11,7 @@ import {
 } from 'fs';
 import { simpleUser } from 'src/auth/dto/signup-response';
 import { promisify } from 'util';
+import { Category } from '@prisma/client';
 
 @Injectable()
 export class CoursesService {
@@ -97,10 +98,28 @@ export class CoursesService {
     if (!user.verified) {
       throw new Error('User is not verified');
     }
+
+    const moderators = await this.prismaService.moderator.findMany({
+      where: {
+        categories: {
+          has: course.category,
+        },
+      },
+    });
+
+    let moderator;
+    if (moderators.length > 0) {
+      moderator = moderators[Math.floor(Math.random() * moderators.length)];
+    } else {
+      moderator = await this.prismaService.moderator.findFirst();
+    }
+
     const newCourse = await this.prismaService.course.create({
       data: {
         name: course.name,
         creatorId: user.id,
+        category: course.category,
+        moderatorId: moderator.id,
       },
     });
 
@@ -136,6 +155,7 @@ export class CoursesService {
       },
       data: {
         name: course.name,
+        category: course.category,
       },
     });
 
@@ -178,10 +198,13 @@ export class CoursesService {
     });
   }
 
-  async getUnVerifiedCourses() {
+  async getUnVerifiedCourses(userId: string) {
     return await this.prismaService.course.findMany({
       where: {
         verified: false,
+        moderator: {
+          userId: userId,
+        },
       },
       include: {
         text: true,
