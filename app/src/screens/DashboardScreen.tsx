@@ -1,10 +1,7 @@
-import {View, Text, Button, TouchableOpacity} from 'react-native';
+import {View, Text, Button} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
-import {useContext, useEffect, useState} from 'react';
+import {useContext} from 'react';
 import {fontPixel} from '../utils/Normalize';
-import {CourseForm} from '../components/courses/CourseForm/CourseForm';
-import {getCourses} from '../services/courses/courses';
-import {FlatList} from 'react-native-gesture-handler';
 
 const DashboardScreen = (props: any) => {
   const {logout, userInfo, socket} = useContext(AuthContext);
@@ -26,7 +23,7 @@ const DashboardScreen = (props: any) => {
           props.navigation.push('CoursesList');
         }}
       />
-       <Button
+      <Button
         title="View quizes"
         onPress={() => {
           props.navigation.push('QuizesList');
@@ -53,10 +50,12 @@ const DashboardScreen = (props: any) => {
           }}
         />
       )}
-      <Button title="Socket test" onPress={() => {
-        if(socket != null )
-          socket.emit('joinQueue')}}
-         />
+      <Button
+        title="Socket test"
+        onPress={() => {
+          if (socket != null) socket.emit('joinQueue');
+        }}
+      />
       {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
         <Button
           title="Verify courses"

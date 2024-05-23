@@ -1,47 +1,37 @@
 import {View, Text, Button, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
-import {useContext, useEffect, useState} from 'react';
-import {fontPixel} from '../utils/Normalize';
-import {CourseForm} from '../components/courses/CourseForm/CourseForm';
-import {getCourses} from '../services/courses/courses';
+import {useContext} from 'react';
+import {getCoursesGQL} from '../services/courses/courses';
 import {FlatList} from 'react-native-gesture-handler';
+import request from 'graphql-request';
+import constants from 'constants';
+import {useQuery} from '@tanstack/react-query';
+import {graphqlURL} from '@/services/settings';
 
-export type courseItem = {
-  id: string;
-  type: 'text' | 'photo';
-  value: string;
-};
-export type course = {
-  id?: string;
-  name: string;
-  text: courseItem[];
-};
 const CoursesList = (props: any) => {
   const {userInfo} = useContext(AuthContext);
-  const [courses, setCourses] = useState<course[]>([]);
-  const getCoursesAsync = async () => {
-    const {
-      data,
-    }: {
-      data: {
-        course: course[];
-      };
-    } = await getCourses(userInfo?.token);
-    setCourses(data.course);
-  };
+  const {data, isLoading, refetch} = useQuery({
+    queryKey: ['userId'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getCoursesGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
 
-  useEffect(() => {
-    getCoursesAsync();
-    return () => {
-      console.log('DashboardScreen unmounted');
-    };
-  }, []);
+  if (isLoading || data == undefined) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
       <Text>Course list: </Text>
       <FlatList
-        data={courses}
+        data={data.course}
         renderItem={({item}) => (
           <View
             style={{

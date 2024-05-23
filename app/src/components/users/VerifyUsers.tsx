@@ -1,42 +1,48 @@
-import {useContext, useState, useEffect} from 'react';
-import {View, Text, Button, TouchableOpacity, FlatList} from 'react-native';
-import {AuthContext, UserInfo} from '../../contexts/AuthContext';
-import {
-  getUsers,
-  getVerifyRequests,
-  verifyUserData,
-} from '../../services/admin/admin';
+import {useContext} from 'react';
+import {View, Text, Button, FlatList} from 'react-native';
+import {AuthContext} from '../../contexts/AuthContext';
 import {fontPixel} from '../../utils/Normalize';
-
+import {getVerifyRequestsGQL, verifyUserDataGQL} from '@/services/admin/admin';
+import {graphqlURL} from '@/services/settings';
+import {useMutation, useQuery} from '@tanstack/react-query';
+import request from 'graphql-request';
+import {VariablesOf} from 'gql.tada';
+export type verifyUserDataDto = VariablesOf<typeof verifyUserDataGQL>;
 const VerifyUsers = (props: any) => {
   const {userInfo} = useContext(AuthContext);
-  const [users, setUsers] = useState<
-    {
-      id: string;
-      userId: string;
-      text: string;
-      createdAt: string;
-      updatedAt: string;
-      User: UserInfo;
-    }[]
-  >([]);
+  const {data, isLoading, refetch} = useQuery({
+    queryKey: ['userId'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getVerifyRequestsGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
 
-  useEffect(() => {
-    const getUsersList = async () => {
-      const res: any = await getVerifyRequests(userInfo?.token);
-      setUsers(res.data.getVerifyRequests);
-    };
-    getUsersList();
-  }, []);
+  const verifyUserMutation = useMutation({
+    mutationFn: async (data: verifyUserDataDto) =>
+      request(graphqlURL, verifyUserDataGQL, data, {
+        Authorization: 'Bearer ' + userInfo?.token,
+      }),
+    onSuccess: (data, variables, context) => {
+      props.navigation.push('CoursesList');
+    },
+  });
+
+  if (data == undefined || isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   const handleClick = async (requestId: string) => {
-    const res: any = await verifyUserData(
-      {
+    verifyUserMutation.mutate({
+      VerifyUser: {
         requestId: requestId,
       },
-      userInfo?.token,
-    );
-    console.log(res);
+    });
   };
 
   return (
@@ -51,7 +57,7 @@ const VerifyUsers = (props: any) => {
       </Text>
 
       <FlatList
-        data={users}
+        data={data.getVerifyRequests}
         renderItem={({item}) => (
           <View
             style={{

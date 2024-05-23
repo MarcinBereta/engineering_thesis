@@ -4,11 +4,20 @@ import DraggableFlatList from 'react-native-draggable-flatlist';
 import {DragItem} from './CourseDragItem';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
-import {Course, newCourse, addPhotos} from '../../../services/courses/courses';
+import {
+  addPhotos,
+  addCourseGQL,
+  courseFragment,
+} from '../../../services/courses/courses';
 import {AuthContext} from '../../../contexts/AuthContext';
 import DocumentPicker from 'react-native-document-picker';
 import {fontPixel} from '../../../utils/Normalize';
 import RNPickerSelect from 'react-native-picker-select';
+import {verifyCourseDto} from '@/screens/UnVerifiedCoursesList';
+import {graphqlURL} from '@/services/settings';
+import {useMutation} from '@tanstack/react-query';
+import request from 'graphql-request';
+import {ResultOf, VariablesOf, readFragment} from '@/graphql';
 
 export type CourseItem = {
   type: 'text' | 'photo';
@@ -20,13 +29,25 @@ export type CourseItem = {
 const generateRandomId = () => {
   return Math.random().toString(36).substring(7);
 };
-
+export type addCourseDto = VariablesOf<typeof addCourseGQL>;
 export const CourseForm = (props: any) => {
   const {userInfo} = useContext(AuthContext);
   const [dragData, setData] = useState<CourseItem[]>([]);
   const [courseName, setCourseName] = useState<string>('');
   const [items, setItems] = useState<File[]>([]);
   const [category, setCategory] = useState('');
+
+  const addCourseMutation = useMutation({
+    mutationFn: async (data: addCourseDto) =>
+      request(graphqlURL, addCourseGQL, data, {
+        Authorization: 'Bearer ' + userInfo?.token,
+      }),
+    onSuccess: (data, variables, context) => {
+      const course = readFragment(courseFragment, data.addCourse);
+      uploadPhotos(course);
+    },
+  });
+
   const updateItemValue = (index: string, value: string) => {
     const newData = dragData.map(item => {
       if (item.id === index) {
@@ -91,7 +112,7 @@ export const CourseForm = (props: any) => {
     };
   };
 
-  const uploadPhotos = async (course: Course) => {
+  const uploadPhotos = async (course: ResultOf<typeof courseFragment>) => {
     const photosToUpload: File[] = [];
     for (let item of dragData) {
       if (item.type === 'photo') {
@@ -121,8 +142,9 @@ export const CourseForm = (props: any) => {
   };
 
   const uploadCourse = async () => {
-    const {data: addCourse} = await newCourse(parseData(), userInfo?.token);
-    uploadPhotos(addCourse.addCourse);
+    addCourseMutation.mutate({
+      CourseInput: parseData(),
+    });
   };
 
   return (

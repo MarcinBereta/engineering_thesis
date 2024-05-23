@@ -1,36 +1,37 @@
 import {View, Text, Button, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
 import {useContext, useEffect, useState} from 'react';
-import {getMyCourses} from '../services/courses/courses';
 import {FlatList} from 'react-native-gesture-handler';
-import {course} from './CoursesList';
+import {getMyCoursesGQL} from '@/services/courses/courses';
+import {graphqlURL} from '@/services/settings';
+import request from 'graphql-request';
+import {useQuery} from '@tanstack/react-query';
 
 const MyCourses = (props: any) => {
   const {userInfo} = useContext(AuthContext);
-  const [courses, setCourses] = useState<course[]>([]);
-  const getCoursesAsync = async () => {
-    const {
-      data,
-    }: {
-      data: {
-        MyCourses: course[];
-      };
-    } = await getMyCourses(userInfo?.token);
-    setCourses(data.MyCourses);
-  };
 
-  useEffect(() => {
-    getCoursesAsync();
-    return () => {
-      console.log('DashboardScreen unmounted');
-    };
-  }, []);
+  const {data, isLoading, refetch} = useQuery({
+    queryKey: ['userId'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getMyCoursesGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
+
+  if (isLoading || data == undefined) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
       <Text>Course list: </Text>
       <FlatList
-        data={courses}
+        data={data.MyCourses}
         renderItem={({item}) => (
           <View
             style={{

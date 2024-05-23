@@ -1,54 +1,60 @@
 import {View, Text, Button, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
 import {useContext, useEffect, useState} from 'react';
-import {getUnVerifiedCourses, verifyCourse} from '../services/courses/courses';
 import {FlatList} from 'react-native-gesture-handler';
+import request from 'graphql-request';
+import {graphqlURL} from '@/services/settings';
+import {
+  getUnverifiedCoursesGQL,
+  verifyCourseGQL,
+} from '@/services/courses/courses';
+import {useMutation, useQuery} from '@tanstack/react-query';
+import {VariablesOf} from '@/graphql';
 
-export type courseItem = {
-  id: string;
-  type: 'text' | 'photo';
-  value: string;
-};
-export type course = {
-  id?: string;
-  name: string;
-  text: courseItem[];
-};
+export type verifyCourseDto = VariablesOf<typeof verifyCourseGQL>;
 const UnVerifiedCoursesList = (props: any) => {
   const {userInfo} = useContext(AuthContext);
-  const [courses, setCourses] = useState<course[]>([]);
-  const getCoursesAsync = async () => {
-    const {
-      data,
-    }: {
-      data: {
-        unVerifiedCourses: course[];
-      };
-    } = await getUnVerifiedCourses(userInfo?.token);
-    setCourses(data.unVerifiedCourses);
-  };
 
-  useEffect(() => {
-    getCoursesAsync();
-    return () => {
-      console.log('DashboardScreen unmounted');
-    };
-  }, []);
+  const {data, isLoading, refetch} = useQuery({
+    queryKey: ['userId'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getUnverifiedCoursesGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
+
+  const verifyCourseMutation = useMutation({
+    mutationFn: async (data: verifyCourseDto) =>
+      request(graphqlURL, verifyCourseGQL, data, {
+        Authorization: 'Bearer ' + userInfo?.token,
+      }),
+    onSuccess: (data, variables, context) => {
+      props.navigation.push('CoursesList');
+    },
+  });
+
+  if (isLoading || data == undefined) {
+    return <Text>Loading...</Text>;
+  }
 
   const handleVerify = async (courseId: string) => {
-    const {
-      data,
-    }: {
-      data: {verifyCourse: course};
-    } = await verifyCourse({courseId: courseId}, userInfo?.token);
-    props.navigation.push('CoursesList');
+    verifyCourseMutation.mutate({
+      verifyCourse: {
+        courseId,
+      },
+    });
   };
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
       <Text>Course list: </Text>
       <FlatList
-        data={courses}
+        data={data.unVerifiedCourses}
         renderItem={({item}) => (
           <View
             style={{

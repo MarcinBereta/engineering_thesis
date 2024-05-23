@@ -1,7 +1,10 @@
 import {Image, Text, View} from 'react-native';
 import constants from '../../../../constants';
-import {courseItem} from '../../../screens/CoursesList';
-
+export type courseItem = {
+  id: string;
+  type: 'text' | 'photo';
+  value: string;
+};
 export const CourseListItem = ({course: item}: {course: courseItem}) => {
   if (item.type == 'photo') {
     console.log(constants.url + '/' + item.value);

@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import React, {useContext, useState} from 'react';
-import {
-  registerUser,
-  loginUser,
-  googleLogin,
-  refreshUser,
-} from '../services/auth/auth';
-import { Socket, io } from "socket.io-client";
+import {registerGQL, loginGQL, refreshUserGQL} from '../services/auth/auth';
+import {Socket, io} from 'socket.io-client';
 import constants from '../../constants';
+import {useMutation} from '@tanstack/react-query';
+import request from 'graphql-request';
+import {graphqlURL} from '@/services/settings';
+import {VariablesOf} from '@/graphql';
+import {loginGoogleGQL} from '../services/auth/auth';
 
 interface AuthContext {
   isLoading: boolean;
@@ -41,10 +41,10 @@ export type UserInfo = {
   role: string;
   verified: boolean;
 };
-export type signInResponse = {
-  access_token: string;
-  user: UserInfo;
-};
+
+export type RegisterDto = VariablesOf<typeof registerGQL>;
+export type LoginDto = VariablesOf<typeof loginGQL>;
+export type GoogleLoginDto = VariablesOf<typeof loginGoogleGQL>;
 
 export const AuthProvider = ({
   children,
@@ -55,7 +55,107 @@ export const AuthProvider = ({
   const [isLoading, setIsLoading] = useState(false);
   const [splashLoading, setSplashLoading] = useState(true);
   const [error, setError] = useState('');
-  const [socket, setSocket] = useState<null|Socket>(null);
+  const [socket, setSocket] = useState<null | Socket>(null);
+
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterDto) =>
+      request(graphqlURL, registerGQL, data),
+    onSuccess: async (data, variables, context) => {
+      setError('');
+      const dataObj = {
+        ...data.signup.user,
+        token: data.signup.access_token,
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
+      setUserInfo(dataObj);
+      const socket = io(constants.url, {
+        auth: {
+          token: 'Bearer ' + data.signup.access_token,
+        },
+      });
+      setSocket(socket);
+    },
+    onError: async (data, variables, context) => {
+      console.log(data);
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginDto) => request(graphqlURL, loginGQL, data),
+    onSuccess: async (data, variables, context) => {
+      console.log(data);
+      setError('');
+
+      const dataObj = {
+        ...data.signin.user,
+        token: data.signin.access_token,
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
+      setUserInfo(dataObj);
+      const socket = io(constants.url, {
+        auth: {
+          token: 'Bearer ' + data.signin.access_token,
+        },
+      });
+      setSocket(socket);
+    },
+    onError: async (data, variables, context) => {
+      console.log(data);
+    },
+  });
+
+  const refreshMutation = useMutation({
+    mutationFn: async (token: string) =>
+      request(
+        graphqlURL,
+        refreshUserGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + token,
+        },
+      ),
+    onSuccess: async (data, variables, context) => {
+      let userInfo = await AsyncStorage.getItem('userInfo');
+      const parsedUserInfo = JSON.parse(userInfo as string) as UserInfo;
+      setError('');
+
+      const dataObj = {
+        ...data.refreshUserData,
+        token: parsedUserInfo.token as string,
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
+      setUserInfo(dataObj);
+      const socket = io(constants.url, {
+        auth: {
+          token: 'Bearer ' + parsedUserInfo.token,
+        },
+      });
+      setSocket(socket);
+    },
+    onError: async (data, variables, context) => {
+      console.log(data);
+    },
+  });
+
+  const googleLoginMutation = useMutation({
+    mutationFn: async (data: GoogleLoginDto) =>
+      request(graphqlURL, loginGoogleGQL, data),
+    onSuccess: async (data, variables, context) => {
+      console.log(data);
+      setError('');
+
+      const dataObj = {
+        ...data.providerLogin.user,
+        token: data.providerLogin.access_token,
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
+      setUserInfo(dataObj);
+    },
+    onError: async (data, variables, context) => {
+      console.log(data);
+    },
+  });
+
   const register = async (
     provider: 'credentials' | 'google' | 'facebook' | 'apple',
     username: string,
@@ -64,41 +164,14 @@ export const AuthProvider = ({
   ) => {
     switch (provider) {
       case 'credentials':
-        try {
-          console.log('?');
-          const {
-            data,
-          }: {
-            data: {
-              signup: signInResponse;
-            };
-          } = await registerUser({
-            username: username,
+        registerMutation.mutate({
+          loginInput: {
             email: email,
             password: password,
-          });
-          if (data != null) {
-            const userInfo = {
-              username: data.signup.user.username,
-              email: data.signup.user.email,
-              id: data.signup.user.id,
-              token: data.signup.access_token,
-              image: data.signup.user.image,
-              role: data.signup.user.role,
-              verified: data.signup.user.verified,
-            };
-            const socket = io(constants.url, {
-              auth: {
-                token: 'Bearer '+userInfo.token,
-              },
-            });
-            setSocket(socket);
-            await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-            setUserInfo(userInfo);
-          }
-        } catch (err) {
-          console.error(err);
-        }
+            username: username,
+          },
+        });
+
         break;
       case 'google':
         break;
@@ -117,36 +190,12 @@ export const AuthProvider = ({
     switch (provider) {
       case 'credentials':
         try {
-          const {
-            data,
-          }: {
-            data: {
-              signin: signInResponse;
-            };
-          } = await loginUser({
-            username: email,
-            password: password,
+          loginMutation.mutate({
+            loginInput: {
+              username: email,
+              password: password,
+            },
           });
-
-          if (data != null) {
-            const userInfo = {
-              username: data.signin.user.username,
-              email: data.signin.user.email,
-              id: data.signin.user.id,
-              token: data.signin.access_token,
-              image: data.signin.user.image,
-              role: data.signin.user.role,
-              verified: data.signin.user.verified,
-            };
-            const socket = io(constants.url, {
-              auth: {
-                token: 'Bearer '+userInfo.token,
-              },
-            });
-            setSocket(socket);
-            await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-            setUserInfo(userInfo);
-          }
         } catch (err) {
           console.error(err);
         }
@@ -158,45 +207,22 @@ export const AuthProvider = ({
           });
 
           const userInfo = await GoogleSignin.signIn();
-          const {
-            data,
-          }: {
-            data: {
-              providerLogin: signInResponse;
-            };
-          } = await googleLogin({
-            email: userInfo.user.email,
-            username:
-              userInfo.user.name ||
-              userInfo.user.familyName + ' ' + userInfo.user.givenName ||
-              '',
-            image: userInfo.user.photo,
+
+          googleLoginMutation.mutate({
+            loginInput: {
+              email: userInfo.user.email,
+              username:
+                userInfo.user.name ||
+                userInfo.user.familyName + ' ' + userInfo.user.givenName ||
+                '',
+              image: userInfo.user.photo as string,
+            },
           });
-          if (data != null) {
-            const userInfo = {
-              username: data.providerLogin.user.username,
-              email: data.providerLogin.user.email,
-              id: data.providerLogin.user.id,
-              token: data.providerLogin.access_token,
-              image: data.providerLogin.user.image,
-              role: data.providerLogin.user.role,
-              verified: data.providerLogin.user.verified,
-            };
-            const socket = io(constants.url, {
-              auth: {
-                token: 'Bearer '+userInfo.token,
-              },
-            });
-            setSocket(socket);
-            await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-            setUserInfo(userInfo);
-          }
         } catch (err) {
           console.log('1');
           console.error(err);
         }
         break;
-      
     }
   };
 
@@ -208,7 +234,6 @@ export const AuthProvider = ({
       setUserInfo(null);
       setIsLoading(false);
       setSocket(null);
-
     } catch (err) {
       setIsLoading(false);
       setSocket(null);
@@ -218,33 +243,13 @@ export const AuthProvider = ({
 
   const isLoggedIn = async () => {
     try {
-      setSplashLoading(true);
       let userInfo = await AsyncStorage.getItem('userInfo');
       const parsedUserInfo = JSON.parse(userInfo as string) as UserInfo;
 
       if (userInfo != null && userInfo != undefined) {
-        const refreshedData: any = await refreshUser(parsedUserInfo.token);
-        const user = {
-          ...refreshedData.data.refreshUserData,
-          image:
-            refreshedData.data.refreshUserData.image == ''
-              ? null
-              : refreshedData.data.refreshUserData.image,
-          token: parsedUserInfo.token,
-        };
-        const socket = io(constants.url, {
-          auth: {
-            token: 'Bearer '+user.token,
-          },
-        });
-        setSocket(socket);
-        await AsyncStorage.setItem('userInfo', JSON.stringify(user));
-        setUserInfo(user);
+        refreshMutation.mutate(parsedUserInfo.token);
       }
-
-      setSplashLoading(false);
     } catch (err) {
-      setSplashLoading(false);
       console.error('is logged in error: ', err);
     }
   };
