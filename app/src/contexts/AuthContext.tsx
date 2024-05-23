@@ -13,7 +13,7 @@ import {loginGoogleGQL} from '../services/auth/auth';
 interface AuthContext {
   isLoading: boolean;
   userInfo: any;
-  splashLoading: boolean;
+  refreshLoading: boolean;
   error: string;
   socket: null | Socket;
   register: (
@@ -136,6 +136,8 @@ export const AuthProvider = ({
       console.log(data);
     },
   });
+
+  const refreshLoading = refreshMutation.isPending;
 
   const googleLoginMutation = useMutation({
     mutationFn: async (data: GoogleLoginDto) =>
@@ -274,7 +276,7 @@ export const AuthProvider = ({
       value={{
         isLoading,
         userInfo,
-        splashLoading,
+        refreshLoading,
         error,
         socket,
         register,
