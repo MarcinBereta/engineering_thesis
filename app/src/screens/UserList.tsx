@@ -2,25 +2,29 @@ import {View, Text, Button, TouchableOpacity} from 'react-native';
 import {AuthContext, UserInfo} from '../contexts/AuthContext';
 import {useContext, useEffect, useState} from 'react';
 import {fontPixel} from '../utils/Normalize';
-import {CourseForm} from '../components/courses/CourseForm/CourseForm';
-import {getCourses} from '../services/courses/courses';
 import {FlatList} from 'react-native-gesture-handler';
-import {getUsers} from '../services/admin/admin';
+import {graphqlURL} from '@/services/settings';
+import {useQuery} from '@tanstack/react-query';
+import request from 'graphql-request';
+import {getUsersGQL} from '@/services/admin/admin';
 
 const UserList = (props: any) => {
   const {userInfo} = useContext(AuthContext);
-  const [users, setUsers] = useState<UserInfo[]>([]);
-
-  useEffect(() => {
-    const getUsersList = async () => {
-      const {data: getAllUsers}: any = await getUsers(userInfo?.token);
-      // const res: any = await getUsers(userInfo?.token);
-
-      // console.log(res);
-      setUsers(getAllUsers.getAllUsers);
-    };
-    getUsersList();
-  }, []);
+  const {data, isLoading, refetch} = useQuery({
+    queryKey: ['userId'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getUsersGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
+  if (data == undefined || isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
@@ -34,7 +38,7 @@ const UserList = (props: any) => {
       </Text>
 
       <FlatList
-        data={users}
+        data={data?.getAllUsers}
         renderItem={({item}) => (
           <View
             style={{

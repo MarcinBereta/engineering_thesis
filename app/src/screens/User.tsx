@@ -2,9 +2,14 @@ import {View, Text, Button, Modal, TouchableOpacity} from 'react-native';
 import {AuthContext, UserInfo} from '../contexts/AuthContext';
 import {useContext, useState} from 'react';
 import {fontPixel} from '../utils/Normalize';
-import {updateUserData} from '../services/admin/admin';
+import {updateUserDataGQL} from '../services/admin/admin';
 import RNPickerSelect from 'react-native-picker-select';
+import {useMutation} from '@tanstack/react-query';
+import request from 'graphql-request';
+import {graphqlURL} from '@/services/settings';
+import {VariablesOf} from '@/graphql';
 
+export type verifyUserDataDto = VariablesOf<typeof updateUserDataGQL>;
 const User = ({route, navigation}: any) => {
   const {userInfo} = useContext(AuthContext);
   const {user} = route.params;
@@ -29,7 +34,6 @@ const User = ({route, navigation}: any) => {
     const cats = [];
     if (user.role == 'USER') return [];
     const userCategories: string[] = user.Moderator[0].categories;
-    console.log(user.Moderator);
     for (let dbCat of dbCategories) {
       cats.push({
         label: dbCat,
@@ -41,19 +45,26 @@ const User = ({route, navigation}: any) => {
   });
   const [userData, setUserData] = useState<UserInfo>(user);
   const [userRole, setUserRole] = useState(user.role);
+
+  const updateUserDataMutation = useMutation({
+    mutationFn: async (data: verifyUserDataDto) =>
+      request(graphqlURL, updateUserDataGQL, data, {
+        Authorization: 'Bearer ' + userInfo?.token,
+      }),
+    onSuccess: (data, variables, context) => {
+      setUserData({...data.updateUser, token: userData.token});
+      setUserRole(data.updateUser.role);
+    },
+  });
   const handleSave = async () => {
-    const res: any = await updateUserData(
-      {
+    updateUserDataMutation.mutate({
+      UserEdit: {
         id: userData.id,
         role: userData.role,
         verified: userData.verified,
         categories: categories.filter(c => c.checked).map(c => c.value),
       },
-      userInfo?.token,
-    );
-
-    setUserData(res.data.updateUser);
-    setUserRole(res.data.updateUser.role);
+    });
   };
 
   return (

@@ -1,41 +1,37 @@
-import { useContext, useState, useEffect } from 'react';
-import {View, Text, Button, TouchableOpacity} from 'react-native';
+import {useContext} from 'react';
+import {View, Text, TouchableOpacity} from 'react-native';
 
 import {FlatList} from 'react-native-gesture-handler';
-import { AuthContext } from '../../contexts/AuthContext';
-import { course } from '../../screens/CoursesList';
-import { getCourses } from '../../services/courses/courses';
-import { Quiz, getQuizes } from '../../services/quiz/quiz';
-
-
+import {AuthContext} from '../../contexts/AuthContext';
+import {graphqlURL} from '@/services/settings';
+import {useQuery} from '@tanstack/react-query';
+import request from 'graphql-request';
+import {getQuizzesGQL} from '@/services/quiz/quiz';
 
 const QuizesList = (props: any) => {
   const {userInfo} = useContext(AuthContext);
-  const [quizes, setQuizes] = useState<Quiz[]>([]);
-  const getQuizesAsync = async () => {
-    const {
-      data,
-    }: {
-      data: {
-        getAllQuizzes: Quiz[];
-      };
-    } = await getQuizes(userInfo?.token);
-    console.log(data)
-    setQuizes(data.getAllQuizzes);
-  };
 
-  useEffect(() => {
-    getQuizesAsync();
-    return () => {
-      console.log('DashboardScreen unmounted');
-    };
-  }, []);
+  const {data, isLoading, refetch} = useQuery({
+    queryKey: ['userId'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getQuizzesGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
+  if (data == undefined || isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
       <Text>Quizes list: </Text>
       <FlatList
-        data={quizes}
+        data={data.getAllQuizzes}
         renderItem={({item}) => (
           <View
             style={{
@@ -54,8 +50,6 @@ const QuizesList = (props: any) => {
           </View>
         )}
       />
-
-      
     </View>
   );
 };

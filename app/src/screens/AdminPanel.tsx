@@ -1,10 +1,7 @@
-import {View, Text, Button, TouchableOpacity} from 'react-native';
+import {View, Text, Button} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
-import {useContext, useEffect, useState} from 'react';
+import {useContext} from 'react';
 import {fontPixel} from '../utils/Normalize';
-import {CourseForm} from '../components/courses/CourseForm/CourseForm';
-import {getCourses} from '../services/courses/courses';
-import {FlatList} from 'react-native-gesture-handler';
 
 const AdminPanel = (props: any) => {
   const {userInfo} = useContext(AuthContext);

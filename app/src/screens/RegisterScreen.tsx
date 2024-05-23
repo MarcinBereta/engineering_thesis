@@ -1,19 +1,11 @@
 import {useContext, useState} from 'react';
-import {
-  View,
-  Text,
-  Button,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
 import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 import {fontPixel} from '../utils/Normalize';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
-import {LoginSchema} from '../schemas/loginSchema';
 import {RegisterSchema} from '../schemas/registerSchema';
 import {FormTextInput} from '../components/inputs/FormTextInput';
 

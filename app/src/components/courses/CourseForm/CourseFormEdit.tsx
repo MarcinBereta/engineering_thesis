@@ -4,11 +4,21 @@ import DraggableFlatList from 'react-native-draggable-flatlist';
 import {DragItem} from './CourseDragItem';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
-import {Course, courseEdit, addPhotos} from '../../../services/courses/courses';
+import {
+  addCourseGQL,
+  addPhotos,
+  courseFragment,
+  editCourseGQL,
+} from '../../../services/courses/courses';
 import {AuthContext} from '../../../contexts/AuthContext';
 import DocumentPicker from 'react-native-document-picker';
 import {fontPixel} from '../../../utils/Normalize';
 import RNPickerSelect from 'react-native-picker-select';
+import {graphqlURL} from '@/services/settings';
+import {useMutation} from '@tanstack/react-query';
+import {ResultOf, VariablesOf, readFragment} from '@/graphql';
+import request from 'graphql-request';
+import {addCourseDto} from './CourseForm';
 
 export type CourseItem = {
   type: 'text' | 'photo';
@@ -20,6 +30,7 @@ export type CourseItem = {
 const generateRandomId = () => {
   return Math.random().toString(36).substring(7);
 };
+export type editCourseDto = VariablesOf<typeof editCourseGQL>;
 
 export const CourseEditForm = ({route, navigation}: any) => {
   const {course} = route.params;
@@ -31,7 +42,16 @@ export const CourseEditForm = ({route, navigation}: any) => {
 
   const [items, setItems] = useState<File[]>([]);
 
-  useEffect(() => {}, []);
+  const editCourseMutation = useMutation({
+    mutationFn: async (data: editCourseDto) =>
+      request(graphqlURL, editCourseGQL, data, {
+        Authorization: 'Bearer ' + userInfo?.token,
+      }),
+    onSuccess: (data, variables, context) => {
+      const course = readFragment(courseFragment, data.editCourse);
+      uploadPhotos(course);
+    },
+  });
 
   const updateItemValue = (index: string, value: string) => {
     const newData = dragData.map(item => {
@@ -101,7 +121,7 @@ export const CourseEditForm = ({route, navigation}: any) => {
     };
   };
 
-  const uploadPhotos = async (course: Course) => {
+  const uploadPhotos = async (course: ResultOf<typeof courseFragment>) => {
     const photosToUpload: File[] = [];
     for (let item of dragData) {
       if (item.type === 'photo') {
@@ -131,12 +151,9 @@ export const CourseEditForm = ({route, navigation}: any) => {
   };
 
   const uploadCourse = async () => {
-    const {data: editCourse}: any = await courseEdit(
-      parseData(),
-      userInfo?.token,
-    );
-    // console.log(editCourse);
-    uploadPhotos(editCourse.editCourse);
+    editCourseMutation.mutate({
+      EditCourseInput: parseData(),
+    });
   };
 
   return (

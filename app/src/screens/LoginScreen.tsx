@@ -1,12 +1,5 @@
-import {useContext, useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Button,
-  TouchableOpacity,
-} from 'react-native';
+import {useContext} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
 import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 import {fontPixel} from '../utils/Normalize';
