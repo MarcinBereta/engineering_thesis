@@ -18,14 +18,14 @@ import {User} from './User';
 import {UnVerifiedCoursesList} from './UnVerifiedCoursesList';
 import {VerifyAccount} from '../components/users/VerifyAccount';
 import {VerifyUsers} from '../components/users/VerifyUsers';
-import { QuizesList } from '../components/quiz/QuizList';
+import {QuizesList} from '../components/quiz/QuizList';
 import QuizMain from '../components/quiz/QuizMain';
 import QuizSocket from '../components/quiz/QuizSocket';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
 const Navigator = ({socket}: {socket: Socket}) => {
-  const {userInfo, splashLoading} = useContext(AuthContext);
+  const {userInfo, refreshLoading} = useContext(AuthContext);
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -33,7 +33,7 @@ const Navigator = ({socket}: {socket: Socket}) => {
           headerShown: false,
           animation: 'none',
         }}>
-        {splashLoading ? (
+        {refreshLoading ? (
           <Stack.Screen component={SplashScreen} name="SplashScreen" />
         ) : userInfo != null ? (
           <>
@@ -51,7 +51,6 @@ const Navigator = ({socket}: {socket: Socket}) => {
             <Stack.Screen component={Course} name="course" />
             <Stack.Screen component={QuizMain} name="quiz" />
             <Stack.Screen component={QuizSocket} name="QuizSearch" />
-
 
             <Stack.Screen component={User} name="User" />
             <Stack.Screen component={UserList} name="UserList" />
