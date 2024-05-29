@@ -51,6 +51,10 @@ type VerificationFormData {
   User: simpleUser!
 }
 
+type NullResponse {
+  message: String!
+}
+
 type SigninResponse {
   access_token: String!
   user: simpleUser!
@@ -93,6 +97,8 @@ type UserScore {
 
 type Query {
   users: [User!]!
+  getUserFriends: [User!]!
+  getUserFriendRequests: [User!]!
   getUser(name: String!): User!
   getAllUsers: [User!]!
   refreshUserData: User!
@@ -111,6 +117,10 @@ type Mutation {
   updateUser(UserEdit: UserEdit!): User!
   addVerificationForm(VerificationForm: VerificationForm!): User!
   verifyUser(VerifyUser: VerifyUser!): User!
+  addFriendRequest(friendName: String!): NullResponse!
+  acceptFriendRequest(friendId: String!): NullResponse!
+  declineFriendRequest(friendId: String!): NullResponse!
+  removeFriend(friendId: String!): NullResponse!
   addCourse(newCourse: CourseInput!): Course!
   editCourse(editCourse: EditCourseInput!): Course!
   verifyCourse(verifyCourse: VerifyCourseDto!): Course!

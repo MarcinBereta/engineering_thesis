@@ -6,9 +6,6 @@ export type courseItem = {
   value: string;
 };
 export const CourseListItem = ({course: item}: {course: courseItem}) => {
-  if (item.type == 'photo') {
-    console.log(constants.url + '/' + item.value);
-  }
   return (
     <View style={{backgroundColor: 'red', flexDirection: 'row'}}>
       {item.type == 'text' ? (

@@ -194,7 +194,6 @@ const User = ({route, navigation}: any) => {
                           justifyContent: 'center',
                         }}
                         onPress={() => {
-                          console.log('pressing');
                           setTempCategories(dt => {
                             return [
                               ...dt,

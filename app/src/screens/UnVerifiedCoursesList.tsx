@@ -72,7 +72,6 @@ const UnVerifiedCoursesList = (props: any) => {
               <Text>{item.name}</Text>
               <Button
                 onPress={() => {
-                  console.log(item);
                   handleVerify(item?.id || '');
                 }}
                 title="Verify"

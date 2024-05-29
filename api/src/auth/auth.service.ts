@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/dto/user.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { SingUpUserInput } from './dto/signup-user.input';
@@ -23,6 +23,24 @@ export class AuthService {
 
   async signup(user: SingUpUserInput) {
     const password = bcrypt.hashSync(user.password, 10);
+
+    const userExists = await this.Prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            email: user.email,
+          },
+          {
+            username: user.username,
+          },
+        ],
+      },
+    });
+
+    if (userExists.length > 0) {
+      throw new GraphQLError('Account already exists');
+    }
+
     const newUser = await this.Prisma.user.create({
       data: {
         email: user.email,
