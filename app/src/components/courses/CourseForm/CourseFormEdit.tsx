@@ -112,7 +112,6 @@ export const CourseEditForm = ({route, navigation}: any) => {
         };
       }
     });
-    console.log(data);
     return {
       name: courseName,
       text: data,

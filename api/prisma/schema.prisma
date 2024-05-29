@@ -28,6 +28,7 @@ model User {
   Friends          Friends[]
   VerificationForm VerificationForm[]
   Moderator        Moderator[]
+  FriendsRequests  FriendsRequests[]
 }
 
 model Course {
@@ -94,6 +95,15 @@ model Friends {
   User      User     @relation(fields: [userId], references: [id])
 }
 
+model FriendsRequests {
+  id        String   @id @default(uuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
+}
+
 model VerificationForm {
   id        String   @id @default(uuid())
   userId    String
@@ -104,13 +114,13 @@ model VerificationForm {
 }
 
 model Moderator {
-  id        String   @id @default(uuid())
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String     @id @default(uuid())
+  userId     String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   categories Category[]
-  User      User     @relation(fields: [userId], references: [id])
-  Course    Course[]
+  User       User       @relation(fields: [userId], references: [id])
+  Course     Course[]
 }
 
 enum CourseItemType {

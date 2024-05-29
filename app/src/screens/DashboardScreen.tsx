@@ -50,10 +50,11 @@ const DashboardScreen = (props: any) => {
           }}
         />
       )}
+
       <Button
-        title="Socket test"
+        title="Friends"
         onPress={() => {
-          if (socket != null) socket.emit('joinQueue');
+          props.navigation.push('Friends');
         }}
       />
       {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (

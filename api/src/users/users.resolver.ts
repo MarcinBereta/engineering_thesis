@@ -1,15 +1,16 @@
 import { Resolver, Query, Args, Context, Mutation } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { User } from './user.entity';
+import { User } from './dto/user.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CurrentUser } from 'src/auth/get-current-user.decorator';
-import { UserEdit } from './edit-user-input';
+import { UserEdit } from './dto/edit-user-input';
 import {
   VerificationForm,
   VerificationFormData,
   VerifyUser,
 } from './verification-form';
+import { NullResponse } from './dto/none-reponse';
 
 @Resolver((of) => User)
 @UseGuards(JwtAuthGuard)
@@ -21,6 +22,16 @@ export class UsersResolver {
   @Query((returns) => [User])
   users(@CurrentUser() user: User): Promise<User[]> {
     return this.UsersService.findAll();
+  }
+
+  @Query((returns) => [User])
+  getUserFriends(@Context() context) {
+    return this.UsersService.getUserFriends(context.req.user.id);
+  }
+
+  @Query((returns) => [User])
+  getUserFriendRequests(@Context() context) {
+    return this.UsersService.getFriendsRequests(context.req.user.id);
   }
 
   @Query((returns) => User)
@@ -68,5 +79,40 @@ export class UsersResolver {
   @Query((returns) => [VerificationFormData])
   async getVerifyRequests(@Context() context): Promise<VerificationFormData[]> {
     return this.UsersService.getVerificationForms();
+  }
+
+  @Mutation((returns) => NullResponse)
+  async addFriendRequest(
+    @Args('friendName') friendName: string,
+    @Context() context,
+  ) {
+    return this.UsersService.sendFriendRequest(friendName, context.req.user.id);
+  }
+
+  @Mutation((returns) => NullResponse)
+  async acceptFriendRequest(
+    @Args('friendId') requestId: string,
+    @Context() context,
+  ) {
+    return this.UsersService.acceptFriendRequest(
+      requestId,
+      context.req.user.id,
+    );
+  }
+
+  @Mutation((returns) => NullResponse)
+  async declineFriendRequest(
+    @Args('friendId') requestId: string,
+    @Context() context,
+  ) {
+    return this.UsersService.declineFriendRequest(
+      requestId,
+      context.req.user.id,
+    );
+  }
+
+  @Mutation((returns) => NullResponse)
+  async removeFriend(@Args('friendId') friendId: string, @Context() context) {
+    return this.UsersService.removeFriend(friendId, context.req.user.id);
   }
 }

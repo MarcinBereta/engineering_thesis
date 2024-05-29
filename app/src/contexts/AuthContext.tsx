@@ -53,7 +53,6 @@ export const AuthProvider = ({
 }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [splashLoading, setSplashLoading] = useState(true);
   const [error, setError] = useState('');
   const [socket, setSocket] = useState<null | Socket>(null);
 
@@ -83,7 +82,6 @@ export const AuthProvider = ({
   const loginMutation = useMutation({
     mutationFn: async (data: LoginDto) => request(graphqlURL, loginGQL, data),
     onSuccess: async (data, variables, context) => {
-      console.log(data);
       setError('');
 
       const dataObj = {
@@ -143,7 +141,6 @@ export const AuthProvider = ({
     mutationFn: async (data: GoogleLoginDto) =>
       request(graphqlURL, loginGoogleGQL, data),
     onSuccess: async (data, variables, context) => {
-      console.log(data);
       setError('');
 
       const dataObj = {

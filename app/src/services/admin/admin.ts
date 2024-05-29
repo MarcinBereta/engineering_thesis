@@ -1,5 +1,3 @@
-import {apiCall} from '../graphqlHandler';
-import {UserInfo} from '../../contexts/AuthContext';
 import {graphql} from '@/graphql';
 
 export const getUsersGQL = graphql(`

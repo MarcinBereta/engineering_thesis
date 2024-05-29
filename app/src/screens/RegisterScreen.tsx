@@ -46,7 +46,6 @@ const RegisterScreen = (props: any) => {
   });
 
   const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
-    console.log('q');
     authContext.register(
       'credentials',
       data.username,

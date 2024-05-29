@@ -1,21 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Category, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserInput } from './create-user-input';
-import { UserEdit } from './edit-user-input';
+import { CreateUserInput } from './dto/create-user-input';
+import { UserEdit } from './dto/edit-user-input';
 
 @Injectable()
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
   async findAll(): Promise<User[]> {
-    console.log(
-      await this.prismaService.user.findMany({
-        include: {
-          Moderator: true,
-        },
-      }),
-    );
     return await this.prismaService.user.findMany({
       include: {
         Moderator: true,
@@ -182,6 +175,155 @@ export class UsersService {
     return await this.prismaService.verificationForm.findFirst({
       where: {
         id: formId,
+      },
+    });
+  }
+
+  async getUserFriends(userId: string) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return await this.prismaService.user.findMany({
+      where: {
+        id: userId,
+      },
+      include: {
+        Friends: {
+          include: {
+            User: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getFriendsRequests(userId: string) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return await this.prismaService.user.findMany({
+      where: {
+        id: userId,
+      },
+      include: {
+        FriendsRequests: {
+          include: {
+            User: true,
+          },
+        },
+      },
+    });
+  }
+
+  async sendFriendRequest(userName: string, userId: string) {
+    const friend = await this.prismaService.user.findUnique({
+      where: {
+        username: userName,
+      },
+    });
+    if (!friend) {
+      throw new Error('User not found');
+    }
+
+    return await this.prismaService.friendsRequests.create({
+      data: {
+        userId: friend.id,
+        friendId: userId,
+      },
+    });
+  }
+
+  async acceptFriendRequest(friendId: string, userId: string) {
+    const request = await this.getFriendRequestByUserId(friendId, userId);
+
+    if (!request) {
+      throw new Error('Request not found');
+    }
+
+    await this.prismaService.friendsRequests.delete({
+      where: {
+        id: request.id,
+      },
+    });
+
+    return await this.prismaService.friends.createMany({
+      data: [
+        {
+          userId: request.userId,
+          friendId: request.friendId,
+        },
+        {
+          userId: request.friendId,
+          friendId: request.userId,
+        },
+      ],
+    });
+  }
+
+  private async getFriendRequestByUserId(userId: string, friendId: string) {
+    return await this.prismaService.friendsRequests.findFirst({
+      where: {
+        OR: [
+          { userId: userId, friendId: friendId },
+          { userId: friendId, friendId: userId },
+        ],
+      },
+    });
+  }
+
+  async declineFriendRequest(friendId: string, userId: string) {
+    const request = await this.getFriendRequestByUserId(friendId, userId);
+    if (!request) {
+      throw new Error('Request not found');
+    }
+
+    return await this.prismaService.friendsRequests.delete({
+      where: {
+        id: request.id,
+      },
+    });
+  }
+
+  async removeFriend(userId: string, friendId: string) {
+    const friend = await this.prismaService.friends.findFirst({
+      where: {
+        userId: userId,
+        friendId: friendId,
+      },
+    });
+    if (!friend) {
+      throw new Error('Friend not found');
+    }
+
+    return await this.prismaService.friends.deleteMany({
+      where: {
+        OR: [
+          { userId: userId, friendId: friendId },
+          { userId: friendId, friendId: userId },
+        ],
+      },
+    });
+  }
+
+  async removeFriendRequest(userId: string, friendId: string) {
+    const request = await this.prismaService.friendsRequests.findFirst({
+      where: {
+        userId: userId,
+        friendId: friendId,
+      },
+    });
+    if (!request) {
+      throw new Error('Request not found');
+    }
+
+    return await this.prismaService.friendsRequests.deleteMany({
+      where: {
+        OR: [
+          { userId: userId, friendId: friendId },
+          { userId: friendId, friendId: userId },
+        ],
       },
     });
   }

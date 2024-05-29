@@ -213,7 +213,6 @@ export class CoursesService {
   }
 
   async verifyCourse(courseId: string) {
-    console.log(courseId);
     return await this.prismaService.course.update({
       where: {
         id: courseId,
