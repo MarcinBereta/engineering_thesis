@@ -28,6 +28,37 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(socket: Socket) {}
   async handleDisconnect(socket: Socket) {}
 
+  @SubscribeMessage('connectToOwnRoom')
+  @UseGuards(SocketGuard)
+  async handleConnectToOwnRoom(socket: Socket, payload: any) {
+    console.log('Joined room: ', payload.userId);
+    socket.join(payload.userId);
+  }
+
+  @SubscribeMessage('fightWithFriend')
+  @UseGuards(SocketGuard)
+  async handleFightInvite(socket: Socket, payload: any) {
+    this.socketService.fightWithFriend(
+      socket,
+      payload.quizId,
+      payload.userId,
+      payload.friendId,
+      payload.username,
+    );
+  }
+
+  @SubscribeMessage('acceptFight')
+  @UseGuards(SocketGuard)
+  async handleAcceptFight(socket: Socket, payload: any) {
+    this.socketService.acceptFight(socket, payload.userId, payload.friendId);
+  }
+
+  @SubscribeMessage('declineFight')
+  @UseGuards(SocketGuard)
+  async handleDeclineFight(socket: Socket, payload: any) {
+    this.socketService.declineFight(socket, payload.userId, payload.friendId);
+  }
+
   @SubscribeMessage('joinQueue')
   @UseGuards(SocketGuard)
   async handleJoinQueue(socket: Socket, payload: any) {

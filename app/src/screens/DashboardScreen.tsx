@@ -1,10 +1,15 @@
 import {View, Text, Button} from 'react-native';
 import {AuthContext} from '../contexts/AuthContext';
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import {fontPixel} from '../utils/Normalize';
+import {setNavigationRef} from '@/utils/NavigationRef';
 
 const DashboardScreen = (props: any) => {
   const {logout, userInfo, socket} = useContext(AuthContext);
+
+  useEffect(() => {
+    setNavigationRef(props.navigation);
+  }, []);
 
   return (
     <View style={{flexDirection: 'column', flex: 1}}>

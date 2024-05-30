@@ -28,6 +28,17 @@ export const getFriendDataGQL = graphql(
   [FriendUserFragmentGQL],
 );
 
+export const getFriendsGQL = graphql(
+  `
+    query GetUserFriends {
+      getUserFriends {
+        ...FriendUserFragment
+      }
+    }
+  `,
+  [FriendUserFragmentGQL],
+);
+
 export const addFriendRequestGQL = graphql(`
   mutation Mutation($friendName: String!) {
     addFriendRequest(friendName: $friendName) {

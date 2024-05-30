@@ -14,21 +14,23 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(uuid())
-  email            String             @unique
-  username         String             @unique
-  verified         Boolean            @default(false)
-  role             Role               @default(USER)
-  image            String?
-  password         String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  courses          Course[]
-  scores           UserScores[]
-  Friends          Friends[]
-  VerificationForm VerificationForm[]
-  Moderator        Moderator[]
-  FriendsRequests  FriendsRequests[]
+  id              String       @id @default(uuid())
+  email           String       @unique
+  username        String       @unique
+  verified        Boolean      @default(false)
+  role            Role         @default(USER)
+  image           String?
+  password        String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  courses         Course[]
+  scores          UserScores[]
+  Friends         Friends[]    @relation(name: "friends_users")
+  Friends_request Friends[]    @relation(name: "friends_friends")
+  VerificationForm        VerificationForm[]
+  Moderator               Moderator[]
+  FriendsRequests         FriendsRequests[]  @relation(name: "friends_requests_user")
+  FriendsRequests_friends FriendsRequests[]  @relation(name: "friends_requests_friend")
 }
 
 model Course {
@@ -92,7 +94,8 @@ model Friends {
   friendId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(name: "friends_users", fields: [userId], references: [id])
+  Friend    User     @relation(name: "friends_friends", fields: [friendId], references: [id])
 }
 
 model FriendsRequests {
@@ -101,7 +104,8 @@ model FriendsRequests {
   friendId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(name: "friends_requests_user", fields: [userId], references: [id])
+  Friend    User     @relation(name: "friends_requests_friend", fields: [friendId], references: [id])
 }
 
 model VerificationForm {

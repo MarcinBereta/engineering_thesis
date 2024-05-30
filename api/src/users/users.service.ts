@@ -184,18 +184,21 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found');
     }
-    return await this.prismaService.user.findMany({
-      where: {
-        id: userId,
-      },
-      include: {
-        Friends: {
-          include: {
-            User: true,
+    const friends = (
+      await this.prismaService.user.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          Friends: {
+            include: {
+              Friend: true,
+            },
           },
         },
-      },
-    });
+      })
+    ).Friends;
+    return friends.map((friend) => friend.Friend);
   }
 
   async getFriendsRequests(userId: string) {
@@ -203,18 +206,23 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found');
     }
-    return await this.prismaService.user.findMany({
-      where: {
-        id: userId,
-      },
-      include: {
-        FriendsRequests: {
-          include: {
-            User: true,
+
+    const requests = (
+      await this.prismaService.user.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          FriendsRequests: {
+            include: {
+              Friend: true,
+            },
           },
         },
-      },
-    });
+      })
+    ).FriendsRequests;
+
+    return requests.map((request) => request.Friend);
   }
 
   async sendFriendRequest(userName: string, userId: string) {

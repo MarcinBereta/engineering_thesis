@@ -74,9 +74,7 @@ export const AuthProvider = ({
       });
       setSocket(socket);
     },
-    onError: async (data, variables, context) => {
-      console.log(data);
-    },
+    onError: async (data, variables, context) => {},
   });
 
   const loginMutation = useMutation({
@@ -97,9 +95,7 @@ export const AuthProvider = ({
       });
       setSocket(socket);
     },
-    onError: async (data, variables, context) => {
-      console.log(data);
-    },
+    onError: async (data, variables, context) => {},
   });
 
   const refreshMutation = useMutation({
@@ -130,9 +126,7 @@ export const AuthProvider = ({
       });
       setSocket(socket);
     },
-    onError: async (data, variables, context) => {
-      console.log(data);
-    },
+    onError: async (data, variables, context) => {},
   });
 
   const refreshLoading = refreshMutation.isPending;
@@ -150,9 +144,7 @@ export const AuthProvider = ({
       await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
       setUserInfo(dataObj);
     },
-    onError: async (data, variables, context) => {
-      console.log(data);
-    },
+    onError: async (data, variables, context) => {},
   });
 
   const register = async (
@@ -217,10 +209,7 @@ export const AuthProvider = ({
               image: userInfo.user.photo as string,
             },
           });
-        } catch (err) {
-          console.log('1');
-          console.error(err);
-        }
+        } catch (err) {}
         break;
     }
   };

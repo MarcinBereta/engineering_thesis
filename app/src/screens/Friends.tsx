@@ -20,13 +20,14 @@ import {
 } from '@/services/friends/friends';
 import {readFragment} from '@/graphql';
 import {FriendItem} from '@/components/friends/FriendItem';
+import {FriendRequestItem} from '@/components/friends/FriendRequestItem';
 
 const Friends = (props: any) => {
   const {userInfo} = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [username, setUsername] = useState('');
 
-  const {data, isLoading, refetch} = useQuery({
+  const {data, isLoading, refetch, error} = useQuery({
     queryKey: ['friendsList'],
     queryFn: async () =>
       request(
@@ -55,6 +56,7 @@ const Friends = (props: any) => {
       setIsModalOpen(false);
       refetch();
     },
+    onError: (data, variables, context) => {},
   });
 
   if (data == undefined || isLoading) {
@@ -66,13 +68,18 @@ const Friends = (props: any) => {
     data.getUserFriendRequests,
   );
   const friends = readFragment(FriendUserFragmentGQL, data.getUserFriends);
-
   return (
     <View style={{flexDirection: 'column', flex: 1}}>
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent={false}
         visible={isModalOpen}
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
         onRequestClose={() => {
           setIsModalOpen(false);
         }}>
@@ -118,7 +125,7 @@ const Friends = (props: any) => {
       </Text>
       <FlatList
         data={friendRequests}
-        renderItem={({item}) => <FriendItem friend={item} />}
+        renderItem={({item}) => <FriendRequestItem friend={item} />}
       />
       <Button
         title="Add friend"

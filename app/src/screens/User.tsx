@@ -122,11 +122,7 @@ const User = ({route, navigation}: any) => {
             .filter(c => c.checked)
             .map(c => {
               return (
-                <TouchableOpacity
-                  key={c.value}
-                  onPress={() => {
-                    console.log(c.value);
-                  }}>
+                <TouchableOpacity key={c.value} onPress={() => {}}>
                   <Text>{c.label}</Text>
                 </TouchableOpacity>
               );
