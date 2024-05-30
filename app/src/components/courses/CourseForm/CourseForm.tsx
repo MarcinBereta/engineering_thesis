@@ -44,6 +44,7 @@ export const CourseForm = (props: any) => {
       }),
     onSuccess: (data, variables, context) => {
       const course = readFragment(courseFragment, data.addCourse);
+
       uploadPhotos(course);
     },
   });
@@ -121,22 +122,25 @@ export const CourseForm = (props: any) => {
         photosToUpload.push(photo);
       }
     }
-    let index = 0;
-    const newPhotos = [];
-    for (let i in dragData) {
-      const photo = dragData[i];
-      for (let it of items) {
-        //@ts-ignore
-        if (photo.value == it.uri) {
+    if (photosToUpload.length > 0) {
+      const newPhotos = [];
+      for (let i in dragData) {
+        const photo = dragData[i];
+        for (let it of items) {
           //@ts-ignore
-          const ending = it.type.split('/')[1];
-          it.name = `${course.text[i].id}.${ending}`;
-          newPhotos.push(it);
+          if (photo.value == it.uri) {
+            //@ts-ignore
+            const ending = it.type.split('/')[1];
+            it.name = `${course.text[i].id}.${ending}`;
+            newPhotos.push(it);
+          }
         }
       }
-    }
-    const res: any = await addPhotos(newPhotos, course.id);
-    if (res.status == 201) {
+      const res: any = await addPhotos(newPhotos, course.id);
+      if (res.status == 201) {
+        props.navigation.push('CoursesList');
+      }
+    } else {
       props.navigation.push('CoursesList');
     }
   };

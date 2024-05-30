@@ -10,10 +10,9 @@ import {graphqlURL} from '@/services/settings';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import request from 'graphql-request';
 import {useContext, useState} from 'react';
-import {View, Text, Image, Modal, Button} from 'react-native';
-import {} from 'react-native/types';
-import {TouchableOpacity} from 'react-native/types';
-export const FriendItem = ({
+import {View, Text, Image, Modal, Button, TouchableOpacity} from 'react-native';
+
+export const FriendRequestItem = ({
   friend,
 }: {
   friend: ResultOf<typeof FriendUserFragmentGQL>;
@@ -67,7 +66,7 @@ export const FriendItem = ({
     <View>
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent={false}
         visible={isModalOpen}
         onRequestClose={() => {
           setIsModalOpen(false);
@@ -87,7 +86,9 @@ export const FriendItem = ({
         />
       </Modal>
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={() => {
+          setIsModalOpen(true);
+        }}
         style={{
           width: '80%',
           flex: 1,

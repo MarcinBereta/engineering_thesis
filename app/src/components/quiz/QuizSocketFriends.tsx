@@ -19,13 +19,15 @@ type Room = {
   questions: ResultOf<typeof quizQuestionFragment>[];
 };
 
-const QuizSocket = ({route, navigation}: any) => {
+const QuizFriends = ({route, navigation}: any) => {
   const {userInfo, socket} = useContext(AuthContext);
 
-  const {quiz} = route.params;
+  const {quiz, friendId, invite} = route.params;
+  const [gameCancelled, setGameCancelled] = useState(false);
   const [gameStage, setGameStage] = useState<
     'waiting' | 'lobby' | 'question' | 'answer' | 'end'
   >('waiting');
+
   const [questionAnserwed, setQuestionAnserwed] = useState(false);
   const [question, setQuestion] = useState<null | ResultOf<
     typeof quizQuestionFragment
@@ -34,12 +36,25 @@ const QuizSocket = ({route, navigation}: any) => {
   const [room, setRoom] = useState<Room | null>(null);
   useEffect(() => {
     if (socket) {
-      socket.emit('joinQueue', {quizId: quiz.id, userId: userInfo?.id});
+      if (!invite)
+        socket.emit('fightWithFriend', {
+          quizId: quiz.id,
+          userId: userInfo?.id,
+          friendId,
+          username: userInfo.username,
+        });
+      else
+        socket.emit('acceptFight', {
+          userId: userInfo?.id,
+          friendId,
+        });
+      socket.on('fightCanceled', data => {
+        setGameCancelled(true);
+      });
 
       socket.on('gameStart', (room: any) => {
         setRoom(room);
         setGameStage('lobby');
-        // setQuestion(room.questions[0])
       });
 
       socket.on('question', (question: any) => {
@@ -126,18 +141,21 @@ const QuizSocket = ({route, navigation}: any) => {
     );
   }
 
+  if (gameCancelled) {
+    return (
+      <View>
+        <Text>Your friend declined game invite</Text>
+        <Button title="Go back" onPress={() => navigation.goBack()} />
+      </View>
+    );
+  }
+
   return (
     <View>
-      <Text style={{fontSize: fontPixel(40)}}>{quiz.name}</Text>
-      <Button
-        onPress={() => {
-          if (socket)
-            socket.emit('leaveQue', {quizId: quiz.id, userId: userInfo?.id});
-        }}
-        title="Cancel searching"
-      />
+      {/* <Text style={{fontSize: fontPixel(40)}}>{quiz.name}</Text> */}
+      <Text>Loading game with friends</Text>
     </View>
   );
 };
 
-export default QuizSocket;
+export default QuizFriends;

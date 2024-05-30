@@ -1,14 +1,15 @@
-import {View, Text, Button} from 'react-native';
+import {View, Text, Button, TouchableOpacity} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {fontPixel} from '../../utils/Normalize';
 import {useContext, useState} from 'react';
 import {QuizQuestion} from './QuizQuestion';
 import {AuthContext} from '../../contexts/AuthContext';
 import {graphqlURL} from '@/services/settings';
-import {useMutation} from '@tanstack/react-query';
+import {useMutation, useQuery} from '@tanstack/react-query';
 import request from 'graphql-request';
 import {addQUizResultGQL, quizQuestionFragment} from '@/services/quiz/quiz';
-import {ResultOf, VariablesOf} from '@/graphql';
+import {ResultOf, VariablesOf, readFragment} from '@/graphql';
+import {FriendUserFragmentGQL, getFriendsGQL} from '@/services/friends/friends';
 
 const shuffleArray = (array: string[]) => {
   return array.sort(() => Math.random() - 0.5);
@@ -20,7 +21,21 @@ export type extendedQuestion = ResultOf<typeof quizQuestionFragment> & {
 
 export type addQuizResultDto = VariablesOf<typeof addQUizResultGQL>;
 const QuizMain = ({route, navigation}: any) => {
-  const {userInfo} = useContext(AuthContext);
+  const {userInfo, socket} = useContext(AuthContext);
+  const [friendSelect, setFriendSelect] = useState(false);
+
+  const {data, isLoading, refetch, error} = useQuery({
+    queryKey: ['friendsList'],
+    queryFn: async () =>
+      request(
+        graphqlURL,
+        getFriendsGQL,
+        {},
+        {
+          Authorization: 'Bearer ' + userInfo?.token,
+        },
+      ),
+  });
 
   const addQuizResultMutation = useMutation({
     mutationFn: async (data: addQuizResultDto) =>
@@ -115,6 +130,39 @@ const QuizMain = ({route, navigation}: any) => {
       </View>
     );
   }
+
+  if (friendSelect && data != undefined) {
+    const friends = readFragment(FriendUserFragmentGQL, data.getUserFriends);
+    return (
+      <View>
+        <Text>Friends list</Text>
+        <FlatList
+          data={friends}
+          renderItem={({item}) => (
+            <TouchableOpacity
+              style={{
+                padding: 15,
+                backgroundColor: 'lightgray',
+                width: '90%',
+                marginLeft: '5%',
+                borderRadius: 20,
+                marginTop: 10,
+              }}
+              onPress={() => {
+                navigation.navigate('QuizWithFriends', {
+                  quiz,
+                  friendId: item.id,
+                  invite: false,
+                });
+              }}>
+              <Text>{item.username}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    );
+  }
+
   return (
     <View>
       <Text style={{fontSize: fontPixel(40)}}>{quiz.name}</Text>
@@ -129,6 +177,12 @@ const QuizMain = ({route, navigation}: any) => {
           navigation.navigate('QuizSearch', {quiz});
         }}
         title="Search for opoonents"
+      />
+      <Button
+        onPress={() => {
+          setFriendSelect(true);
+        }}
+        title="Fight with friend"
       />
     </View>
   );

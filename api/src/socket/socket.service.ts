@@ -20,6 +20,15 @@ export class SocketService {
       socket: Socket;
     }[]
   > = new Map();
+
+  private waiting: Map<
+    string,
+    {
+      quizId: string;
+      friendId: string;
+      socket: Socket;
+    }
+  > = new Map();
   private rooms: Map<string, Room> = new Map();
   constructor(private prismaService: PrismaService) {}
   @WebSocketServer() server: Server;
@@ -56,6 +65,57 @@ export class SocketService {
     //         socket:socket
     //     }], quizId)
     // }
+  }
+
+  async fightWithFriend(
+    socket: Socket,
+    quizId: string,
+    userId: string,
+    friendId: string,
+    username: string,
+  ) {
+    const quiz = await this.prismaService.quiz.findUnique({
+      where: {
+        id: quizId,
+      },
+    });
+    this.waiting.set(userId, {
+      quizId,
+      friendId,
+      socket,
+    });
+    console.log(friendId);
+    this.server.to(friendId).emit('fightWithFriend', {
+      userId,
+      quizId,
+      username,
+      quiz,
+    });
+  }
+
+  async acceptFight(socket: Socket, userId: string, friendId: string) {
+    let data = this.waiting.get(friendId);
+    if (data.friendId == userId)
+      this.createRoom(
+        [
+          {
+            user: userId,
+            socket: socket,
+          },
+          {
+            user: friendId,
+            socket: data.socket,
+          },
+        ],
+        data.quizId,
+      );
+  }
+
+  async declineFight(socket: Socket, userId: string, friendId: string) {
+    let data = this.waiting.get(friendId);
+    if (data.friendId == userId) {
+      data.socket.emit('fightCanceled');
+    }
   }
 
   async leaveQueue(socket: Socket, quizId: string, userId: string) {

@@ -52,7 +52,7 @@ type VerificationFormData {
 }
 
 type NullResponse {
-  message: String!
+  message: String
 }
 
 type SigninResponse {

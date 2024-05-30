@@ -35,6 +35,7 @@ const UnVerifiedCoursesList = (props: any) => {
       }),
     onSuccess: (data, variables, context) => {
       props.navigation.push('CoursesList');
+      refetch();
     },
   });
 

@@ -4,16 +4,16 @@ import {Navigator} from './src/screens/Navigator';
 import {AuthProvider} from './src/contexts/AuthContext';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {SocketHandler} from '@/contexts/SocketHandler';
 const queryClient = new QueryClient();
 
 export default function App() {
-  const socket = io(constants.url, {autoConnect: false});
-
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Navigator socket={socket} />
+          <SocketHandler />
+          <Navigator />
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
