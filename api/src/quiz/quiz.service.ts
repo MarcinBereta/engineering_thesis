@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 import { Quiz } from './dto/quiz.dto';
 import { AddScore } from './dto/addScore.dto';
 
 @Injectable()
 export class QuizService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService) { }
 
   async getQuizById(id: string): Promise<Quiz> {
     return this.prismaService.quiz.findUnique({
@@ -26,6 +26,25 @@ export class QuizService {
         UserScores: true,
       },
     });
+  }
+  // merge texts from course
+  async mergeTexts(id: string) {
+    let course = await this.prismaService.course.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        text: true,
+      },
+    });
+    let mergedText = '';
+    course.text.forEach((text) => {
+      if (text.type === 'text') {
+        mergedText += text.value;
+      }
+    });
+    return mergedText;
+
   }
 
   async addUserScore(addScore: AddScore, userId: string): Promise<Quiz> {
