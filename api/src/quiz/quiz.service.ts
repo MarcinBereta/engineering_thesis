@@ -83,14 +83,11 @@ export class QuizService {
       model: "gpt-3.5-turbo",
       response_format: { "type": "json_object" },
     });
-    console.log(completion.choices[0].message.content)
     return completion.choices[0].message.content;
   }
   /*
-  Dodać weryfikację czy kurs istnieje
-  Dodać weryfikację poprawności formatu danych z OpenAI
-  Dodać możliwość edycji pytań
-  
+  Dodać weryfikację poprawności formatu danych z OpenAI prior
+  Wbudować ponawianie jeśli np OpenAI nie zwróci odpowiedzi albo zwróci w złym formacie
   */
   async addQuizToDataBase(courseId: string): Promise<Quiz> {
     if (!this.isCourseExist) {
@@ -98,6 +95,7 @@ export class QuizService {
     }
     let questions = await this.generateQuestions(courseId);
     let questionsJson = JSON.parse(questions);
+    // weryfikacja poprawności jsona
     let courseName = await this.getCourseName(courseId);
     if (questionsJson && questionsJson.quiz && Array.isArray(questionsJson.quiz)) {
       let quiz = await this.prismaService.quiz.create({
@@ -125,6 +123,25 @@ export class QuizService {
     }
   }
 
+  async deleteQuestionAndQuiz(courseId: string): Promise<void> {
+    let quiz = await this.prismaService.quiz.findFirst({
+      where: {
+        courseId: courseId,
+      },
+    });
+    if (quiz) {
+      await this.prismaService.question.deleteMany({
+        where: {
+          quizId: quiz.id,
+        },
+      });
+      await this.prismaService.quiz.delete({
+        where: {
+          id: quiz.id,
+        },
+      });
+    }
+  }
 
 
   async addUserScore(addScore: AddScore, userId: string): Promise<Quiz> {
