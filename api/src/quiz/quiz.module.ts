@@ -6,6 +6,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   providers: [QuizService, QuizResolver],
-  imports:[PrismaModule]
+  imports:[PrismaModule],
+  exports: [QuizService]
 })
 export class QuizModule {}

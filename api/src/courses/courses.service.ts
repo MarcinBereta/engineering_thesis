@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Course, CourseInput, EditCourseInput } from './dto/CourseDTO';
 import path, { extname, join } from 'path';
+import { QuizService } from 'src/quiz/quiz.service';
 import {
   writeFileSync,
   existsSync,
@@ -15,7 +16,9 @@ import { Category } from '@prisma/client';
 
 @Injectable()
 export class CoursesService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService,
+    private quizService: QuizService
+  ) { }
 
   async processCourse(course: EditCourseInput | CourseInput, id: string) {
     const courseItemsToAdd = [];
@@ -165,7 +168,11 @@ export class CoursesService {
       },
     });
     await this.processCourse(course, course.id);
-
+    // is course verified
+    if (courseToEdit.verified) {
+      await this.quizService.deleteQuestionAndQuiz(course.id);
+      await this.quizService.addQuizToDataBase(course.id);
+    }
     return await this.prismaService.course.findUnique({
       where: {
         id: course.id,
@@ -213,6 +220,8 @@ export class CoursesService {
   }
 
   async verifyCourse(courseId: string) {
+    await this.quizService.addQuizToDataBase(courseId);
+
     return await this.prismaService.course.update({
       where: {
         id: courseId,
