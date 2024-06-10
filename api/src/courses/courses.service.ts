@@ -127,8 +127,7 @@ export class CoursesService {
     });
 
     await this.processCourse(course, newCourse.id);
-    // dodaanie quizu
-    await this.quizService.addQuizToDataBase(newCourse.id); // dodawanie quizu podczas tworzenia kursu
+
     return await this.prismaService.course.findUnique({
       where: {
         id: newCourse.id,
@@ -169,8 +168,11 @@ export class CoursesService {
       },
     });
     await this.processCourse(course, course.id);
-    await this.quizService.deleteQuestionAndQuiz(course.id);
-    await this.quizService.addQuizToDataBase(course.id);
+    // is course verified
+    if (courseToEdit.verified) {
+      await this.quizService.deleteQuestionAndQuiz(course.id);
+      await this.quizService.addQuizToDataBase(course.id);
+    }
     return await this.prismaService.course.findUnique({
       where: {
         id: course.id,
@@ -218,6 +220,8 @@ export class CoursesService {
   }
 
   async verifyCourse(courseId: string) {
+    await this.quizService.addQuizToDataBase(courseId);
+
     return await this.prismaService.course.update({
       where: {
         id: courseId,

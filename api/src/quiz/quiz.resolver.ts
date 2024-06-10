@@ -23,12 +23,4 @@ export class QuizResolver {
     async addUserScore(@Args('addScore') addScore: AddScore, @Context() context) {
         return this.quizService.addUserScore(addScore, context.req.user.id)
     }
-    // @Query(returns => String)
-    // async mergeTexts(courseId: string): Promise<string> {
-    //     return this.quizService.mergeTexts(courseId)
-    // }
-    // @Query(returns => String)
-    // async generateQuestions(courseId: string): Promise<string> {
-    //     return this.quizService.generateQuestions(courseId);
-    // }
 }
