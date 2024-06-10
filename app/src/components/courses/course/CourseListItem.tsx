@@ -7,7 +7,7 @@ export type courseItem = {
 };
 export const CourseListItem = ({course: item}: {course: courseItem}) => {
   return (
-    <View style={{backgroundColor: 'red', flexDirection: 'row'}}>
+    <View style={{flexDirection: 'row'}}>
       {item.type == 'text' ? (
         <Text>{item.value}</Text>
       ) : (

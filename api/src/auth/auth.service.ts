@@ -22,6 +22,7 @@ export class AuthService {
   ) {}
 
   async signup(user: SingUpUserInput) {
+    console.log('HERE');
     const password = bcrypt.hashSync(user.password, 10);
 
     const userExists = await this.Prisma.user.findMany({

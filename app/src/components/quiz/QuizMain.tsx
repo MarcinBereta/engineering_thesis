@@ -95,7 +95,9 @@ const QuizMain = ({route, navigation}: any) => {
               return question;
             });
             setQuestions(newQuestions);
-            setCurrentQuestion(currentQuestion + 1);
+            if (currentQuestion + 1 == questions.length) {
+              handleEndQuiz();
+            } else setCurrentQuestion(currentQuestion + 1);
           }}
         />
         <View>

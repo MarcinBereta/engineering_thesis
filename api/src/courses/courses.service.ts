@@ -16,9 +16,10 @@ import { Category } from '@prisma/client';
 
 @Injectable()
 export class CoursesService {
-  constructor(private prismaService: PrismaService,
-    private quizService: QuizService
-  ) { }
+  constructor(
+    private prismaService: PrismaService,
+    private quizService: QuizService,
+  ) {}
 
   async processCourse(course: EditCourseInput | CourseInput, id: string) {
     const courseItemsToAdd = [];
