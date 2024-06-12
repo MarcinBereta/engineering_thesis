@@ -12,7 +12,8 @@ import {
 } from 'fs';
 import { simpleUser } from 'src/auth/dto/signup-response';
 import { promisify } from 'util';
-import { Category } from '@prisma/client';
+import { Category, Moderator, Prisma } from '@prisma/client';
+import { SimpleModerator } from 'src/users/dto/user.entity';
 
 @Injectable()
 export class CoursesService {
@@ -111,11 +112,13 @@ export class CoursesService {
       },
     });
 
-    let moderator;
+    let moderator: Moderator;
     if (moderators.length > 0) {
       moderator = moderators[Math.floor(Math.random() * moderators.length)];
     } else {
-      moderator = await this.prismaService.moderator.findFirst();
+      const query = Prisma.sql`
+      select * from "Moderator" order by array_length(categories, 1) desc limit 1`;
+      moderator = await this.prismaService.$queryRaw(query);
     }
 
     const newCourse = await this.prismaService.course.create({

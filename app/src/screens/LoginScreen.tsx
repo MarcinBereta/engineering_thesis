@@ -72,6 +72,7 @@ const LoginScreen = (props: any) => {
           control={control}
           name="password"
           placeholder="Password"
+          secureTextEntry={true}
           style={styles.textInput}
         />
         <GoogleSigninButton
