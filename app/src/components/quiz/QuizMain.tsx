@@ -1,15 +1,15 @@
-import {View, Text, Button, TouchableOpacity} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
-import {fontPixel} from '../../utils/Normalize';
-import {useContext, useState} from 'react';
-import {QuizQuestion} from './QuizQuestion';
-import {AuthContext} from '../../contexts/AuthContext';
-import {graphqlURL} from '@/services/settings';
-import {useMutation, useQuery} from '@tanstack/react-query';
+import { View, Text, Button, TouchableOpacity } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
+import { fontPixel } from '../../utils/Normalize';
+import { useContext, useState } from 'react';
+import { QuizQuestion } from './QuizQuestion';
+import { AuthContext } from '../../contexts/AuthContext';
+import { graphqlURL } from '@/services/settings';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
-import {addQUizResultGQL, quizQuestionFragment} from '@/services/quiz/quiz';
-import {ResultOf, VariablesOf, readFragment} from '@/graphql';
-import {FriendUserFragmentGQL, getFriendsGQL} from '@/services/friends/friends';
+import { addQUizResultGQL, quizQuestionFragment } from '@/services/quiz/quiz';
+import { ResultOf, VariablesOf, readFragment } from '@/graphql';
+import { FriendUserFragmentGQL, getFriendsGQL } from '@/services/friends/friends';
 
 const shuffleArray = (array: string[]) => {
   return array.sort(() => Math.random() - 0.5);
@@ -20,11 +20,11 @@ export type extendedQuestion = ResultOf<typeof quizQuestionFragment> & {
 };
 
 export type addQuizResultDto = VariablesOf<typeof addQUizResultGQL>;
-const QuizMain = ({route, navigation}: any) => {
-  const {userInfo, socket} = useContext(AuthContext);
+const QuizMain = ({ route, navigation }: any) => {
+  const { userInfo, socket } = useContext(AuthContext);
   const [friendSelect, setFriendSelect] = useState(false);
 
-  const {data, isLoading, refetch, error} = useQuery({
+  const { data, isLoading, refetch, error } = useQuery({
     queryKey: ['friendsList'],
     queryFn: async () =>
       request(
@@ -42,12 +42,12 @@ const QuizMain = ({route, navigation}: any) => {
       request(graphqlURL, addQUizResultGQL, data, {
         Authorization: 'Bearer ' + userInfo?.token,
       }),
-    onSuccess: (data, variables, context) => {
-      navigation.push('CoursesList');
-    },
+    // onSuccess: (data, variables, context) => {
+    //   navigation.push('QuizResult', data);
+    // },
   });
 
-  const {quiz} = route.params;
+  const { quiz } = route.params;
   const [questions, setQuestions] = useState<extendedQuestion[]>(() => {
     const extendedQuestions = quiz.questions.map(
       (question: ResultOf<typeof quizQuestionFragment>) => {
@@ -68,17 +68,22 @@ const QuizMain = ({route, navigation}: any) => {
     const correctAnswers = questions.filter(
       question => question.userAnswer === question.correct,
     );
+    let correct = correctAnswers.length;
+    let all = questions.length;
     setStart(false);
     console.log(
       `You answered ${correctAnswers.length} out of ${questions.length} questions correctly`,
     );
+    // create screen to show result
     addQuizResultMutation.mutate({
       addScore: {
         quizId: quiz.id,
         userId: userInfo?.id,
         score: correctAnswers.length,
       },
-    });
+    }
+    );
+    navigation.navigate('QuizResult', { score: correct, total: all });
   };
 
   if (start) {
@@ -90,7 +95,7 @@ const QuizMain = ({route, navigation}: any) => {
           setAnswer={(answer: string, index: number) => {
             const newQuestions = questions.map((question, i) => {
               if (i === index) {
-                return {...question, userAnswer: answer};
+                return { ...question, userAnswer: answer };
               }
               return question;
             });
@@ -114,11 +119,10 @@ const QuizMain = ({route, navigation}: any) => {
                 setCurrentQuestion(currentQuestion + 1);
               }
             }}
-            title={`${
-              currentQuestion == questions.length - 1
-                ? 'End quiz'
-                : 'Next question'
-            }`}
+            title={`${currentQuestion == questions.length - 1
+              ? 'End quiz'
+              : 'Next question'
+              }`}
           />
           {currentQuestion != 0 && (
             <Button
@@ -140,7 +144,7 @@ const QuizMain = ({route, navigation}: any) => {
         <Text>Friends list</Text>
         <FlatList
           data={friends}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <TouchableOpacity
               style={{
                 padding: 15,
@@ -167,7 +171,7 @@ const QuizMain = ({route, navigation}: any) => {
 
   return (
     <View>
-      <Text style={{fontSize: fontPixel(40)}}>{quiz.name}</Text>
+      <Text style={{ fontSize: fontPixel(40) }}>{quiz.name}</Text>
       <Button
         onPress={() => {
           setStart(true);
@@ -176,7 +180,7 @@ const QuizMain = ({route, navigation}: any) => {
       />
       <Button
         onPress={() => {
-          navigation.navigate('QuizSearch', {quiz});
+          navigation.navigate('QuizSearch', { quiz });
         }}
         title="Search for opoonents"
       />

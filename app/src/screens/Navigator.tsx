@@ -23,6 +23,7 @@ import QuizMain from '../components/quiz/QuizMain';
 import QuizSocket from '../components/quiz/QuizSocket';
 import {Friends} from './Friends';
 import QuizFriends from '@/components/quiz/QuizSocketFriends';
+import QuizResult from './QuizResult';
 // import {Stack}
 const Stack = createNativeStackNavigator();
 
@@ -54,7 +55,7 @@ const Navigator = ({}: {}) => {
             <Stack.Screen component={QuizMain} name="quiz" />
             <Stack.Screen component={QuizSocket} name="QuizSearch" />
             <Stack.Screen component={QuizFriends} name="QuizWithFriends" />
-
+            <Stack.Screen name="QuizResult" component={QuizResult} />
             <Stack.Screen component={Friends} name="Friends" />
 
             <Stack.Screen component={User} name="User" />

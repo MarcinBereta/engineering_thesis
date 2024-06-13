@@ -1,16 +1,16 @@
-import {View, Text, Button, TouchableOpacity} from 'react-native';
-import {AuthContext} from '../contexts/AuthContext';
-import {useContext} from 'react';
-import {getCoursesGQL} from '../services/courses/courses';
-import {FlatList} from 'react-native-gesture-handler';
+import { View, Text, Button, TouchableOpacity } from 'react-native';
+import { AuthContext } from '../contexts/AuthContext';
+import { useContext } from 'react';
+import { getCoursesGQL } from '../services/courses/courses';
+import { FlatList } from 'react-native-gesture-handler';
 import request from 'graphql-request';
 import constants from 'constants';
-import {useQuery} from '@tanstack/react-query';
-import {graphqlURL} from '@/services/settings';
+import { useQuery } from '@tanstack/react-query';
+import { graphqlURL } from '@/services/settings';
 
 const CoursesList = (props: any) => {
-  const {userInfo} = useContext(AuthContext);
-  const {data, isLoading, refetch} = useQuery({
+  const { userInfo } = useContext(AuthContext);
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ['userId'],
     queryFn: async () =>
       request(
@@ -28,11 +28,11 @@ const CoursesList = (props: any) => {
   }
 
   return (
-    <View style={{flexDirection: 'column', flex: 1}}>
+    <View style={{ flexDirection: 'column', flex: 1 }}>
       <Text>Course list: </Text>
       <FlatList
         data={data.course}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View
             style={{
               padding: 15,
@@ -44,12 +44,18 @@ const CoursesList = (props: any) => {
             }}>
             <TouchableOpacity
               onPress={() => {
-                props.navigation.push('course', {course: item});
+                props.navigation.push('course', { course: item });
               }}>
               <Text>{item.name}</Text>
             </TouchableOpacity>
           </View>
         )}
+      />
+      <Button
+        title="Go to Main Page"
+        onPress={() => {
+          props.navigation.push('DashboardScreen');
+        }}
       />
 
       {userInfo?.verified ? (
@@ -64,4 +70,4 @@ const CoursesList = (props: any) => {
   );
 };
 
-export {CoursesList};
+export { CoursesList };
