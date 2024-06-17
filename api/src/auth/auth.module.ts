@@ -11,18 +11,18 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { jwtConstants } from './constants';
 
 @Module({
-  imports: [
-    ConfigModule,
-    forwardRef(() => UsersModule),
-    PassportModule,
-    PrismaModule,
-    UsersModule,
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '7d' },
-      global: true,
-    }),
-  ],
-  providers: [AuthService, AuthResolver, JwtStrategy, LocalStrategy],
+    imports: [
+        ConfigModule,
+        forwardRef(() => UsersModule),
+        PassportModule,
+        PrismaModule,
+        UsersModule,
+        JwtModule.register({
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '7d' },
+            global: true,
+        }),
+    ],
+    providers: [AuthService, AuthResolver, JwtStrategy, LocalStrategy],
 })
 export class AuthModule {}

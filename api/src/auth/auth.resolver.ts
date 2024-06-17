@@ -10,28 +10,28 @@ import { ProviderInput } from './dto/provider.input';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) {}
 
-  @Mutation(() => SignupResponse)
-  async signup(
-    @Args('registerUserInput') registerUserInput: SingUpUserInput,
-  ): Promise<SignupResponse> {
-    return this.authService.signup(registerUserInput);
-  }
+    @Mutation(() => SignupResponse)
+    async signup(
+        @Args('registerUserInput') registerUserInput: SingUpUserInput
+    ): Promise<SignupResponse> {
+        return this.authService.signup(registerUserInput);
+    }
 
-  @Mutation(() => SigninResponse)
-  async providerLogin(
-    @Args('providerUserInput') providerInput: ProviderInput,
-  ): Promise<SignupResponse> {
-    return this.authService.providerLogin(providerInput);
-  }
+    @Mutation(() => SigninResponse)
+    async providerLogin(
+        @Args('providerUserInput') providerInput: ProviderInput
+    ): Promise<SignupResponse> {
+        return this.authService.providerLogin(providerInput);
+    }
 
-  @Mutation(() => SigninResponse)
-  @UseGuards(GqlAuthGuard)
-  async signin(
-    @Args('loginUserInput') loginUserInput: SigninUserInput,
-    @Context() context,
-  ): Promise<SigninResponse> {
-    return this.authService.signin(context.user);
-  }
+    @Mutation(() => SigninResponse)
+    @UseGuards(GqlAuthGuard)
+    async signin(
+        @Args('loginUserInput') loginUserInput: SigninUserInput,
+        @Context() context
+    ): Promise<SigninResponse> {
+        return this.authService.signin(context.user);
+    }
 }

@@ -11,6 +11,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -21,8 +22,8 @@ model User {
   role            Role         @default(USER)
   image           String?
   password        String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
   courses         Course[]
   scores          UserScores[]
   Friends         Friends[]    @relation(name: "friends_users")
@@ -37,8 +38,8 @@ model Course {
   id          String       @id @default(uuid())
   name        String
   creatorId   String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
   verified    Boolean      @default(false)
   category    Category
   creator     User         @relation(fields: [creatorId], references: [id])
@@ -54,8 +55,8 @@ model CourseItem {
   type      CourseItemType
   value     String
   course    Course         @relation(fields: [courseId], references: [id])
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime       @updatedAt @db.Timestamptz(3)
 }
 
 model Quiz {
@@ -82,8 +83,8 @@ model UserScores {
   userId    String
   quizId    String
   score     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3) 
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
   User      User     @relation(fields: [userId], references: [id])
   Quiz      Quiz     @relation(fields: [quizId], references: [id])
 }
@@ -92,8 +93,8 @@ model Friends {
   id        String   @id @default(uuid())
   userId    String
   friendId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
   User      User     @relation(name: "friends_users", fields: [userId], references: [id])
   Friend    User     @relation(name: "friends_friends", fields: [friendId], references: [id])
 }
@@ -102,8 +103,8 @@ model FriendsRequests {
   id        String   @id @default(uuid())
   userId    String
   friendId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
   User      User     @relation(name: "friends_requests_user", fields: [userId], references: [id])
   Friend    User     @relation(name: "friends_requests_friend", fields: [friendId], references: [id])
 }
@@ -112,16 +113,16 @@ model VerificationForm {
   id        String   @id @default(uuid())
   userId    String
   text      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
   User      User     @relation(fields: [userId], references: [id])
 }
 
 model Moderator {
   id         String     @id @default(uuid())
   userId     String
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime   @updatedAt @db.Timestamptz(3)
   categories Category[]
   User       User       @relation(fields: [userId], references: [id])
   Course     Course[]

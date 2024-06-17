@@ -15,30 +15,41 @@ import { CoursesModule } from './courses/courses.module';
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { QuizModule } from './quiz/quiz.module';
-import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { SocketModule } from './socket/socket.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-       playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
-    }),
-    UsersModule,
-    ConfigModule.forRoot(),
-    PrismaModule,
-    AuthModule,
-    CoursesModule,
-    FilesModule,
-    QuizModule,
-    SocketModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService, PrismaService, AuthResolver, AuthService],
+    imports: [
+        ConfigModule.forRoot(),
+
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+            playground: false,
+            plugins: [ApolloServerPluginLandingPageLocalDefault()],
+        }),
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'public'),
+        }),
+        CacheModule.register({
+            isGlobal: true,
+            store: redisStore,
+            socket: {
+                host: process.env.REDIS_HOST,
+                port: process.env.REDIS_HOST_PORT,
+            },
+        }),
+        UsersModule,
+        PrismaModule,
+        AuthModule,
+        CoursesModule,
+        FilesModule,
+        QuizModule,
+        SocketModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService, PrismaService, AuthResolver, AuthService],
 })
 export class AppModule {}

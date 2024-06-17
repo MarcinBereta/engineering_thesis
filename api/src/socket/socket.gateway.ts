@@ -1,12 +1,11 @@
 import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-
 import { parse } from 'path';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
@@ -16,69 +15,77 @@ import { Context } from '@nestjs/graphql';
 import { SocketService } from './socket.service';
 
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
+    cors: {
+        origin: '*',
+    },
 })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer()
-  public server: Server;
-  constructor(private socketService: SocketService) {}
+    @WebSocketServer()
+    public server: Server;
+    constructor(private socketService: SocketService) {}
 
-  async handleConnection(socket: Socket) {}
-  async handleDisconnect(socket: Socket) {}
+    async handleConnection(socket: Socket) {}
+    async handleDisconnect(socket: Socket) {}
 
-  @SubscribeMessage('connectToOwnRoom')
-  @UseGuards(SocketGuard)
-  async handleConnectToOwnRoom(socket: Socket, payload: any) {
-    console.log('Joined room: ', payload.userId);
-    socket.join(payload.userId);
-  }
+    @SubscribeMessage('connectToOwnRoom')
+    @UseGuards(SocketGuard)
+    async handleConnectToOwnRoom(socket: Socket, payload: any) {
+        console.log('Joined room: ', payload.userId);
+        socket.join(payload.userId);
+    }
 
-  @SubscribeMessage('fightWithFriend')
-  @UseGuards(SocketGuard)
-  async handleFightInvite(socket: Socket, payload: any) {
-    this.socketService.fightWithFriend(
-      socket,
-      payload.quizId,
-      payload.userId,
-      payload.friendId,
-      payload.username,
-    );
-  }
+    @SubscribeMessage('fightWithFriend')
+    @UseGuards(SocketGuard)
+    async handleFightInvite(socket: Socket, payload: any) {
+        this.socketService.fightWithFriend(
+            socket,
+            payload.quizId,
+            payload.userId,
+            payload.friendId,
+            payload.username
+        );
+    }
 
-  @SubscribeMessage('acceptFight')
-  @UseGuards(SocketGuard)
-  async handleAcceptFight(socket: Socket, payload: any) {
-    this.socketService.acceptFight(socket, payload.userId, payload.friendId);
-  }
+    @SubscribeMessage('acceptFight')
+    @UseGuards(SocketGuard)
+    async handleAcceptFight(socket: Socket, payload: any) {
+        this.socketService.acceptFight(
+            socket,
+            payload.userId,
+            payload.friendId
+        );
+    }
 
-  @SubscribeMessage('declineFight')
-  @UseGuards(SocketGuard)
-  async handleDeclineFight(socket: Socket, payload: any) {
-    this.socketService.declineFight(socket, payload.userId, payload.friendId);
-  }
+    @SubscribeMessage('declineFight')
+    @UseGuards(SocketGuard)
+    async handleDeclineFight(socket: Socket, payload: any) {
+        this.socketService.declineFight(
+            socket,
+            payload.userId,
+            payload.friendId
+        );
+    }
 
-  @SubscribeMessage('joinQueue')
-  @UseGuards(SocketGuard)
-  async handleJoinQueue(socket: Socket, payload: any) {
-    // console.log(payload)
-    this.socketService.joinQueue(socket, payload.quizId, payload.userId);
-  }
+    @SubscribeMessage('joinQueue')
+    @UseGuards(SocketGuard)
+    async handleJoinQueue(socket: Socket, payload: any) {
+        // console.log(payload)
+        this.socketService.joinQueue(socket, payload.quizId, payload.userId);
+    }
 
-  @SubscribeMessage('leaveQueue')
-  @UseGuards(SocketGuard)
-  async handleLeaveQueue(socket: Socket, payload: any) {
-    this.socketService.leaveQueue(socket, payload.quizId, payload.userId);
-  }
+    @SubscribeMessage('leaveQueue')
+    @UseGuards(SocketGuard)
+    async handleLeaveQueue(socket: Socket, payload: any) {
+        this.socketService.leaveQueue(socket, payload.quizId, payload.userId);
+    }
 
-  @SubscribeMessage('answer')
-  @UseGuards(SocketGuard)
-  async handleAnswer(socket: Socket, payload: any) {
-    this.socketService.handleAnswer(
-      payload.roomId,
-      payload.userId,
-      payload.answer,
-    );
-  }
+    @SubscribeMessage('answer')
+    @UseGuards(SocketGuard)
+    async handleAnswer(socket: Socket, payload: any) {
+        this.socketService.handleAnswer(
+            payload.roomId,
+            payload.userId,
+            payload.answer
+        );
+    }
 }

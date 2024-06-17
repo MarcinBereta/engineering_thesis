@@ -4,7 +4,7 @@ import { CoursesService } from './courses.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { QuizModule } from 'src/quiz/quiz.module';
 @Module({
-  providers: [CoursesResolver, CoursesService],
-  imports: [PrismaModule, QuizModule],
+    providers: [CoursesResolver, CoursesService],
+    imports: [PrismaModule, QuizModule],
 })
-export class CoursesModule { }
+export class CoursesModule {}

@@ -10,6 +10,7 @@ import {graphqlURL} from '@/services/settings';
 import {VariablesOf} from '@/graphql';
 
 export type verifyUserDataDto = VariablesOf<typeof updateUserDataGQL>;
+
 const User = ({route, navigation}: any) => {
   const {userInfo} = useContext(AuthContext);
   const {user} = route.params;

@@ -2,8 +2,6 @@ import {View, Button, TextInput} from 'react-native';
 import {useContext, useState} from 'react';
 import {AuthContext, UserInfo} from '../../contexts/AuthContext';
 import {addVerificationRequestGQL} from '../../services/admin/admin';
-import {verifyCourseDto} from '@/screens/UnVerifiedCoursesList';
-import {verifyCourseGQL} from '@/services/courses/courses';
 import {graphqlURL} from '@/services/settings';
 import {useMutation} from '@tanstack/react-query';
 import request from 'graphql-request';
@@ -22,7 +20,7 @@ const VerifyAccount = ({route, navigation}: any) => {
         Authorization: 'Bearer ' + userInfo?.token,
       }),
     onSuccess: (data, variables, context) => {
-      navigation.push('dashboard');
+      navigation.push('DashboardScreen');
     },
   });
 
