@@ -9,6 +9,7 @@ import { CoursesService } from './courses.service';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 
 @Resolver((of) => Course)
 @UseGuards(JwtAuthGuard)
@@ -33,6 +34,20 @@ export class CoursesResolver {
         return await this.courseService.getUnVerifiedCourses(
             context.req.user.id
         );
+    }
+
+    @Query((returns) => [Course])
+    async getCoursesWithPagination(
+        @Args('pagination') pagination: PaginationDto
+    ) {
+        return await this.courseService.getAllCoursesWithPagination(pagination);
+    }
+
+    @Query((returns) => CountDto)
+    async countCoursesWithPagination(
+        @Args('pagination') pagination: PaginationDto
+    ) {
+        return await this.courseService.getCoursesCount(pagination);
     }
 
     @Query((returns) => [Course])

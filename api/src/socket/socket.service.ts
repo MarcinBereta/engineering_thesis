@@ -81,7 +81,6 @@ export class SocketService {
             friendId,
             socket,
         });
-        console.log(friendId);
         this.server.to(friendId).emit('fightWithFriend', {
             userId,
             quizId,

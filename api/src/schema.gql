@@ -72,6 +72,11 @@ type CourseItem {
     value: String!
 }
 
+type CountDto {
+    count: Float!
+    size: Float!
+}
+
 type Quiz {
     id: String!
     courseId: String!
@@ -104,9 +109,18 @@ type Query {
     getVerifyRequests: [VerificationFormData!]!
     course: [Course!]!
     unVerifiedCourses: [Course!]!
+    getCoursesWithPagination(pagination: PaginationDto!): [Course!]!
+    countCoursesWithPagination(pagination: PaginationDto!): CountDto!
     MyCourses: [Course!]!
-    getQuizById: Quiz!
+    getQuizById(id: String!): Quiz!
     getAllQuizzes: [Quiz!]!
+    getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
+    countQuizWithPagination(pagination: PaginationDto!): CountDto!
+}
+
+input PaginationDto {
+    page: Float!
+    search: String
 }
 
 type Mutation {

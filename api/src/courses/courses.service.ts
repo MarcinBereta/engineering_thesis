@@ -7,6 +7,8 @@ import { simpleUser } from 'src/auth/dto/signup-response';
 import { Moderator, Prisma } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { PaginationDto } from 'src/utils/pagination.dto';
+import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
 
 @Injectable()
 export class CoursesService {
@@ -193,6 +195,84 @@ export class CoursesService {
         });
     }
 
+    async getAllCoursesWithPagination(paginationDto: PaginationDto) {
+        const { page, search } = paginationDto;
+
+        if (search) {
+            const courses = await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    verified: true,
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    },
+                },
+                skip: (page - 1) * PAGINATION_SIZE,
+                take: PAGINATION_SIZE,
+            });
+            return courses;
+        }
+
+        const cachedCourses = await this.cacheManager.get(
+            'all_courses/' + page
+        );
+        if (cachedCourses) {
+            return cachedCourses;
+        }
+
+        const courses = await this.prismaService.course.findMany({
+            include: {
+                text: true,
+            },
+            where: {
+                verified: true,
+            },
+            skip: (page - 1) * PAGINATION_SIZE,
+            take: PAGINATION_SIZE,
+        });
+        await this.cacheManager.set('all_courses/' + page, courses);
+        return courses;
+    }
+
+    async getCoursesCount(paginationDto: PaginationDto) {
+        const { search } = paginationDto;
+
+        if (search) {
+            const count = await this.prismaService.course.count({
+                where: {
+                    verified: true,
+                    name: {
+                        contains: search,
+                    },
+                },
+            });
+
+            return { count, size: PAGINATION_SIZE };
+        }
+
+        const coursesCountCached = await this.cacheManager.get('courses_count');
+
+        if (coursesCountCached) {
+            return {
+                count: coursesCountCached,
+                size: PAGINATION_SIZE,
+            };
+        }
+
+        const count = await this.prismaService.course.count({
+            where: {
+                verified: true,
+            },
+        });
+
+        await this.cacheManager.set('courses_count', count);
+
+        return { count, size: PAGINATION_SIZE };
+    }
+
     async getAllCourses() {
         const cachedCourses = await this.cacheManager.get('all_courses');
         if (cachedCourses) {
@@ -267,10 +347,16 @@ export class CoursesService {
             },
         });
         await this.quizService.addQuizToDataBase(courseId);
-        await this.cacheManager.del('all_courses');
         await this.cacheManager.del('my_courses/' + course.creatorId);
         await this.cacheManager.del('unverified_courses/' + course.moderatorId);
-
+        const keys = await this.cacheManager.store.keys();
+        const cachesToDelete = [];
+        for (let key of keys) {
+            if (key.includes('all_courses')) {
+                cachesToDelete.push(this.cacheManager.del(key));
+            }
+        }
+        await Promise.all(cachesToDelete);
         return course;
     }
 }

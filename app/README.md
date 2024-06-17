@@ -12,9 +12,9 @@
 
 > `npx create-react-native-app my-app -t with-reanimated`
 
-- Run `yarn` or `npm install`
-- Run `yarn start` or `npm run start` to try it out.
+-   Run `yarn` or `npm install`
+-   Run `yarn start` or `npm run start` to try it out.
 
 ## 📝 Notes
 
-- [`react-native-reanimated` docs](https://docs.swmansion.com/react-native-reanimated/)
+-   [`react-native-reanimated` docs](https://docs.swmansion.com/react-native-reanimated/)

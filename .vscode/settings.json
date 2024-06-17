@@ -2,6 +2,5 @@
     "cSpell.words": ["itemik", "Signin", "tada"],
     "typescript.tsdk": "app/node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true,
-    "prettier.configPath": "../.prettierrc",
-    "editor.formatOnSave": true
+    "prettier.configPath": "../.prettierrc"
 }

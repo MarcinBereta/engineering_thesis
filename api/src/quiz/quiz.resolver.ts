@@ -5,6 +5,7 @@ import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { AddScore } from './dto/addScore.dto';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 
 @Resolver((of) => Quiz)
 @UseGuards(JwtAuthGuard)
@@ -12,7 +13,7 @@ export class QuizResolver {
     constructor(private quizService: QuizService) {}
 
     @Query((returns) => Quiz)
-    async getQuizById(id: string): Promise<Quiz> {
+    async getQuizById(@Args('id') id: string): Promise<Quiz> {
         return this.quizService.getQuizById(id);
     }
 
@@ -21,6 +22,20 @@ export class QuizResolver {
     @Query((returns) => [Quiz])
     async getAllQuizzes(): Promise<Quiz[]> {
         return this.quizService.getAllQuizzes();
+    }
+
+    @Query((returns) => [Quiz])
+    async getQuizzesWithPagination(
+        @Args('pagination') pagination: PaginationDto
+    ): Promise<Quiz[]> {
+        return this.quizService.getQuizzesWithPagination(pagination);
+    }
+
+    @Query((returns) => CountDto)
+    async countQuizWithPagination(
+        @Args('pagination') pagination: PaginationDto
+    ) {
+        return await this.quizService.getQuizzesCountWithPagination(pagination);
     }
 
     @Mutation((returns) => Quiz)

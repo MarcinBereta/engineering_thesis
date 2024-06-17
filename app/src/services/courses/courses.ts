@@ -1,107 +1,125 @@
 import axios from 'axios';
-import {apiCall} from '../graphqlHandler';
+import { apiCall } from '../graphqlHandler';
 import constants from '../../../constants';
-import {graphql} from '@/graphql';
+import { graphql } from '@/graphql';
 
 export const courseFragment = graphql(`
-  fragment courseFragment on Course {
-    id
-    name
-    text {
-      id
-      type
-      value
+    fragment courseFragment on Course {
+        id
+        name
+        text {
+            id
+            type
+            value
+        }
     }
-  }
 `);
 
 export const addCourseGQL = graphql(
-  `
-    mutation AddCourse($CourseInput: CourseInput!) {
-      addCourse(newCourse: $CourseInput) {
-        ...courseFragment
-      }
-    }
-  `,
-  [courseFragment],
+    `
+        mutation AddCourse($CourseInput: CourseInput!) {
+            addCourse(newCourse: $CourseInput) {
+                ...courseFragment
+            }
+        }
+    `,
+    [courseFragment]
 );
 
 export const verifyCourseGQL = graphql(`
-  mutation verifyCourse($verifyCourse: VerifyCourseDto!) {
-    verifyCourse(verifyCourse: $verifyCourse) {
-      id
-      name
-      text {
-        id
-        type
-        value
-      }
+    mutation verifyCourse($verifyCourse: VerifyCourseDto!) {
+        verifyCourse(verifyCourse: $verifyCourse) {
+            id
+            name
+            text {
+                id
+                type
+                value
+            }
+        }
     }
-  }
 `);
 export const editCourseGQL = graphql(
-  `
-    mutation EditCourse($EditCourseInput: EditCourseInput!) {
-      editCourse(editCourse: $EditCourseInput) {
-        ...courseFragment
-      }
-    }
-  `,
-  [courseFragment],
+    `
+        mutation EditCourse($EditCourseInput: EditCourseInput!) {
+            editCourse(editCourse: $EditCourseInput) {
+                ...courseFragment
+            }
+        }
+    `,
+    [courseFragment]
 );
 
 export const getCoursesGQL = graphql(`
-  query getCourses {
-    course {
-      name
-      text {
-        id
-        type
-        value
-      }
+    query getCourses {
+        course {
+            name
+            text {
+                id
+                type
+                value
+            }
+        }
     }
-  }
+`);
+
+export const getCoursesWithPaginationGQL = graphql(`
+    query GetCoursesWithPagination($pagination: PaginationDto!) {
+        getCoursesWithPagination(pagination: $pagination) {
+            id
+            name
+            text {
+                id
+                type
+                value
+            }
+        }
+        countCoursesWithPagination(pagination: $pagination) {
+            count
+            size
+        }
+    }
 `);
 
 export const getUnverifiedCoursesGQL = graphql(`
-  query getCourses {
-    unVerifiedCourses {
-      id
-      name
-      text {
-        id
-        type
-        value
-      }
+    query getCourses {
+        unVerifiedCourses {
+            id
+            name
+            text {
+                id
+                type
+                value
+            }
+        }
     }
-  }
 `);
 
 export const getMyCoursesGQL = graphql(`
-  query getCourses {
-    MyCourses {
-      id
-      name
-      text {
-        id
-        type
-        value
-      }
+    query getCourses {
+        MyCourses {
+            id
+            name
+            text {
+                id
+                type
+                value
+            }
+        }
     }
-  }
 `);
 
 export const addPhotos = async (photos: File[], id: string) => {
-  const formData = new FormData();
-  for (const photo of photos) {
-    formData.append('files[]', photo);
-  }
-  return await axios({
-    method: 'POST',
-    url: constants.url + `/files/${id}`,
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-    data: formData,
-  });
+    const formData = new FormData();
+    for (const photo of photos) {
+        formData.append('files[]', photo);
+    }
+    return await axios({
+        method: 'POST',
+        url: constants.url + `/files/${id}`,
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+        data: formData,
+    });
 };

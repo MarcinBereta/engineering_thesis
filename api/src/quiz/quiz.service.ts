@@ -5,6 +5,8 @@ import { AddScore } from './dto/addScore.dto';
 import OpenAI from 'openai';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { PaginationDto } from 'src/utils/pagination.dto';
+import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
 @Injectable()
 export class QuizService {
     constructor(
@@ -34,6 +36,78 @@ export class QuizService {
         }
 
         return quiz;
+    }
+
+    async getQuizzesWithPagination(pagination: PaginationDto) {
+        const { search, page } = pagination;
+
+        if (search) {
+            return await this.prismaService.quiz.findMany({
+                where: {
+                    name: {
+                        contains: search,
+                    },
+                },
+                include: {
+                    questions: true,
+                    UserScores: true,
+                },
+                skip: page,
+                take: PAGINATION_SIZE,
+            });
+        }
+
+        const cachedQuizzes = await this.cacheManager.get<Quiz[]>(
+            'all_quizzes/' + page
+        );
+        if (cachedQuizzes) {
+            return cachedQuizzes;
+        }
+
+        const quizzes = await this.prismaService.quiz.findMany({
+            include: {
+                questions: true,
+                UserScores: true,
+            },
+            skip: (page - 1) * PAGINATION_SIZE,
+            take: PAGINATION_SIZE,
+        });
+
+        if (quizzes) {
+            await this.cacheManager.set('all_quizzes/' + page, quizzes);
+        }
+
+        return quizzes;
+    }
+
+    async getQuizzesCountWithPagination(pagination: PaginationDto) {
+        const { search } = pagination;
+
+        if (search) {
+            const count = await this.prismaService.quiz.count({
+                where: {
+                    name: {
+                        contains: search,
+                    },
+                },
+            });
+
+            return { count, size: PAGINATION_SIZE };
+        }
+
+        const cachedCount =
+            await this.cacheManager.get<number>('quizzes_count');
+        if (cachedCount) {
+            return { count: cachedCount, size: PAGINATION_SIZE };
+        }
+
+        const count = await this.prismaService.quiz.count();
+
+        if (count) {
+            await this.cacheManager.set('quizzes_count', count);
+        }
+
+        return { count, size: PAGINATION_SIZE };
     }
 
     async getAllQuizzes(): Promise<Quiz[]> {
