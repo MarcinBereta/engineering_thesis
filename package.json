@@ -4,5 +4,8 @@
     },
     "devDependencies": {
         "prettier": "^3.3.2"
+    },
+    "dependencies": {
+        "eslint-plugin-prettier": "^5.1.3"
     }
 }

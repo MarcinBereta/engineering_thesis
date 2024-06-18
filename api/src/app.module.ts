@@ -19,9 +19,29 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { SocketModule } from './socket/socket.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
     imports: [
+        ThrottlerModule.forRoot([
+            {
+                name: 'short',
+                ttl: 1000,
+                limit: 3,
+            },
+            {
+                name: 'medium',
+                ttl: 10000,
+                limit: 20,
+            },
+            {
+                name: 'long',
+                ttl: 60000,
+                limit: 100,
+            },
+        ]),
+
         ConfigModule.forRoot(),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -50,6 +70,15 @@ import * as redisStore from 'cache-manager-redis-store';
         SocketModule,
     ],
     controllers: [AppController],
-    providers: [AppService, PrismaService, AuthResolver, AuthService],
+    providers: [
+        AppService,
+        PrismaService,
+        AuthResolver,
+        AuthService,
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
+    ],
 })
 export class AppModule {}
