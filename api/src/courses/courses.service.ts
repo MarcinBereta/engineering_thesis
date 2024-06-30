@@ -9,9 +9,13 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
+import OpenAI from 'openai';
 
 @Injectable()
 export class CoursesService {
+    private openai = new OpenAI({
+        apiKey: process.env.OPEN_API_KEY,
+    });
     constructor(
         private prismaService: PrismaService,
         private quizService: QuizService,
@@ -134,6 +138,8 @@ export class CoursesService {
 
         await this.processCourse(course, newCourse.id);
 
+        await this.createSummary(newCourse.id);
+
         return await this.prismaService.course.findUnique({
             where: {
                 id: newCourse.id,
@@ -142,6 +148,45 @@ export class CoursesService {
                 text: true,
             },
         });
+    }
+
+    private async createSummary(courseId:string){
+        const course = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+            include: {
+                text: true,
+            },
+        });
+        const text = course.text.filter((t=>t.type=="text")).map((item) => item.value).join(' ');
+        const response =await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'You are a helpful assistant designed to summary the text.',
+                },
+                { role: 'user', content: text },
+                {
+                    role: 'assistant',
+                    content:
+                        'Please summarize the text in a few sentences.',
+                },
+            ],
+            model: 'gpt-3.5-turbo',
+            response_format: { type: 'text' },
+        });
+
+        await this.prismaService.course.update({
+            where:{
+                id:courseId
+            },
+            data:{
+                summary:response.choices[0].message.content
+            }
+        })
+
     }
 
     async editCourse(course: EditCourseInput, user: simpleUser) {
@@ -185,6 +230,7 @@ export class CoursesService {
             'unverified_courses/' + courseToEdit.moderatorId
         );
 
+        await this.createSummary(course.id);
         return await this.prismaService.course.findUnique({
             where: {
                 id: course.id,
@@ -358,5 +404,24 @@ export class CoursesService {
         }
         await Promise.all(cachesToDelete);
         return course;
+    }
+
+    async getDashboardCourses(){
+        const cachedCourses = await this.cacheManager.get('dashboard_courses');
+        if (cachedCourses) {
+            return cachedCourses;
+        }
+        const courses = await this.prismaService.course.findMany({
+            include: {
+                text: true,
+            },
+            where: {
+                verified: true,
+            },
+            take: 5,
+        });
+
+        await this.cacheManager.set('dashboard_courses', courses);
+        return courses;
     }
 }

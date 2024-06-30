@@ -75,10 +75,10 @@ import { APP_GUARD } from '@nestjs/core';
         PrismaService,
         AuthResolver,
         AuthService,
-        {
-            provide: APP_GUARD,
-            useClass: ThrottlerGuard,
-        },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: ThrottlerGuard,
+        // },
     ],
 })
 export class AppModule {}

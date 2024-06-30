@@ -68,6 +68,7 @@ const QuizMain = ({ route, navigation }: any) => {
     const [start, setStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const handleEndQuiz = async () => {
+        if(userInfo == null) return
         const correctAnswers = questions.filter(
             (question) => question.userAnswer === question.correct
         );
@@ -81,7 +82,7 @@ const QuizMain = ({ route, navigation }: any) => {
         addQuizResultMutation.mutate({
             addScore: {
                 quizId: quiz.id,
-                userId: userInfo?.id,
+                userId: userInfo.id || '',
                 score: correctAnswers.length,
             },
         });

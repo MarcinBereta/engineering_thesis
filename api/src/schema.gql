@@ -3,16 +3,16 @@
 # ------------------------------------------------------
 
 type User {
-    id: String!
-    username: String!
-    email: String!
-    password: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    role: String!
-    verified: Boolean!
-    image: String
-    Moderator: [SimpleModerator!]!
+  id: String!
+  username: String!
+  email: String!
+  password: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  role: String!
+  verified: Boolean!
+  image: String
+  Moderator: [SimpleModerator!]!
 }
 
 """
@@ -21,182 +21,190 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type SimpleModerator {
-    id: String!
-    userId: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    categories: [String!]!
+  id: String!
+  userId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  categories: [String!]!
 }
 
 type simpleUser {
-    id: String!
-    email: String!
-    username: String!
-    image: String
-    verified: Boolean!
-    role: String!
+  id: String!
+  email: String!
+  username: String!
+  image: String
+  verified: Boolean!
+  role: String!
 }
 
 type SignupResponse {
-    access_token: String!
-    user: simpleUser!
+  access_token: String!
+  user: simpleUser!
 }
 
 type VerificationFormData {
-    id: String!
-    userId: String!
-    text: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    User: simpleUser!
+  id: String!
+  userId: String!
+  text: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  User: simpleUser!
 }
 
 type NullResponse {
-    message: String
+  message: String
 }
 
 type SigninResponse {
-    access_token: String!
-    user: simpleUser!
+  access_token: String!
+  user: simpleUser!
 }
 
 type Course {
-    id: String!
-    name: String!
-    text: [CourseItem!]!
+  id: String!
+  name: String!
+  summary: String
+  text: [CourseItem!]!
 }
 
 type CourseItem {
-    id: String!
-    type: String!
-    value: String!
+  id: String!
+  type: String!
+  value: String!
 }
 
 type CountDto {
-    count: Float!
-    size: Float!
+  count: Float!
+  size: Float!
 }
 
 type Quiz {
-    id: String!
-    courseId: String!
-    name: String!
-    questions: [Question!]!
-    UserScores: [UserScore!]!
+  id: String!
+  courseId: String!
+  name: String!
+  questions: [Question!]!
+  UserScores: [UserScore!]!
 }
 
 type Question {
-    id: String!
-    quizId: String!
-    question: String!
-    answers: [String!]!
-    correct: String!
+  id: String!
+  quizId: String!
+  question: String!
+  answers: [String!]!
+  correct: String!
 }
 
 type UserScore {
-    userId: String!
-    quizId: String!
-    score: Float!
-    createdAt: DateTime!
+  userId: String!
+  quizId: String!
+  score: Float!
+  createdAt: DateTime!
+}
+
+type DashboardQuiz {
+  name: String!
+  category: String!
 }
 
 type Query {
-    users: [User!]!
-    getUserFriends: [User!]!
-    getUserFriendRequests: [User!]!
-    getAllUsers: [User!]!
-    refreshUserData: User!
-    getVerifyRequests: [VerificationFormData!]!
-    course: [Course!]!
-    unVerifiedCourses: [Course!]!
-    getCoursesWithPagination(pagination: PaginationDto!): [Course!]!
-    countCoursesWithPagination(pagination: PaginationDto!): CountDto!
-    MyCourses: [Course!]!
-    getQuizById(id: String!): Quiz!
-    getAllQuizzes: [Quiz!]!
-    getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
-    countQuizWithPagination(pagination: PaginationDto!): CountDto!
+  users: [User!]!
+  getUserFriends: [User!]!
+  getUserFriendRequests: [User!]!
+  getAllUsers: [User!]!
+  refreshUserData: User!
+  getVerifyRequests: [VerificationFormData!]!
+  course: [Course!]!
+  dashboardCourses: [Course!]!
+  unVerifiedCourses: [Course!]!
+  getCoursesWithPagination(pagination: PaginationDto!): [Course!]!
+  countCoursesWithPagination(pagination: PaginationDto!): CountDto!
+  MyCourses: [Course!]!
+  getQuizById(id: String!): Quiz!
+  getAllQuizzes: [Quiz!]!
+  getDashboardQuizzes: [DashboardQuiz!]!
+  getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
+  countQuizWithPagination(pagination: PaginationDto!): CountDto!
 }
 
 input PaginationDto {
-    page: Float!
-    search: String
+  page: Float!
+  search: String
 }
 
 type Mutation {
-    signup(registerUserInput: SingUpUserInput!): SignupResponse!
-    providerLogin(providerUserInput: ProviderInput!): SigninResponse!
-    signin(loginUserInput: SigninUserInput!): SigninResponse!
-    updateUser(UserEdit: UserEdit!): User!
-    addVerificationForm(VerificationForm: VerificationForm!): User!
-    verifyUser(VerifyUser: VerifyUser!): User!
-    addFriendRequest(friendName: String!): NullResponse!
-    acceptFriendRequest(friendId: String!): NullResponse!
-    declineFriendRequest(friendId: String!): NullResponse!
-    removeFriend(friendId: String!): NullResponse!
-    addCourse(newCourse: CourseInput!): Course!
-    editCourse(editCourse: EditCourseInput!): Course!
-    verifyCourse(verifyCourse: VerifyCourseDto!): Course!
-    addUserScore(addScore: AddScore!): Quiz!
+  signup(registerUserInput: SingUpUserInput!): SignupResponse!
+  providerLogin(providerUserInput: ProviderInput!): SigninResponse!
+  signin(loginUserInput: SigninUserInput!): SigninResponse!
+  updateUser(UserEdit: UserEdit!): User!
+  addVerificationForm(VerificationForm: VerificationForm!): User!
+  verifyUser(VerifyUser: VerifyUser!): User!
+  addFriendRequest(friendName: String!): NullResponse!
+  acceptFriendRequest(friendId: String!): NullResponse!
+  declineFriendRequest(friendId: String!): NullResponse!
+  removeFriend(friendId: String!): NullResponse!
+  addCourse(newCourse: CourseInput!): Course!
+  editCourse(editCourse: EditCourseInput!): Course!
+  verifyCourse(verifyCourse: VerifyCourseDto!): Course!
+  addUserScore(addScore: AddScore!): Quiz!
 }
 
 input SingUpUserInput {
-    username: String!
-    password: String!
-    email: String!
+  username: String!
+  password: String!
+  email: String!
 }
 
 input ProviderInput {
-    email: String!
-    username: String!
-    image: String!
+  email: String!
+  username: String!
+  image: String!
 }
 
 input SigninUserInput {
-    username: String!
-    password: String!
+  username: String!
+  password: String!
 }
 
 input UserEdit {
-    id: String!
-    role: String!
-    verified: Boolean!
-    categories: [String!]!
+  id: String!
+  role: String!
+  verified: Boolean!
+  categories: [String!]!
 }
 
 input VerificationForm {
-    text: String!
+  text: String!
 }
 
 input VerifyUser {
-    requestId: String!
+  requestId: String!
 }
 
 input CourseInput {
-    name: String!
-    text: [CourseItemInput!]!
-    category: String!
+  name: String!
+  text: [CourseItemInput!]!
+  category: String!
 }
 
 input CourseItemInput {
-    id: String!
-    type: String!
-    value: String!
+  id: String!
+  type: String!
+  value: String!
 }
 
 input EditCourseInput {
-    name: String!
-    category: String!
-    text: [CourseItemInput!]!
-    id: String!
+  name: String!
+  category: String!
+  text: [CourseItemInput!]!
+  id: String!
 }
 
 input VerifyCourseDto {
-    courseId: String!
+  courseId: String!
 }
 
 input AddScore {
-    userId: String!
-    quizId: String!
-    score: Float!
+  userId: String!
+  quizId: String!
+  score: Float!
 }

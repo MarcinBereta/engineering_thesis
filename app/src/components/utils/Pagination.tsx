@@ -12,7 +12,7 @@ export const Pagination = ({
     count: number;
     changePage: (page: number) => void;
 }) => {
-    const maxPages = Math.ceil(count / pageSize);
+    const maxPages = Math.max(Math.ceil(count / pageSize),1);
     return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
             <Button

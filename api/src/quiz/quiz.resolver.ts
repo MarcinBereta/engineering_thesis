@@ -6,6 +6,7 @@ import { QuizService } from './quiz.service';
 import { AddScore } from './dto/addScore.dto';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
+import { DashboardQuiz } from './dto/quiz.dashboard';
 
 @Resolver((of) => Quiz)
 @UseGuards(JwtAuthGuard)
@@ -22,6 +23,13 @@ export class QuizResolver {
     @Query((returns) => [Quiz])
     async getAllQuizzes(): Promise<Quiz[]> {
         return this.quizService.getAllQuizzes();
+    }
+
+    @UseInterceptors(CacheInterceptor)
+    @CacheKey('dashboard_quizzes')
+    @Query((returns) => [DashboardQuiz])
+    async getDashboardQuizzes(): Promise<DashboardQuiz[]> {
+        return this.quizService.getDashboardQuizzes();
     }
 
     @Query((returns) => [Quiz])

@@ -7,6 +7,8 @@ export class Course {
     id: string;
     @Field()
     name: string;
+    @Field({nullable: true})
+    summary: string;
     @Field((type) => [CourseItem])
     text: CourseItem[];
 }

@@ -36,7 +36,7 @@ const QuizFriends = ({ route, navigation }: any) => {
     const [room, setRoom] = useState<Room | null>(null);
     useEffect(() => {
         if (socket) {
-            if (!invite)
+            if (!invite && userInfo !== null)
                 socket.emit('fightWithFriend', {
                     quizId: quiz.id,
                     userId: userInfo?.id,

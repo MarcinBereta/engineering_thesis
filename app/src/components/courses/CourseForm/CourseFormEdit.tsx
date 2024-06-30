@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Button, FlatList, Text, View } from 'react-native';
+import { Button, Dimensions, FlatList, Text, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { DragItem } from './CourseDragItem';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -18,7 +18,10 @@ import { graphqlURL } from '@/services/settings';
 import { useMutation } from '@tanstack/react-query';
 import { ResultOf, VariablesOf, readFragment } from '@/graphql';
 import request from 'graphql-request';
-import { addCourseDto } from './CourseForm';
+import { AppFile, addCourseDto } from './CourseForm';
+import { Dialog } from '@rneui/themed';
+import { CustomButton } from '@/components/CustomButton';
+const { height, width } = Dimensions.get('window');
 
 export type CourseItem = {
     type: 'text' | 'photo';
@@ -40,8 +43,11 @@ export const CourseEditForm = ({ route, navigation }: any) => {
     const [courseName, setCourseName] = useState<string>(course.name);
     const [category, setCategory] = useState(course.category);
 
-    const [items, setItems] = useState<File[]>([]);
-
+    const [items, setItems] = useState<AppFile[]>([]);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isTextFormOpen, setIsTextFormOpen] = useState(false);
+    const [textForm, setTextForm] = useState('');
+    
     const editCourseMutation = useMutation({
         mutationFn: async (data: editCourseDto) =>
             request(graphqlURL, editCourseGQL, data, {
@@ -133,7 +139,6 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                 photosToUpload.push(photo);
             }
         }
-        let index = 0;
         const newPhotos = [];
         for (let i in dragData) {
             const photo = dragData[i];
@@ -218,33 +223,82 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                     );
                 }}
             />
-            <Button
-                onPress={() =>
-                    setData([
-                        ...dragData,
-                        {
-                            id: generateRandomId(),
-                            type: 'text',
-                            value: 'New Item',
-                        },
-                    ])
-                }
-                title="Add new text field"
+            <CustomButton
+                onPress={() => {
+                    setIsDialogOpen(!isDialogOpen);
+                }}
+                title="Add new field"
             />
-            <Button
-                onPress={() =>
-                    // setData([
-                    //   ...dragData,
-                    //   {
-                    //     id: generateRandomId(),
-                    //     type: 'photo',
-                    //     value: 'New Photo',
-                    //   },
-                    // ])
-                    uploadFile()
-                }
-                title="Add new photo"
-            />
+            <Dialog
+                isVisible={isDialogOpen}
+                onDismiss={() => setIsDialogOpen(false)}
+                overlayStyle={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                }}
+                onPressOut={() => {
+                    setIsDialogOpen(false);
+                }}
+            >
+                <Dialog.Title
+                    title="Add new field"
+                    titleStyle={{ textAlign: 'center' }}
+                />
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                    }}
+                >
+                    <CustomButton
+                        onPress={() => {
+                            uploadFile();
+                        }}
+                        title="Add photo"
+                    />
+                    <CustomButton
+                        onPress={() => {
+                            setIsDialogOpen(false);
+                            setIsTextFormOpen(true);
+                            setTextForm('');
+                        }}
+                        title="Add text"
+                    />
+                </View>
+            </Dialog>
+
+            <Dialog
+                isVisible={isTextFormOpen}
+                onDismiss={() => setIsTextFormOpen(false)}
+                onPressOut={() => {
+                    setIsTextFormOpen(false);
+                }}
+            >
+                <TextInput
+                    value={textForm}
+                    onChangeText={(text) => setTextForm(text)}
+                    style={{ fontSize: fontPixel(30), textAlign: 'center', maxHeight:height*0.6 }}
+                    placeholder="Text"
+                    multiline={true}
+                />
+                <CustomButton
+                    onPress={() => {
+                        if (textForm.length > 0)
+                            setData([
+                                ...dragData,
+                                {
+                                    id: generateRandomId(),
+                                    type: 'text',
+                                    value: textForm,
+                                },
+                            ]);
+                        setIsTextFormOpen(false);
+                    }}
+                    title="Add"
+                />
+            </Dialog>
             <Button
                 onPress={() => {
                     uploadCourse();

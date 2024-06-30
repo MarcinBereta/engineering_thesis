@@ -15,7 +15,7 @@ export const SocketHandler = () => {
         };
     }>(null);
     useEffect(() => {
-        if (socket) {
+        if (socket && userInfo) {
             socket.connect();
             socket.emit('connectToOwnRoom', {
                 userId: userInfo.id,
@@ -27,9 +27,9 @@ export const SocketHandler = () => {
                 socket.disconnect();
             };
         }
-    }, [socket]);
+    }, [socket, userInfo]);
 
-    return gameRequest == null || socket == null ? null : (
+    return gameRequest == null || socket == null || userInfo == null? null : (
         <View>
             <Text>
                 {gameRequest.userName} wants to play with you in{' '}

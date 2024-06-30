@@ -15,19 +15,19 @@ datasource db {
 }
 
 model User {
-  id              String       @id @default(uuid())
-  email           String       @unique
-  username        String       @unique
-  verified        Boolean      @default(false)
-  role            Role         @default(USER)
-  image           String?
-  password        String?
-  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
-  courses         Course[]
-  scores          UserScores[]
-  Friends         Friends[]    @relation(name: "friends_users")
-  Friends_request Friends[]    @relation(name: "friends_friends")
+  id                      String             @id @default(uuid())
+  email                   String             @unique
+  username                String             @unique
+  verified                Boolean            @default(false)
+  role                    Role               @default(USER)
+  image                   String?
+  password                String?
+  createdAt               DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime           @updatedAt @db.Timestamptz(3)
+  courses                 Course[]
+  scores                  UserScores[]
+  Friends                 Friends[]          @relation(name: "friends_users")
+  Friends_request         Friends[]          @relation(name: "friends_friends")
   VerificationForm        VerificationForm[]
   Moderator               Moderator[]
   FriendsRequests         FriendsRequests[]  @relation(name: "friends_requests_user")
@@ -41,6 +41,7 @@ model Course {
   createdAt   DateTime     @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
   verified    Boolean      @default(false)
+  summary     String       @default("")
   category    Category
   creator     User         @relation(fields: [creatorId], references: [id])
   text        CourseItem[]
@@ -83,7 +84,7 @@ model UserScores {
   userId    String
   quizId    String
   score     Int
-  createdAt DateTime @default(now()) @db.Timestamptz(3) 
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   User      User     @relation(fields: [userId], references: [id])
   Quiz      Quiz     @relation(fields: [quizId], references: [id])

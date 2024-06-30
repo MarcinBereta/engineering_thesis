@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import React, { useContext, useState } from 'react';
+import React, {  useState } from 'react';
 import { registerGQL, loginGQL, refreshUserGQL } from '../services/auth/auth';
 import { Socket, io } from 'socket.io-client';
 import constants from '../../constants';
@@ -12,7 +12,7 @@ import { loginGoogleGQL } from '../services/auth/auth';
 
 interface AuthContext {
     isLoading: boolean;
-    userInfo: any;
+    userInfo: null | UserInfo;
     refreshLoading: boolean;
     error: string;
     socket: null | Socket;
@@ -112,6 +112,7 @@ export const AuthProvider = ({
         onSuccess: async (data, variables, context) => {
             let userInfo = await AsyncStorage.getItem('userInfo');
             const parsedUserInfo = JSON.parse(userInfo as string) as UserInfo;
+            console.log(parsedUserInfo)
             setError('');
 
             const dataObj = {

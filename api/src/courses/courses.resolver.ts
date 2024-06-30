@@ -24,6 +24,14 @@ export class CoursesResolver {
         return await this.courseService.getAllCourses();
     }
 
+    @UseInterceptors(CacheInterceptor)
+    @CacheKey('dashboard_courses')
+    @Query((returns) => [Course])
+    async dashboardCourses() {
+        console.log('dashboard_courses');
+        return await this.courseService.getDashboardCourses();
+    }
+
     @Query((returns) => [Course])
     async unVerifiedCourses(@Context() context) {
         if (

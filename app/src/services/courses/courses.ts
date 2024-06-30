@@ -68,6 +68,7 @@ export const getCoursesWithPaginationGQL = graphql(`
         getCoursesWithPagination(pagination: $pagination) {
             id
             name
+            summary
             text {
                 id
                 type
@@ -86,6 +87,7 @@ export const getUnverifiedCoursesGQL = graphql(`
         unVerifiedCourses {
             id
             name
+            summary
             text {
                 id
                 type

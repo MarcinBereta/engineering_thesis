@@ -1,4 +1,11 @@
-import { View, Text, Button, TouchableOpacity, TextInput } from 'react-native';
+import {
+    View,
+    Text,
+    Button,
+    TouchableOpacity,
+    TextInput,
+    Dimensions,
+} from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import { useContext, useState } from 'react';
 import { getCoursesWithPaginationGQL } from '../services/courses/courses';
@@ -8,7 +15,17 @@ import { useQuery } from '@tanstack/react-query';
 import { graphqlURL } from '@/services/settings';
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '@/components/utils/Pagination';
+import { Layout } from '@/components/Layout';
+import { CustomButton } from '@/components/CustomButton';
+import { SearchBar } from '@rneui/themed';
+import { ResultOf } from 'gql.tada';
+import { CourseListItem } from '@/components/courses/list/CourseListItem';
+import { normalizeText } from '@rneui/base';
 
+const { height } = Dimensions.get('window');
+export type Course = ResultOf<
+    typeof getCoursesWithPaginationGQL
+>['getCoursesWithPagination'][0];
 const CoursesList = (props: any) => {
     const { userInfo } = useContext(AuthContext);
     const [search, setSearch] = useState('');
@@ -39,10 +56,11 @@ const CoursesList = (props: any) => {
     }
 
     return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
-            <Text>Course list: </Text>
+        <Layout navigation={props.navigation} icon="course">
+            <Text style={{textAlign: 'center', fontWeight:'bold', fontSize:normalizeText(30)}}>Course list </Text>
 
-            <TextInput
+            <SearchBar
+                platform="android"
                 placeholder="Search"
                 value={search}
                 onChangeText={(text) => {
@@ -51,27 +69,12 @@ const CoursesList = (props: any) => {
             />
             <FlatList
                 data={data.getCoursesWithPagination}
+                contentContainerStyle={{ maxHeight: height * 0.6 }}
                 renderItem={({ item }) => (
-                    <View
-                        style={{
-                            padding: 15,
-                            backgroundColor: 'lightgray',
-                            width: '90%',
-                            marginLeft: '5%',
-                            borderRadius: 20,
-                            marginTop: 10,
-                        }}
-                    >
-                        <TouchableOpacity
-                            onPress={() => {
-                                props.navigation.push('course', {
-                                    course: item,
-                                });
-                            }}
-                        >
-                            <Text>{item.name}</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <CourseListItem
+                        course={item}
+                        navigation={props.navigation}
+                    />
                 )}
             />
 
@@ -81,23 +84,7 @@ const CoursesList = (props: any) => {
                 count={data.countCoursesWithPagination.count}
                 changePage={(page) => setPage(page)}
             />
-
-            <Button
-                title="Go to Main Page"
-                onPress={() => {
-                    props.navigation.push('DashboardScreen');
-                }}
-            />
-
-            {userInfo?.verified ? (
-                <Button
-                    title="Create course"
-                    onPress={() => {
-                        props.navigation.push('createCourse');
-                    }}
-                />
-            ) : null}
-        </View>
+        </Layout>
     );
 };
 

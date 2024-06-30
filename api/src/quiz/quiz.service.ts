@@ -7,8 +7,13 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
+import { Prisma } from '@prisma/client';
+import { DashboardQuiz } from './dto/quiz.dashboard';
 @Injectable()
 export class QuizService {
+    private openai = new OpenAI({
+        apiKey: process.env.OPEN_API_KEY,
+    });
     constructor(
         private prismaService: PrismaService,
 
@@ -36,6 +41,13 @@ export class QuizService {
         }
 
         return quiz;
+    }
+
+    async getDashboardQuizzes(): Promise<DashboardQuiz[]> {
+        const rawQuery = Prisma.sql`select q.name, c.category from "Quiz" q inner join "Course" C on q."courseId" = C.id order by (select count(*) as count from "UserScores" u where u."quizId"  = q.id) desc limit 5`;
+        const quizzes: DashboardQuiz[] =
+            await this.prismaService.$queryRaw(rawQuery);
+        return quizzes;
     }
 
     async getQuizzesWithPagination(pagination: PaginationDto) {
@@ -168,12 +180,9 @@ export class QuizService {
     }
 
     async generateQuestions(courseId: string): Promise<string> {
-        let mergedText: string;
-        mergedText = await this.mergeTexts(courseId);
-        const openai = new OpenAI({
-            apiKey: process.env.OPEN_API_KEY,
-        });
-        const completion = await openai.chat.completions.create({
+        let mergedText: string = await this.mergeTexts(courseId);
+
+        const completion = await this.openai.chat.completions.create({
             messages: [
                 {
                     role: 'system',
