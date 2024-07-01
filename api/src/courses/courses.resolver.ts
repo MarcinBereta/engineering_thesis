@@ -3,6 +3,7 @@ import {
     Course,
     CourseInput,
     EditCourseInput,
+    ExtendedCourse,
     VerifyCourseDto,
 } from './dto/CourseDTO';
 import { CoursesService } from './courses.service';
@@ -24,9 +25,9 @@ export class CoursesResolver {
         return await this.courseService.getAllCourses();
     }
 
-    @UseInterceptors(CacheInterceptor)
-    @CacheKey('dashboard_courses')
-    @Query((returns) => [Course])
+    // @UseInterceptors(CacheInterceptor)
+    // @CacheKey('dashboard_courses')
+    @Query((returns) => [ExtendedCourse])
     async dashboardCourses() {
         console.log('dashboard_courses');
         return await this.courseService.getDashboardCourses();

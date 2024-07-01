@@ -12,6 +12,7 @@ import {
 } from './verification-form';
 import { NullResponse } from './dto/none-reponse';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 
 @Resolver((of) => User)
 @UseGuards(JwtAuthGuard)
@@ -25,6 +26,18 @@ export class UsersResolver {
     @CacheKey('all_users')
     users(@CurrentUser() user: User): Promise<User[]> {
         return this.UsersService.findAll();
+    }
+
+    @Query((returns) => [User])
+    getUsersWithPagination(@Args('pagination') pagination: PaginationDto) {
+        return this.UsersService.getUsersWithPagination(pagination);
+    }
+
+    @Query((returns) => CountDto)
+    countUsersWithPagination(
+        @Args('pagination') pagination: PaginationDto
+    ): Promise<CountDto> {
+        return this.UsersService.getUsersCount(pagination);
     }
 
     @Query((returns) => [User])

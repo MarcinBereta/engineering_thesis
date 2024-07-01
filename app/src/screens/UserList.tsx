@@ -7,21 +7,35 @@ import { graphqlURL } from '@/services/settings';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { getUsersGQL } from '@/services/admin/admin';
+import { Avatar, Card, SearchBar } from '@rneui/themed';
+import { useDebounce } from '@/utils/Debouncer';
+import { Pagination } from '@/components/utils/Pagination';
 
 const UserList = (props: any) => {
     const { userInfo } = useContext(AuthContext);
-    const { data, isLoading, refetch } = useQuery({
-        queryKey: ['userId'],
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+
+    const debounceSearch = useDebounce(search);
+
+    const { data, isLoading, refetch, error } = useQuery({
+        queryKey: ['userId', debounceSearch, page],
         queryFn: async () =>
             request(
                 graphqlURL,
                 getUsersGQL,
-                {},
+                {
+                    pagination: {
+                        search: debounceSearch,
+                        page: page,
+                    },
+                },
                 {
                     Authorization: 'Bearer ' + userInfo?.token,
                 }
             ),
     });
+
     if (data == undefined || isLoading) {
         return <Text>Loading...</Text>;
     }
@@ -30,46 +44,68 @@ const UserList = (props: any) => {
         <View style={{ flexDirection: 'column', flex: 1 }}>
             <Text
                 style={{
-                    fontSize: fontPixel(20),
+                    fontSize: fontPixel(30),
                     padding: 10,
                     color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
                 }}
             >
                 User list!
             </Text>
 
+            <SearchBar
+                platform="android"
+                placeholder="Search"
+                value={search}
+                onChangeText={(text) => {
+                    setSearch(text);
+                }}
+            />
+
             <FlatList
-                data={data?.getAllUsers}
+                data={data?.getUsersWithPagination}
                 renderItem={({ item }) => (
-                    <View
-                        style={{
-                            padding: 5,
-                            borderColor: 'black',
-                            borderWidth: 1,
-                            margin: 5,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
+                    <TouchableOpacity
+                        onPress={() => {
+                            props.navigation.push('User', {
+                                user: item,
+                            });
                         }}
                     >
-                        <Text style={{ flex: 6 }}>{item.username}</Text>
-                        <View
-                            style={{
-                                flex: 6,
-                                justifyContent: 'space-around',
+                        <Card
+                            containerStyle={{
+                                padding: 10,
+                                margin: 5,
                                 flexDirection: 'row',
+                                display: 'flex',
                             }}
                         >
-                            <Button
-                                onPress={() => {
-                                    props.navigation.push('User', {
-                                        user: item,
-                                    });
-                                }}
-                                title="View"
-                            />
-                        </View>
-                    </View>
+                            <View style={{ flexDirection: 'row', flexGrow: 1 }}>
+                                <Avatar
+                                    containerStyle={{ margin: 10 }}
+                                    source={{
+                                        uri:
+                                            item.image ||
+                                            'https://cdn-icons-png.flaticon.com/512/6596/6596121.png',
+                                    }}
+                                />
+                                <View style={{ flexDirection: 'column' }}>
+                                    <Text>{item.username}</Text>
+                                    <Text style={{ fontWeight: '300' }}>
+                                        {item.role}
+                                    </Text>
+                                </View>
+                            </View>
+                        </Card>
+                    </TouchableOpacity>
                 )}
+            />
+            <Pagination
+                currentPage={page}
+                pageSize={data.countUsersWithPagination.size}
+                count={data.countUsersWithPagination.count}
+                changePage={(page: number) => setPage(page)}
             />
         </View>
     );

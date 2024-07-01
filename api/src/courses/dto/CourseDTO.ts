@@ -14,6 +14,19 @@ export class Course {
 }
 
 @ObjectType()
+export class CourseCreator {
+    @Field()
+    username: string;
+    @Field()
+    email: string;
+}
+@ObjectType()
+export class ExtendedCourse extends Course {
+    @Field((type) => CourseCreator)
+    creator: CourseCreator;
+}
+
+@ObjectType()
 export class CourseItem {
     @Field()
     id: string;

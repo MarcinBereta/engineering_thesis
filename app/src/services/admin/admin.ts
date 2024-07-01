@@ -1,8 +1,8 @@
 import { graphql } from '@/graphql';
 
 export const getUsersGQL = graphql(`
-    query getUsers {
-        getAllUsers {
+    query getUsers($pagination: PaginationDto!) {
+        getUsersWithPagination(pagination: $pagination) {
             id
             email
             username
@@ -16,6 +16,10 @@ export const getUsersGQL = graphql(`
                 updatedAt
                 categories
             }
+        }
+        countUsersWithPagination(pagination: $pagination) {
+            count
+            size
         }
     }
 `);

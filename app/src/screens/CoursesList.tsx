@@ -1,11 +1,4 @@
-import {
-    View,
-    Text,
-    Button,
-    TouchableOpacity,
-    TextInput,
-    Dimensions,
-} from 'react-native';
+import { Text, Dimensions } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import { useContext, useState } from 'react';
 import { getCoursesWithPaginationGQL } from '../services/courses/courses';
@@ -57,7 +50,15 @@ const CoursesList = (props: any) => {
 
     return (
         <Layout navigation={props.navigation} icon="course">
-            <Text style={{textAlign: 'center', fontWeight:'bold', fontSize:normalizeText(30)}}>Course list </Text>
+            <Text
+                style={{
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: normalizeText(30),
+                }}
+            >
+                Course list{' '}
+            </Text>
 
             <SearchBar
                 platform="android"

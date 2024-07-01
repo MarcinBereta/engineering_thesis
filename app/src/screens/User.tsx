@@ -8,6 +8,8 @@ import { useMutation } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
 import { VariablesOf } from '@/graphql';
+import { CustomButton } from '@/components/CustomButton';
+import { Layout } from '@/components/Layout';
 
 export type verifyUserDataDto = VariablesOf<typeof updateUserDataGQL>;
 
@@ -16,7 +18,31 @@ const User = ({ route, navigation }: any) => {
     const { user } = route.params;
     const [tempCategories, setTempCategories] = useState<
         { value: string; label: string; checked: boolean }[]
-    >([]);
+    >(() => {
+        let dbCategories = [
+            'MATH',
+            'SCIENCE',
+            'HISTORY',
+            'GEOGRAPHY',
+            'ENGLISH',
+            'ART',
+            'MUSIC',
+            'SPORTS',
+            'OTHER',
+        ];
+        const cats = [];
+        if (user.role == 'USER') return [];
+        const userCategories: string[] = user.Moderator[0].categories;
+        for (let dbCat of dbCategories) {
+            if (userCategories.includes(dbCat))
+                cats.push({
+                    label: dbCat,
+                    value: dbCat,
+                    checked: userCategories.includes(dbCat),
+                });
+        }
+        return cats;
+    });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [categories, setCategories] = useState<
         { value: string; label: string; checked: boolean }[]
@@ -71,19 +97,30 @@ const User = ({ route, navigation }: any) => {
     };
 
     return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
+        <Layout navigation={navigation} icon="admin">
+            <Text
+                style={{
+                    fontSize: fontPixel(30),
+                    padding: 10,
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                }}
+            >
+                {userData.username}
+            </Text>
             <Text
                 style={{
                     fontSize: fontPixel(20),
                     padding: 10,
                     color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
                 }}
             >
-                User
+                Email: {userData.email}
             </Text>
-            <Text>Username:{userData.username}</Text>
-            <Text>Email: {userData.email}</Text>
-            {userInfo.role == 'ADMIN' ? (
+            {userInfo?.role == 'ADMIN' ? (
                 <RNPickerSelect
                     onValueChange={(value) => {
                         setUserData((dt) => {
@@ -120,8 +157,18 @@ const User = ({ route, navigation }: any) => {
             />
 
             {userRole == 'MODERATOR' || userRole == 'ADMIN' ? (
-                <View>
-                    <Text>Moderator Categories</Text>
+                <View style={{ padding: 5 }}>
+                    <Text
+                        style={{
+                            fontSize: fontPixel(20),
+                            padding: 10,
+                            color: 'black',
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                        }}
+                    >
+                        Moderator Categories
+                    </Text>
                     {categories
                         .filter((c) => c.checked)
                         .map((c) => {
@@ -134,7 +181,7 @@ const User = ({ route, navigation }: any) => {
                                 </TouchableOpacity>
                             );
                         })}
-                    <Button
+                    <CustomButton
                         title="Add categories"
                         onPress={() => {
                             setIsModalOpen(true);
@@ -223,7 +270,7 @@ const User = ({ route, navigation }: any) => {
                                         );
                                     })}
 
-                                <Button
+                                <CustomButton
                                     title="Save"
                                     onPress={() => {
                                         setCategories((dt) => {
@@ -247,8 +294,12 @@ const User = ({ route, navigation }: any) => {
                     </Modal>
                 </View>
             ) : null}
-            <Button title="Save" onPress={handleSave} />
-        </View>
+            <CustomButton
+                containerStyle={{ width: '50%', marginLeft: '25%' }}
+                title="Save profile"
+                onPress={handleSave}
+            />
+        </Layout>
     );
 };
 

@@ -55,6 +55,11 @@ type NullResponse {
   message: String
 }
 
+type CountDto {
+  count: Float!
+  size: Float!
+}
+
 type SigninResponse {
   access_token: String!
   user: simpleUser!
@@ -67,15 +72,23 @@ type Course {
   text: [CourseItem!]!
 }
 
+type CourseCreator {
+  username: String!
+  email: String!
+}
+
+type ExtendedCourse {
+  id: String!
+  name: String!
+  summary: String
+  text: [CourseItem!]!
+  creator: CourseCreator!
+}
+
 type CourseItem {
   id: String!
   type: String!
   value: String!
-}
-
-type CountDto {
-  count: Float!
-  size: Float!
 }
 
 type Quiz {
@@ -108,13 +121,15 @@ type DashboardQuiz {
 
 type Query {
   users: [User!]!
+  getUsersWithPagination(pagination: PaginationDto!): [User!]!
+  countUsersWithPagination(pagination: PaginationDto!): CountDto!
   getUserFriends: [User!]!
   getUserFriendRequests: [User!]!
   getAllUsers: [User!]!
   refreshUserData: User!
   getVerifyRequests: [VerificationFormData!]!
   course: [Course!]!
-  dashboardCourses: [Course!]!
+  dashboardCourses: [ExtendedCourse!]!
   unVerifiedCourses: [Course!]!
   getCoursesWithPagination(pagination: PaginationDto!): [Course!]!
   countCoursesWithPagination(pagination: PaginationDto!): CountDto!

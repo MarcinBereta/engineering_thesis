@@ -6,6 +6,8 @@ import { UserEdit } from './dto/edit-user-input';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { VerificationFormData } from './verification-form';
+import { PaginationDto } from 'src/utils/pagination.dto';
+import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
 @Injectable()
 export class UsersService {
     constructor(
@@ -30,8 +32,97 @@ export class UsersService {
         return users;
     }
 
+    async getUsersWithPagination(paginationDto: PaginationDto) {
+        const { page, search } = paginationDto;
+        if (search) {
+            return await this.prismaService.user.findMany({
+                where: {
+                    OR: [
+                        {
+                            username: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            email: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                },
+                skip: (page - 1) * PAGINATION_SIZE,
+                take: PAGINATION_SIZE,
+            });
+        }
+
+        const cachedUsers = await this.cacheManager.get<User[]>(
+            'all_users/' + page
+        );
+        if (cachedUsers) {
+            return cachedUsers;
+        }
+
+        const users = await this.prismaService.user.findMany({
+            skip: (page - 1) * PAGINATION_SIZE,
+            take: PAGINATION_SIZE,
+        });
+
+        await this.cacheManager.set('all_users/' + page, users);
+
+        return users;
+    }
+
+    async getUsersCount(paginationDto: PaginationDto) {
+        const { search } = paginationDto;
+        if (search) {
+            const count = await this.prismaService.user.count({
+                where: {
+                    OR: [
+                        {
+                            username: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            email: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                },
+            });
+            return {
+                count,
+                size: PAGINATION_SIZE,
+            };
+        }
+
+        const cachedUsersCount =
+            await this.cacheManager.get<number>('all_users_count');
+
+        if (cachedUsersCount) {
+            return {
+                count: cachedUsersCount,
+                size: PAGINATION_SIZE,
+            };
+        }
+
+        const count = await this.prismaService.user.count();
+
+        await this.cacheManager.set('all_users_count', count);
+
+        return {
+            count,
+            size: PAGINATION_SIZE,
+        };
+    }
+
     async create(User: CreateUserInput): Promise<User> {
-        this.cacheManager.del('all_users');
+        await this.deleteUserCache();
         return await this.prismaService.user.create({
             data: {
                 email: User.email,
@@ -42,10 +133,6 @@ export class UsersService {
     }
 
     async getUserById(id: string): Promise<User> {
-        const cachedUser = await this.cacheManager.get<User>('user/' + id);
-        if (cachedUser) {
-            return cachedUser;
-        }
         const user = await await this.prismaService.user.findUnique({
             where: {
                 id,
@@ -54,20 +141,11 @@ export class UsersService {
         if (!user) {
             throw new Error('User not found');
         }
-        await this.cacheManager.set('user/' + id, user);
-        await this.cacheManager.set('user/name/' + user.username, user);
 
         return user;
     }
 
     async getUserByName(username: string): Promise<User> {
-        const cachedUser = await this.cacheManager.get<User>(
-            'user/name/' + username
-        );
-        if (cachedUser) {
-            return cachedUser;
-        }
-
         const user = await this.prismaService.user.findUnique({
             where: {
                 username: username,
@@ -76,7 +154,6 @@ export class UsersService {
         if (!user) {
             throw new Error('User not found');
         }
-        await this.cacheManager.set('user/' + user.id, user);
         return user;
     }
 
@@ -86,6 +163,7 @@ export class UsersService {
                 userId: userId,
             },
         });
+        await this.deleteUserCache();
     }
 
     private async updateModerator(userId: string, categories: string[]) {
@@ -112,6 +190,18 @@ export class UsersService {
                 },
             });
         }
+        await this.deleteUserCache();
+    }
+
+    async deleteUserCache() {
+        const keys = await this.cacheManager.store.keys();
+        const cachesToDelete = [];
+        for (let key of keys) {
+            if (key.includes('all_users')) {
+                cachesToDelete.push(this.cacheManager.del(key));
+            }
+        }
+        await Promise.all(cachesToDelete);
     }
 
     async updateUser(userData: UserEdit): Promise<User> {
@@ -132,9 +222,7 @@ export class UsersService {
             },
         });
 
-        await this.cacheManager.del('all_users');
-        await this.cacheManager.del('user/' + user.id);
-        await this.cacheManager.del('user/name/' + user.username);
+        await this.deleteUserCache();
 
         return user;
     }
@@ -201,6 +289,7 @@ export class UsersService {
             },
         });
         await this.cacheManager.del('verification_requests');
+        await this.deleteUserCache();
 
         return user;
     }

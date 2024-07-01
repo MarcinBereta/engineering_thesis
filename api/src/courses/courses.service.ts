@@ -414,13 +414,13 @@ export class CoursesService {
         const courses = await this.prismaService.course.findMany({
             include: {
                 text: true,
+                creator: true,
             },
             where: {
                 verified: true,
             },
             take: 5,
         });
-
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;
     }

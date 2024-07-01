@@ -1,4 +1,5 @@
 import { graphql } from '@/graphql';
+import { FriendUserFragmentGQL } from '../friends/friends';
 
 export const quizQuestionFragment = graphql(`
     fragment quizQuestionFragment on Question {
@@ -76,4 +77,33 @@ export const addQUizResultGQL = graphql(
         }
     `,
     [quizQuestionFragment]
+);
+
+export const dashboardDataGQL = graphql(
+    `
+        query DashboardCourses {
+            dashboardCourses {
+                id
+                name
+                summary
+                text {
+                    id
+                    type
+                    value
+                }
+                creator {
+                    username
+                    email
+                }
+            }
+            getDashboardQuizzes {
+                name
+                category
+            }
+            getUserFriends {
+                ...FriendUserFragment
+            }
+        }
+    `,
+    [FriendUserFragmentGQL]
 );

@@ -7,17 +7,35 @@ import { Layout } from '@/components/Layout';
 import { Avatar, Icon } from '@rneui/themed';
 import { DashboardCourseSection } from '@/components/dashboard/CourseSection';
 import { DashboardQuizSection } from '@/components/dashboard/QuizSection';
-const {height, width} = Dimensions.get('window');
+import { useQuery } from '@tanstack/react-query';
+import request from 'graphql-request';
+import { graphqlURL } from '@/services/settings';
+import { dashboardDataGQL } from '@/services/quiz/quiz';
+import { DashboardFriendsSection } from '@/components/dashboard/FriendsSection';
+import { CustomButton } from '@/components/CustomButton';
+const { height, width } = Dimensions.get('window');
 const DashboardScreen = (props: any) => {
     const { logout, userInfo, socket } = useContext(AuthContext);
-    
-    if(userInfo === null){
-        return null;
-    }
 
+    const { data, isLoading, refetch, isError, error } = useQuery({
+        queryKey: ['courses'],
+        queryFn: async () =>
+            request(
+                graphqlURL,
+                dashboardDataGQL,
+                {},
+                {
+                    Authorization: 'Bearer ' + userInfo?.token,
+                }
+            ),
+    });
     useEffect(() => {
         setNavigationRef(props.navigation);
     }, []);
+
+    if (userInfo === null || data === undefined) {
+        return null;
+    }
 
     return (
         <Layout navigation={props.navigation} icon="home">
@@ -29,16 +47,34 @@ const DashboardScreen = (props: any) => {
                     }}
                 >
                     <Avatar
-                    containerStyle={{margin:10}}
-                        size={width*0.1}
+                        containerStyle={{ margin: 10 }}
+                        size={width * 0.1}
                         rounded
                         source={{
                             uri: 'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                     />
-                    <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                        <Icon type="font-awesome" name="bell" size={width*0.08} color="black" containerStyle={{margin:5}}/>
-                        <Icon type="font-awesome" name="gear" size={width*0.08} color="black" containerStyle={{margin:5}}/>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-around',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Icon
+                            type="font-awesome"
+                            name="bell"
+                            size={width * 0.08}
+                            color="black"
+                            containerStyle={{ margin: 5 }}
+                        />
+                        <Icon
+                            type="font-awesome"
+                            name="gear"
+                            size={width * 0.08}
+                            color="black"
+                            containerStyle={{ margin: 5 }}
+                        />
                     </View>
                 </View>
                 <View style={{ flexDirection: 'column' }}>
@@ -54,82 +90,50 @@ const DashboardScreen = (props: any) => {
                 </View>
 
                 <View>
-                    <DashboardCourseSection navigation={props.navigation}/>
-                    <DashboardQuizSection navigation={props.navigation}/>
-
+                    <DashboardCourseSection
+                        navigation={props.navigation}
+                        courses={data?.dashboardCourses}
+                    />
+                    <DashboardQuizSection
+                        navigation={props.navigation}
+                        quizzes={data?.getDashboardQuizzes}
+                    />
+                    <DashboardFriendsSection
+                        navigation={props.navigation}
+                        friends={data?.getUserFriends}
+                    />
                 </View>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        alignItems: 'center',
+                        marginTop: 10,
+                    }}
+                >
+                    {userInfo?.verified ? (
+                        <CustomButton
+                            title="Create course"
+                            onPress={() => {
+                                props.navigation.push('createCourse');
+                            }}
+                        />
+                    ) : (
+                        <CustomButton
+                            title="Verify account"
+                            onPress={() => {
+                                props.navigation.push('VerifyAccount');
+                            }}
+                        />
+                    )}
 
-                <Button
-                    title="View courses"
-                    onPress={() => {
-                        props.navigation.push('CoursesList');
-                    }}
-                />
-                <Button
-                    title="View quizes"
-                    onPress={() => {
-                        props.navigation.push('QuizesList');
-                    }}
-                />
-                <Button
-                    title="My courses"
-                    onPress={() => {
-                        props.navigation.push('MyCourses');
-                    }}
-                />
-                {userInfo?.verified ? (
-                    <Button
-                        title="Create course"
+                    <CustomButton
+                        title="Logout"
                         onPress={() => {
-                            props.navigation.push('createCourse');
+                            logout();
                         }}
                     />
-                ) : (
-                    <Button
-                        title="Verify account"
-                        onPress={() => {
-                            props.navigation.push('VerifyAccount');
-                        }}
-                    />
-                )}
-
-                <Button
-                    title="Friends"
-                    onPress={() => {
-                        props.navigation.push('Friends');
-                    }}
-                />
-                {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
-                    <Button
-                        title="Verify courses"
-                        onPress={() => {
-                            props.navigation.push('UnVerifiedCourses');
-                        }}
-                    />
-                ) : null}
-                {userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR' ? (
-                    <Button
-                        title="Verify users"
-                        onPress={() => {
-                            props.navigation.push('VerifyUsers');
-                        }}
-                    />
-                ) : null}
-                {userInfo?.role == 'ADMIN' ? (
-                    <Button
-                        title="Go to admin"
-                        onPress={() => {
-                            props.navigation.push('AdminPanel');
-                        }}
-                    />
-                ) : null}
-
-                <Button
-                    title="Logout"
-                    onPress={() => {
-                        logout();
-                    }}
-                />
+                </View>
             </View>
         </Layout>
     );
