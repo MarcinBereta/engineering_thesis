@@ -1,9 +1,11 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
-export class DashboardQuiz{
+export class DashboardQuiz {
     @Field()
-    name:string;
+    id: string;
     @Field()
-    category:string
+    name: string;
+    @Field()
+    category: string;
 }

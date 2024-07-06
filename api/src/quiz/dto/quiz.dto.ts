@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { SimpleCourse } from 'src/courses/dto/CourseDTO';
 
 @ObjectType()
 export class Quiz {
@@ -12,6 +13,8 @@ export class Quiz {
     questions: Question[];
     @Field((type) => [UserScore])
     UserScores: UserScore[];
+    @Field((type) => SimpleCourse, { nullable: true })
+    course?: SimpleCourse;
 }
 
 @ObjectType()

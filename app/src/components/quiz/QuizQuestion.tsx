@@ -4,12 +4,14 @@ import {
     FlatList,
     TouchableOpacity,
     StyleSheet,
+    Dimensions,
 } from 'react-native';
 import { quizQuestionFragment } from '../../services/quiz/quiz';
 import { fontPixel } from '../../utils/Normalize';
 import { useState } from 'react';
 import { ResultOf } from '@/graphql';
-
+import { Card } from '@rneui/themed';
+const { width, height } = Dimensions.get('window');
 export const QuizQuestion = ({
     question,
     index,
@@ -27,26 +29,22 @@ export const QuizQuestion = ({
                 data={question.answers}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity
-                        onPress={() => {
-                            addAnswer(item);
-                            setAnswer(item, index);
+                    <Card
+                        containerStyle={{
+                            backgroundColor:
+                                answer == item ? 'lightblue' : 'white',
+                            width: width * 0.6,
                         }}
                     >
-                        <Text
-                            style={[
-                                styles.answer,
-                                {
-                                    backgroundColor:
-                                        answer === item
-                                            ? 'lightblue'
-                                            : 'lightgray',
-                                },
-                            ]}
+                        <TouchableOpacity
+                            onPress={() => {
+                                addAnswer(item);
+                                setAnswer(item, index);
+                            }}
                         >
-                            {item}
-                        </Text>
-                    </TouchableOpacity>
+                            <Text style={[styles.answer]}>{item}</Text>
+                        </TouchableOpacity>
+                    </Card>
                 )}
             />
         </View>
@@ -66,15 +64,14 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         marginBottom: 30,
-        backgroundColor: 'lightgray',
-        width: '60%',
+        width: '70%',
+        textAlign: 'center',
     },
     answer: {
         fontSize: fontPixel(15),
         padding: 10,
         margin: 10,
         borderRadius: 10,
-
-        backgroundColor: 'lightgray',
+        textAlign: 'center',
     },
 });

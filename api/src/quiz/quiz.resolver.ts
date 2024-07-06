@@ -27,8 +27,8 @@ export class QuizResolver {
 
     @UseInterceptors(CacheInterceptor)
     @CacheKey('dashboard_quizzes')
-    @Query((returns) => [DashboardQuiz])
-    async getDashboardQuizzes(): Promise<DashboardQuiz[]> {
+    @Query((returns) => [Quiz])
+    async getDashboardQuizzes(): Promise<Quiz[]> {
         return this.quizService.getDashboardQuizzes();
     }
 

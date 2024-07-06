@@ -65,10 +65,18 @@ type SigninResponse {
   user: simpleUser!
 }
 
+type SimpleCourse {
+  id: String!
+  name: String!
+  summary: String
+  category: String!
+}
+
 type Course {
   id: String!
   name: String!
   summary: String
+  category: String!
   text: [CourseItem!]!
 }
 
@@ -81,6 +89,7 @@ type ExtendedCourse {
   id: String!
   name: String!
   summary: String
+  category: String!
   text: [CourseItem!]!
   creator: CourseCreator!
 }
@@ -97,6 +106,7 @@ type Quiz {
   name: String!
   questions: [Question!]!
   UserScores: [UserScore!]!
+  course: SimpleCourse
 }
 
 type Question {
@@ -112,11 +122,6 @@ type UserScore {
   quizId: String!
   score: Float!
   createdAt: DateTime!
-}
-
-type DashboardQuiz {
-  name: String!
-  category: String!
 }
 
 type Query {
@@ -136,7 +141,7 @@ type Query {
   MyCourses: [Course!]!
   getQuizById(id: String!): Quiz!
   getAllQuizzes: [Quiz!]!
-  getDashboardQuizzes: [DashboardQuiz!]!
+  getDashboardQuizzes: [Quiz!]!
   getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
   countQuizWithPagination(pagination: PaginationDto!): CountDto!
 }

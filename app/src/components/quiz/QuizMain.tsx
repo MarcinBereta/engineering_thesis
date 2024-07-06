@@ -1,4 +1,4 @@
-import { View, Text, Button, TouchableOpacity } from 'react-native';
+import { View, Text, Button, TouchableOpacity, Dimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { fontPixel } from '../../utils/Normalize';
 import { useContext, useState } from 'react';
@@ -13,6 +13,10 @@ import {
     FriendUserFragmentGQL,
     getFriendsGQL,
 } from '@/services/friends/friends';
+import { Layout } from '../Layout';
+import { CustomButton } from '../CustomButton';
+import { useDebounce } from '@/utils/Debouncer';
+import { Avatar, Card } from '@rneui/themed';
 
 const shuffleArray = (array: string[]) => {
     return array.sort(() => Math.random() - 0.5);
@@ -23,6 +27,9 @@ export type extendedQuestion = ResultOf<typeof quizQuestionFragment> & {
 };
 
 export type addQuizResultDto = VariablesOf<typeof addQUizResultGQL>;
+
+const { height, width } = Dimensions.get('window');
+
 const QuizMain = ({ route, navigation }: any) => {
     const { userInfo, socket } = useContext(AuthContext);
     const [friendSelect, setFriendSelect] = useState(false);
@@ -68,7 +75,7 @@ const QuizMain = ({ route, navigation }: any) => {
     const [start, setStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const handleEndQuiz = async () => {
-        if(userInfo == null) return
+        if (userInfo == null) return;
         const correctAnswers = questions.filter(
             (question) => question.userAnswer === question.correct
         );
@@ -91,7 +98,17 @@ const QuizMain = ({ route, navigation }: any) => {
 
     if (start) {
         return (
-            <View>
+            <Layout navigation={navigation} icon="quiz">
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        fontSize: fontPixel(20),
+                        fontWeight: 'bold',
+                        margin: 10,
+                    }}
+                >
+                    Question {currentQuestion + 1} of {questions.length}
+                </Text>
                 <QuizQuestion
                     question={questions[currentQuestion]}
                     index={currentQuestion}
@@ -108,11 +125,14 @@ const QuizMain = ({ route, navigation }: any) => {
                         } else setCurrentQuestion(currentQuestion + 1);
                     }}
                 />
-                <View>
-                    <Text>
-                        Question {currentQuestion + 1} of {questions.length}
-                    </Text>
-                    <Button
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        margin: 10,
+                    }}
+                >
+                    <CustomButton
                         onPress={() => {
                             if (currentQuestion === questions.length - 1) {
                                 setStart(false);
@@ -129,7 +149,7 @@ const QuizMain = ({ route, navigation }: any) => {
                         }`}
                     />
                     {currentQuestion != 0 && (
-                        <Button
+                        <CustomButton
                             onPress={() => {
                                 setCurrentQuestion(currentQuestion - 1);
                             }}
@@ -137,7 +157,7 @@ const QuizMain = ({ route, navigation }: any) => {
                         />
                     )}
                 </View>
-            </View>
+            </Layout>
         );
     }
 
@@ -147,58 +167,103 @@ const QuizMain = ({ route, navigation }: any) => {
             data.getUserFriends
         );
         return (
-            <View>
-                <Text>Friends list</Text>
+            <Layout navigation={navigation} icon="quiz">
+                <Text
+                    style={{
+                        fontSize: fontPixel(40),
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                    }}
+                >
+                    Friends list
+                </Text>
                 <FlatList
                     data={friends}
                     renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={{
-                                padding: 15,
-                                backgroundColor: 'lightgray',
-                                width: '90%',
-                                marginLeft: '5%',
-                                borderRadius: 20,
-                                marginTop: 10,
-                            }}
-                            onPress={() => {
-                                navigation.navigate('QuizWithFriends', {
-                                    quiz,
-                                    friendId: item.id,
-                                    invite: false,
-                                });
-                            }}
-                        >
-                            <Text>{item.username}</Text>
-                        </TouchableOpacity>
+                        <Card>
+                            <TouchableOpacity
+                                style={{
+                                    padding: 15,
+                                    width: '90%',
+                                    marginLeft: '5%',
+                                    borderRadius: 20,
+                                    marginTop: 10,
+                                    flexDirection: 'row',
+                                    // justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => {
+                                    navigation.navigate('QuizWithFriends', {
+                                        quiz,
+                                        friendId: item.id,
+                                        invite: false,
+                                    });
+                                }}
+                            >
+                                <Avatar
+                                    source={{
+                                        uri:
+                                            item.image ||
+                                            'https://randomuser.me/api/portraits/men/36.jpg',
+                                    }}
+                                    size="medium"
+                                    rounded
+                                />
+                                <Text
+                                    style={{
+                                        fontSize: fontPixel(20),
+                                        marginLeft: 10,
+                                    }}
+                                >
+                                    {item.username}
+                                </Text>
+                            </TouchableOpacity>
+                        </Card>
                     )}
                 />
-            </View>
+            </Layout>
         );
     }
 
     return (
-        <View>
-            <Text style={{ fontSize: fontPixel(40) }}>{quiz.name}</Text>
-            <Button
-                onPress={() => {
-                    setStart(true);
+        <Layout navigation={navigation} icon="quiz">
+            <Text
+                style={{
+                    fontSize: fontPixel(40),
+                    textAlign: 'center',
+                    fontWeight: 'bold',
                 }}
-                title="Start quiz"
-            />
-            <Button
-                onPress={() => {
-                    navigation.navigate('QuizSearch', { quiz });
+            >
+                {quiz.name}
+            </Text>
+            <View
+                style={{
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                    height: height * 0.2,
+                    padding: 10,
                 }}
-                title="Search for opoonents"
-            />
-            <Button
-                onPress={() => {
-                    setFriendSelect(true);
-                }}
-                title="Fight with friend"
-            />
-        </View>
+            >
+                <CustomButton
+                    onPress={() => {
+                        setStart(true);
+                    }}
+                    title="Start quiz"
+                />
+                <CustomButton
+                    onPress={() => {
+                        navigation.navigate('QuizSearch', { quiz });
+                    }}
+                    title="Search for opoonents"
+                />
+                <CustomButton
+                    onPress={() => {
+                        setFriendSelect(true);
+                    }}
+                    title="Fight with friend"
+                />
+            </View>
+        </Layout>
     );
 };
 

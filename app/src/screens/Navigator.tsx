@@ -18,7 +18,7 @@ import { User } from './User';
 import { UnVerifiedCoursesList } from './UnVerifiedCoursesList';
 import { VerifyAccount } from '../components/users/VerifyAccount';
 import { VerifyUsers } from '../components/users/VerifyUsers';
-import { QuizesList } from '../components/quiz/QuizList';
+import { QuizzesList } from '../components/quiz/QuizList';
 import QuizMain from '../components/quiz/QuizMain';
 import QuizSocket from '../components/quiz/QuizSocket';
 import { Friends } from './Friends';
@@ -53,8 +53,8 @@ const Navigator = ({}: {}) => {
                             name="CoursesList"
                         />
                         <Stack.Screen
-                            component={QuizesList}
-                            name="QuizesList"
+                            component={QuizzesList}
+                            name="QuizzesList"
                         />
 
                         <Stack.Screen

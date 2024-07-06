@@ -43,10 +43,24 @@ export class QuizService {
         return quiz;
     }
 
-    async getDashboardQuizzes(): Promise<DashboardQuiz[]> {
-        const rawQuery = Prisma.sql`select q.name, c.category from "Quiz" q inner join "Course" C on q."courseId" = C.id order by (select count(*) as count from "UserScores" u where u."quizId"  = q.id) desc limit 5`;
-        const quizzes: DashboardQuiz[] =
+    async getDashboardQuizzes(): Promise<Quiz[]> {
+        const rawQuery = Prisma.sql`select q.id, q.name, c.category from "Quiz" q inner join "Course" C on q."courseId" = C.id order by (select count(*) as count from "UserScores" u where u."quizId"  = q.id) desc limit 5`;
+        const quizzesRaw: DashboardQuiz[] =
             await this.prismaService.$queryRaw(rawQuery);
+
+        const quizzes = await this.prismaService.quiz.findMany({
+            where: {
+                id: {
+                    in: quizzesRaw.map((q) => q.id),
+                },
+            },
+            include: {
+                questions: true,
+                UserScores: true,
+                course: true,
+            },
+        });
+        console.log(quizzes);
         return quizzes;
     }
 
@@ -63,6 +77,7 @@ export class QuizService {
                 include: {
                     questions: true,
                     UserScores: true,
+                    course: true,
                 },
                 skip: page,
                 take: PAGINATION_SIZE,
@@ -80,6 +95,7 @@ export class QuizService {
             include: {
                 questions: true,
                 UserScores: true,
+                course: true,
             },
             skip: (page - 1) * PAGINATION_SIZE,
             take: PAGINATION_SIZE,

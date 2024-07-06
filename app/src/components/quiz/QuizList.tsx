@@ -8,8 +8,12 @@ import request from 'graphql-request';
 import { getQuizzesWithPaginationGQL } from '@/services/quiz/quiz';
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '../utils/Pagination';
+import { Card, SearchBar } from '@rneui/themed';
+import { normalizeText } from '@rneui/base';
+import { QuizzesListItem } from './QuizListItem';
+import { Layout } from '../Layout';
 
-const QuizesList = (props: any) => {
+const QuizzesList = (props: any) => {
     const { userInfo } = useContext(AuthContext);
 
     const [search, setSearch] = useState('');
@@ -39,9 +43,18 @@ const QuizesList = (props: any) => {
     }
 
     return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
-            <Text>Quizes list: </Text>
-            <TextInput
+        <Layout navigation={props.navigation} icon="quiz">
+            <Text
+                style={{
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: normalizeText(30),
+                }}
+            >
+                Quizzes list
+            </Text>
+            <SearchBar
+                platform="android"
                 placeholder="Search"
                 value={search}
                 onChangeText={(text) => {
@@ -51,23 +64,11 @@ const QuizesList = (props: any) => {
             <FlatList
                 data={data.getQuizzesWithPagination}
                 renderItem={({ item }) => (
-                    <View
-                        style={{
-                            padding: 15,
-                            backgroundColor: 'lightgray',
-                            width: '90%',
-                            marginLeft: '5%',
-                            borderRadius: 20,
-                        }}
-                    >
-                        <TouchableOpacity
-                            onPress={() => {
-                                props.navigation.push('quiz', { quiz: item });
-                            }}
-                        >
-                            <Text>{item.name}</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <QuizzesListItem
+                        key={item.id}
+                        item={item}
+                        navigation={props.navigation}
+                    />
                 )}
             />
             <Pagination
@@ -76,8 +77,8 @@ const QuizesList = (props: any) => {
                 count={data.countQuizWithPagination.count}
                 changePage={(page) => setPage(page)}
             />
-        </View>
+        </Layout>
     );
 };
 
-export { QuizesList };
+export { QuizzesList };

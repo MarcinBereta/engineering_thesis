@@ -1,14 +1,19 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Category } from '@prisma/client';
-
 @ObjectType()
-export class Course {
+export class SimpleCourse {
     @Field()
     id: string;
     @Field()
     name: string;
-    @Field({nullable: true})
+    @Field({ nullable: true })
     summary: string;
+    @Field()
+    category: Category;
+}
+
+@ObjectType()
+export class Course extends SimpleCourse {
     @Field((type) => [CourseItem])
     text: CourseItem[];
 }

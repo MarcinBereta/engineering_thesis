@@ -14,15 +14,48 @@ export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationTyp
         navigation.navigate(destination)
     }
 
-    return <View style={{
-        height:'10%',
-        flexDirection:'row',
-        justifyContent:'space-around',
-    }}>
-        <Icon type="font-awesome" raised onPress={handlePress.bind('','DashboardScreen')} name="home" size={30} color={icon == "home" ? "#F00":"#000"} />
-        <Icon type="font-awesome" raised onPress={handlePress.bind('','CoursesList')} name="book" size={30} color={icon == "course" ? "#F00":"#000"} />
-        <Icon type="font-awesome" raised onPress={handlePress.bind('','QuizesLists')} name="gamepad" size={30} color={icon == "quiz" ? "#F00":"#000"} />
-        {userInfo.role == "ADMIN" || userInfo.role == "MODERATOR" ?<Icon raised type="font-awesome" onPress={handlePress.bind('','AdminPanel')} name="fa-book" size={30} color={icon == "admin" ? "#F00":"#000"} />:null }
-
-    </View>
+    return (
+        <View
+            style={{
+                height: '10%',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+            }}
+        >
+            <Icon
+                type="font-awesome"
+                raised
+                onPress={handlePress.bind('', 'DashboardScreen')}
+                name="home"
+                size={30}
+                color={icon == 'home' ? '#F00' : '#000'}
+            />
+            <Icon
+                type="font-awesome"
+                raised
+                onPress={handlePress.bind('', 'CoursesList')}
+                name="book"
+                size={30}
+                color={icon == 'course' ? '#F00' : '#000'}
+            />
+            <Icon
+                type="font-awesome"
+                raised
+                onPress={handlePress.bind('', 'QuizzesList')}
+                name="gamepad"
+                size={30}
+                color={icon == 'quiz' ? '#F00' : '#000'}
+            />
+            {userInfo.role == 'ADMIN' || userInfo.role == 'MODERATOR' ? (
+                <Icon
+                    raised
+                    type="font-awesome"
+                    onPress={handlePress.bind('', 'AdminPanel')}
+                    name="fa-book"
+                    size={30}
+                    color={icon == 'admin' ? '#F00' : '#000'}
+                />
+            ) : null}
+        </View>
+    );
 }

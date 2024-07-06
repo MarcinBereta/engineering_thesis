@@ -37,6 +37,12 @@ export const getQuizzesWithPaginationGQL = graphql(
                 questions {
                     ...quizQuestionFragment
                 }
+                course {
+                    id
+                    name
+                    summary
+                    category
+                }
             }
             countQuizWithPagination(pagination: $pagination) {
                 count
@@ -97,13 +103,23 @@ export const dashboardDataGQL = graphql(
                 }
             }
             getDashboardQuizzes {
+                id
+                courseId
                 name
-                category
+                questions {
+                    ...quizQuestionFragment
+                }
+                course {
+                    id
+                    name
+                    summary
+                    category
+                }
             }
             getUserFriends {
                 ...FriendUserFragment
             }
         }
     `,
-    [FriendUserFragmentGQL]
+    [FriendUserFragmentGQL, quizQuestionFragment]
 );

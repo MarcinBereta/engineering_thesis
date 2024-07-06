@@ -33,6 +33,7 @@ const DashboardScreen = (props: any) => {
         setNavigationRef(props.navigation);
     }, []);
 
+
     if (userInfo === null || data === undefined) {
         return null;
     }
