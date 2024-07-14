@@ -295,14 +295,14 @@ export class QuizService {
         if (!this.checkCourseExistence(courseId)) {
             throw new Error('The course does not exist.');
         }
-        let questions = await this.generateQuestions(courseId);
-        let questionsJson = JSON.parse(questions);
+        const questions = await this.generateQuestions(courseId);
+        const questionsJson = JSON.parse(questions);
         let verified = await this.verifyQuiz(questionsJson);
         let tries = 2;
         while (!verified) {
             if (tries > 0) {
-                let questions = await this.generateQuestions(courseId);
-                let questionsJson = JSON.parse(questions);
+                const questions = await this.generateQuestions(courseId);
+                const questionsJson = JSON.parse(questions);
                 verified = await this.verifyQuiz(questionsJson);
                 tries--;
             } else {
@@ -310,13 +310,13 @@ export class QuizService {
             }
         }
 
-        let courseName = await this.getCourseName(courseId);
+        const courseName = await this.getCourseName(courseId);
         if (
             questionsJson &&
             questionsJson.quiz &&
             Array.isArray(questionsJson.quiz)
         ) {
-            let quiz = await this.prismaService.quiz.create({
+            const quiz = await this.prismaService.quiz.create({
                 data: {
                     courseId: courseId,
                     name: courseName,
@@ -346,7 +346,7 @@ export class QuizService {
     }
 
     async deleteQuestionAndQuiz(courseId: string): Promise<void> {
-        let quiz = await this.prismaService.quiz.findFirst({
+        const quiz = await this.prismaService.quiz.findFirst({
             where: {
                 courseId: courseId,
             },
