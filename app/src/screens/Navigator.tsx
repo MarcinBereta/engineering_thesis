@@ -14,21 +14,84 @@ import { MyCourses } from './MyCourses';
 import { CourseEditForm } from '../components/courses/CourseForm/CourseFormEdit';
 import { UserList } from './UserList';
 import { AdminPanel } from './AdminPanel';
-import { User } from './User';
 import { UnVerifiedCoursesList } from './UnVerifiedCoursesList';
 import { VerifyAccount } from '../components/users/VerifyAccount';
 import { VerifyUsers } from '../components/users/VerifyUsers';
 import { QuizzesList } from '../components/quiz/QuizList';
-import QuizMain from '../components/quiz/QuizMain';
+import QuizMain from './QuizMain';
 import QuizSocket from '../components/quiz/QuizSocket';
 import { Friends } from './Friends';
 import QuizFriends from '@/components/quiz/QuizSocketFriends';
 import QuizResult from './QuizResult';
-// import {Stack}
+import { ResultOf } from 'gql.tada';
+import { quizQuestionFragment } from '@/services/quiz/quiz';
+import { UserPage } from './User';
+import { UserSettings } from './UserSettings';
+
 const Stack = createNativeStackNavigator();
+
+export type Course = {
+    id: string;
+    name: string;
+    category: string;
+    language: string;
+    summary?: string;
+    text: {
+        id: string;
+        type: string;
+        value: string;
+    }[];
+};
+
+export type Quiz = {
+    courseId: string;
+    id: string;
+    name: string;
+    questions: ResultOf<typeof quizQuestionFragment>[];
+};
+export type User = {
+    username: string;
+    email: string;
+    id: string;
+    token?: string;
+    image: string | null;
+    role: string;
+    verified: boolean;
+    Moderator: {
+        id: string;
+        userId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        categories: string[];
+    }[];
+};
+
+export type AuthenticatedRootStackParamList = {
+    DashboardScreen: undefined;
+    CoursesList: undefined;
+    QuizzesList: undefined;
+    UnVerifiedCourses: undefined;
+    MyCourses: undefined;
+    EditCourse: { course: Course };
+    createCourse: undefined;
+    course: { course: Course };
+    quiz: { quiz: Quiz };
+    QuizSearch: { quiz: Quiz };
+    QuizWithFriends: { quiz: Quiz; friendId: string; invite: boolean };
+    QuizResult: { score: number; total: number };
+    Friends: undefined;
+    User: { user: User };
+    UserList: undefined;
+    AdminPanel: undefined;
+    VerifyUsers: undefined;
+    VerifyAccount: undefined;
+    UserSettings: undefined;
+};
 
 const Navigator = ({}: {}) => {
     const { userInfo, refreshLoading } = useContext(AuthContext);
+    const AuthenticatedStack =
+        createNativeStackNavigator<AuthenticatedRootStackParamList>();
     return (
         <NavigationContainer>
             <Stack.Navigator
@@ -44,60 +107,82 @@ const Navigator = ({}: {}) => {
                     />
                 ) : userInfo != null ? (
                     <>
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={DashboardScreen}
                             name="DashboardScreen"
                         />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={CoursesList}
                             name="CoursesList"
                         />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={QuizzesList}
                             name="QuizzesList"
                         />
 
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={UnVerifiedCoursesList}
                             name="UnVerifiedCourses"
                         />
-                        <Stack.Screen component={MyCourses} name="MyCourses" />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
+                            component={MyCourses}
+                            name="MyCourses"
+                        />
+                        <AuthenticatedStack.Screen
                             component={CourseEditForm}
                             name="EditCourse"
                         />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={CourseForm}
                             name="createCourse"
                         />
-                        <Stack.Screen component={Course} name="course" />
-                        <Stack.Screen component={QuizMain} name="quiz" />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
+                            component={Course}
+                            name="course"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={QuizMain}
+                            name="quiz"
+                        />
+                        <AuthenticatedStack.Screen
                             component={QuizSocket}
                             name="QuizSearch"
                         />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={QuizFriends}
                             name="QuizWithFriends"
                         />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             name="QuizResult"
                             component={QuizResult}
                         />
-                        <Stack.Screen component={Friends} name="Friends" />
+                        <AuthenticatedStack.Screen
+                            component={Friends}
+                            name="Friends"
+                        />
 
-                        <Stack.Screen component={User} name="User" />
-                        <Stack.Screen component={UserList} name="UserList" />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
+                            component={UserPage}
+                            name="User"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={UserSettings}
+                            name="UserSettings"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={UserList}
+                            name="UserList"
+                        />
+                        <AuthenticatedStack.Screen
                             component={AdminPanel}
                             name="AdminPanel"
                         />
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={VerifyUsers}
                             name="VerifyUsers"
                         />
 
-                        <Stack.Screen
+                        <AuthenticatedStack.Screen
                             component={VerifyAccount}
                             name="VerifyAccount"
                         />

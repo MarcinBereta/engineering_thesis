@@ -51,7 +51,7 @@ export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationTyp
                     raised
                     type="font-awesome"
                     onPress={handlePress.bind('', 'AdminPanel')}
-                    name="fa-book"
+                    name="lock"
                     size={30}
                     color={icon == 'admin' ? '#F00' : '#000'}
                 />

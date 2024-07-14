@@ -56,7 +56,7 @@ export class CoursesService {
             }
         }
 
-        for (let courseItem of courseItemsToAdd) {
+        for (const courseItem of courseItemsToAdd) {
             if (
                 courseItem.type == 'photo' &&
                 courseItem.value.includes('files/courses/')
@@ -133,6 +133,7 @@ export class CoursesService {
                 creatorId: user.id,
                 category: course.category,
                 moderatorId: moderator.id,
+                language: course.language,
             },
         });
 
@@ -210,6 +211,7 @@ export class CoursesService {
             data: {
                 name: course.name,
                 category: course.category,
+                language: course.language,
             },
         });
 
@@ -397,7 +399,7 @@ export class CoursesService {
         await this.cacheManager.del('unverified_courses/' + course.moderatorId);
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
-        for (let key of keys) {
+        for (const key of keys) {
             if (key.includes('all_courses')) {
                 cachesToDelete.push(this.cacheManager.del(key));
             }

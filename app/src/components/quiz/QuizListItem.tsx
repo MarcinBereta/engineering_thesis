@@ -3,6 +3,7 @@ import { getQuizzesWithPaginationGQL } from '@/services/quiz/quiz';
 import { Card } from '@rneui/themed';
 import { NavigationType } from '../Navbar';
 import { ResultOf } from 'gql.tada';
+import { useTranslation } from 'react-i18next';
 
 const QuizzesListItem = ({
     navigation,
@@ -13,6 +14,7 @@ const QuizzesListItem = ({
         typeof getQuizzesWithPaginationGQL
     >['getQuizzesWithPagination'][0];
 }) => {
+    const { t } = useTranslation();
     return (
         <Card
             containerStyle={{
@@ -36,12 +38,16 @@ const QuizzesListItem = ({
                     }}
                 >
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontWeight: 'bold' }}>Course:</Text>
+                        <Text style={{ fontWeight: 'bold' }}>
+                            {t('course')}:
+                        </Text>
                         <Text> {item.course?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontWeight: 'bold' }}>Category:</Text>
-                        <Text> {item.course?.category}</Text>
+                        <Text style={{ fontWeight: 'bold' }}>
+                            {t('category')}:
+                        </Text>
+                        <Text> {t(item.course?.category as string)}</Text>
                     </View>
                 </View>
             </TouchableOpacity>

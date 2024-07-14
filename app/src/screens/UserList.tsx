@@ -1,6 +1,6 @@
-import { View, Text, Button, TouchableOpacity } from 'react-native';
-import { AuthContext, UserInfo } from '../contexts/AuthContext';
-import { useContext, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { AuthContext } from '../contexts/AuthContext';
+import { useContext, useState } from 'react';
 import { fontPixel } from '../utils/Normalize';
 import { FlatList } from 'react-native-gesture-handler';
 import { graphqlURL } from '@/services/settings';
@@ -10,8 +10,17 @@ import { getUsersGQL } from '@/services/admin/admin';
 import { Avatar, Card, SearchBar } from '@rneui/themed';
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '@/components/utils/Pagination';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
+type UserList = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'UserList'
+>;
 
-const UserList = (props: any) => {
+const UserList = (props: UserList) => {
+    const { t } = useTranslation();
+
     const { userInfo } = useContext(AuthContext);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);

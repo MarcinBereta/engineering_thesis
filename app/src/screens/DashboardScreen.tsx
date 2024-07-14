@@ -1,4 +1,4 @@
-import { View, Text, Button, Dimensions } from 'react-native';
+import { View, Text, Button, Dimensions, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import { useContext, useEffect } from 'react';
 import { fontPixel } from '../utils/Normalize';
@@ -13,8 +13,18 @@ import { graphqlURL } from '@/services/settings';
 import { dashboardDataGQL } from '@/services/quiz/quiz';
 import { DashboardFriendsSection } from '@/components/dashboard/FriendsSection';
 import { CustomButton } from '@/components/CustomButton';
+import { useTranslation } from 'react-i18next';
+import { ScrollView } from 'react-native-gesture-handler';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 const { height, width } = Dimensions.get('window');
-const DashboardScreen = (props: any) => {
+
+type DashboardScreen = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'DashboardScreen'
+>;
+const DashboardScreen = (props: DashboardScreen) => {
+    const { t } = useTranslation();
     const { logout, userInfo, socket } = useContext(AuthContext);
 
     const { data, isLoading, refetch, isError, error } = useQuery({
@@ -32,7 +42,6 @@ const DashboardScreen = (props: any) => {
     useEffect(() => {
         setNavigationRef(props.navigation);
     }, []);
-
 
     if (userInfo === null || data === undefined) {
         return null;
@@ -69,13 +78,19 @@ const DashboardScreen = (props: any) => {
                             color="black"
                             containerStyle={{ margin: 5 }}
                         />
-                        <Icon
-                            type="font-awesome"
-                            name="gear"
-                            size={width * 0.08}
-                            color="black"
-                            containerStyle={{ margin: 5 }}
-                        />
+                        <TouchableOpacity
+                            onPress={() => {
+                                props.navigation.navigate('UserSettings');
+                            }}
+                        >
+                            <Icon
+                                type="font-awesome"
+                                name="gear"
+                                size={width * 0.08}
+                                color="black"
+                                containerStyle={{ margin: 5 }}
+                            />
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'column' }}>
@@ -86,11 +101,15 @@ const DashboardScreen = (props: any) => {
                             color: 'black',
                         }}
                     >
-                        {userInfo.username}
+                        {t('hello')} {userInfo.username}
                     </Text>
                 </View>
 
-                <View>
+                <ScrollView
+                    style={{
+                        maxHeight: height * 0.7,
+                    }}
+                >
                     <DashboardCourseSection
                         navigation={props.navigation}
                         courses={data?.dashboardCourses}
@@ -103,7 +122,7 @@ const DashboardScreen = (props: any) => {
                         navigation={props.navigation}
                         friends={data?.getUserFriends}
                     />
-                </View>
+                </ScrollView>
                 <View
                     style={{
                         flexDirection: 'row',
@@ -114,14 +133,14 @@ const DashboardScreen = (props: any) => {
                 >
                     {userInfo?.verified ? (
                         <CustomButton
-                            title="Create course"
+                            title={t('create_course')}
                             onPress={() => {
                                 props.navigation.push('createCourse');
                             }}
                         />
                     ) : (
                         <CustomButton
-                            title="Verify account"
+                            title={t('verify_account')}
                             onPress={() => {
                                 props.navigation.push('VerifyAccount');
                             }}
@@ -129,7 +148,7 @@ const DashboardScreen = (props: any) => {
                     )}
 
                     <CustomButton
-                        title="Logout"
+                        title={t('logout')}
                         onPress={() => {
                             logout();
                         }}

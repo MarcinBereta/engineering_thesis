@@ -6,8 +6,14 @@ import { graphqlURL } from '@/services/settings';
 import { useMutation } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { VariablesOf } from 'gql.tada';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 export type addVerificationRequestDto = VariablesOf<
     typeof addVerificationRequestGQL
+>;
+type VerifyAccount = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'VerifyAccount'
 >;
 const VerifyAccount = ({ route, navigation }: any) => {
     const { userInfo } = useContext(AuthContext);

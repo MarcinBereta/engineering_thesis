@@ -5,6 +5,7 @@ import { ResultOf } from 'gql.tada';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
+import { useTranslation } from 'react-i18next';
 
 export const DashboardCourseSection = ({
     navigation,
@@ -13,6 +14,8 @@ export const DashboardCourseSection = ({
     navigation: NavigationType;
     courses: ResultOf<typeof dashboardDataGQL>['dashboardCourses'];
 }) => {
+    const { t } = useTranslation();
+
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
             <TouchableOpacity
@@ -28,7 +31,7 @@ export const DashboardCourseSection = ({
                 }}
             >
                 <Text style={{ fontSize: normalizeText(20), paddingRight: 20 }}>
-                    Featured courses
+                    {t('featured_courses')}
                 </Text>
                 <Icon type="font-awesome" name="arrow-right" size={30} />
             </TouchableOpacity>

@@ -12,10 +12,17 @@ import { Card, SearchBar } from '@rneui/themed';
 import { normalizeText } from '@rneui/base';
 import { QuizzesListItem } from './QuizListItem';
 import { Layout } from '../Layout';
-
-const QuizzesList = (props: any) => {
+import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+type QuizzesList = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'QuizzesList'
+>;
+const QuizzesList = (props: QuizzesList) => {
     const { userInfo } = useContext(AuthContext);
-
+    const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
 
@@ -39,7 +46,7 @@ const QuizzesList = (props: any) => {
             ),
     });
     if (data == undefined || isLoading) {
-        return <Text>Loading...</Text>;
+        return <Text>{t('loading')}...</Text>;
     }
 
     return (
@@ -51,7 +58,7 @@ const QuizzesList = (props: any) => {
                     fontSize: normalizeText(30),
                 }}
             >
-                Quizzes list
+                {t('quizzes_list')}
             </Text>
             <SearchBar
                 platform="android"

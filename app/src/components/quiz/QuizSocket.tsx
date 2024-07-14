@@ -6,6 +6,9 @@ import { QuizQuestion } from './QuizQuestion';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ResultOf } from '@/graphql';
 import { quizQuestionFragment } from '@/services/quiz/quiz';
+import { useTranslation } from 'react-i18next';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Room = {
     id: string;
@@ -19,14 +22,19 @@ type Room = {
     questions: ResultOf<typeof quizQuestionFragment>[];
 };
 
-const QuizSocket = ({ route, navigation }: any) => {
-    const { userInfo, socket } = useContext(AuthContext);
+type QuizSearch = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'QuizSearch'
+>;
 
+const QuizSocket = ({ route, navigation }: QuizSearch) => {
+    const { userInfo, socket } = useContext(AuthContext);
+    const { t } = useTranslation();
     const { quiz } = route.params;
     const [gameStage, setGameStage] = useState<
         'waiting' | 'lobby' | 'question' | 'answer' | 'end'
     >('waiting');
-    const [questionAnserwed, setQuestionAnserwed] = useState(false);
+    const [questionAnswered, setQuestionAnswered] = useState(false);
     const [question, setQuestion] = useState<null | ResultOf<
         typeof quizQuestionFragment
     >>(null);
@@ -51,7 +59,7 @@ const QuizSocket = ({ route, navigation }: any) => {
                 });
                 setGameStage('question');
                 setQuestion(question);
-                setQuestionAnserwed(false);
+                setQuestionAnswered(false);
             });
 
             socket.on('questionEnd', (correct: string) => {
@@ -68,7 +76,9 @@ const QuizSocket = ({ route, navigation }: any) => {
     if (gameStage == 'answer') {
         return (
             <View>
-                <Text>Correct answer is {question?.correct}</Text>
+                <Text>
+                    {t('correct_answer_is')} {question?.correct}
+                </Text>
             </View>
         );
     }
@@ -76,8 +86,8 @@ const QuizSocket = ({ route, navigation }: any) => {
     if (gameStage == 'lobby' && room) {
         return (
             <View>
-                <Text>Game starting in 5 seconds</Text>
-                <Text>Players:</Text>
+                <Text>{t('game_starts_in')}</Text>
+                <Text>{t('players')}:</Text>
                 <FlatList
                     data={room.users}
                     keyExtractor={(item, index) => index.toString()}
@@ -94,8 +104,8 @@ const QuizSocket = ({ route, navigation }: any) => {
                     question={question}
                     index={0}
                     setAnswer={(answer: string, index: number) => {
-                        if (socket && !questionAnserwed) {
-                            setQuestionAnserwed(true);
+                        if (socket && !questionAnswered) {
+                            setQuestionAnswered(true);
                             socket.emit('answer', {
                                 roomId: room?.id,
                                 userId: userInfo?.id,
@@ -111,8 +121,8 @@ const QuizSocket = ({ route, navigation }: any) => {
     if (gameStage == 'end' && room) {
         return (
             <View>
-                <Text>Game ended</Text>
-                <Text>Players:</Text>
+                <Text>{t('game_ended')}</Text>
+                <Text>{t('players')}:</Text>
                 <FlatList
                     data={room.users}
                     keyExtractor={(item, index) => index.toString()}
@@ -136,8 +146,9 @@ const QuizSocket = ({ route, navigation }: any) => {
                             quizId: quiz.id,
                             userId: userInfo?.id,
                         });
+                    navigation.goBack();
                 }}
-                title="Cancel searching"
+                title={t('cancel_search')}
             />
         </View>
     );

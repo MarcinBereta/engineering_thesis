@@ -10,8 +10,15 @@ import { graphqlURL } from '@/services/settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { VariablesOf } from 'gql.tada';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 export type verifyUserDataDto = VariablesOf<typeof verifyUserDataGQL>;
-const VerifyUsers = (props: any) => {
+type VerifyUsers = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'VerifyUsers'
+>;
+
+const VerifyUsers = (props: VerifyUsers) => {
     const { userInfo } = useContext(AuthContext);
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['userId'],

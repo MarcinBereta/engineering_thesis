@@ -6,6 +6,7 @@ import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { FriendUserFragmentGQL } from '@/services/friends/friends';
+import { useTranslation } from 'react-i18next';
 
 export const DashboardFriendsSection = ({
     navigation,
@@ -14,6 +15,7 @@ export const DashboardFriendsSection = ({
     navigation: NavigationType;
     friends: ResultOf<typeof dashboardDataGQL>['getUserFriends'];
 }) => {
+    const { t } = useTranslation();
     const friendsList = readFragment(FriendUserFragmentGQL, friends);
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -30,7 +32,7 @@ export const DashboardFriendsSection = ({
                 }}
             >
                 <Text style={{ fontSize: normalizeText(20), paddingRight: 20 }}>
-                    Friends
+                    {t('friends')}
                 </Text>
                 <Icon type="font-awesome" name="arrow-right" size={30} />
             </TouchableOpacity>

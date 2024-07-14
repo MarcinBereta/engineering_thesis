@@ -14,7 +14,7 @@ export class SimpleCourse {
 
 @ObjectType()
 export class Course extends SimpleCourse {
-    @Field((type) => [CourseItem])
+    @Field(() => [CourseItem])
     text: CourseItem[];
 }
 
@@ -27,7 +27,7 @@ export class CourseCreator {
 }
 @ObjectType()
 export class ExtendedCourse extends Course {
-    @Field((type) => CourseCreator)
+    @Field(() => CourseCreator)
     creator: CourseCreator;
 }
 
@@ -45,10 +45,12 @@ export class CourseItem {
 export class CourseInput {
     @Field()
     name: string;
-    @Field((type) => [CourseItemInput])
+    @Field(() => [CourseItemInput])
     text: CourseItemInput[];
     @Field()
     category: Category;
+    @Field()
+    language: string;
 }
 
 @InputType()
@@ -57,10 +59,12 @@ export class EditCourseInput {
     name: string;
     @Field()
     category: Category;
-    @Field((type) => [CourseItemInput])
+    @Field(() => [CourseItemInput])
     text: CourseItemInput[];
     @Field()
     id: string;
+    @Field()
+    language: string;
 }
 
 @InputType()

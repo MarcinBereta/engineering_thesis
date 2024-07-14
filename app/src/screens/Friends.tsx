@@ -21,8 +21,18 @@ import {
 import { readFragment } from '@/graphql';
 import { FriendItem } from '@/components/friends/FriendItem';
 import { FriendRequestItem } from '@/components/friends/FriendRequestItem';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 
-const Friends = (props: any) => {
+type Friends = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'Friends'
+>;
+
+const Friends = (props: Friends) => {
+    const { t } = useTranslation();
+
     const { userInfo } = useContext(AuthContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [username, setUsername] = useState('');
@@ -60,7 +70,7 @@ const Friends = (props: any) => {
     });
 
     if (data == undefined || isLoading) {
-        return <Text>Loading...</Text>;
+        return <Text>{t('loading')}...</Text>;
     }
 
     const friendRequests = readFragment(
@@ -85,20 +95,20 @@ const Friends = (props: any) => {
                 }}
             >
                 <TextInput
-                    placeholder="Enter username"
+                    placeholder={t('enter_username')}
                     onChangeText={(text) => {
                         setUsername(text);
                     }}
                 />
 
                 <Button
-                    title="Add"
+                    title={t('add')}
                     onPress={() => {
                         addFriend.mutate(username);
                     }}
                 />
                 <Button
-                    title="cancel"
+                    title={t('cancel')}
                     onPress={() => {
                         setIsModalOpen(false);
                     }}
@@ -111,7 +121,7 @@ const Friends = (props: any) => {
                     color: 'black',
                 }}
             >
-                Friend list!
+                {t('friend_list')}!
             </Text>
             <FlatList
                 data={friends}
@@ -124,14 +134,14 @@ const Friends = (props: any) => {
                     color: 'black',
                 }}
             >
-                Friend Requests!
+                {t('friend_request')}!
             </Text>
             <FlatList
                 data={friendRequests}
                 renderItem={({ item }) => <FriendRequestItem friend={item} />}
             />
             <Button
-                title="Add friend"
+                title={t('add_friend')}
                 onPress={() => {
                     setIsModalOpen(true);
                 }}

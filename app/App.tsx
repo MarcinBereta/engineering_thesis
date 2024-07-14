@@ -1,10 +1,10 @@
-import { io } from 'socket.io-client';
-import constants from './constants';
 import { Navigator } from './src/screens/Navigator';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SocketHandler } from '@/contexts/SocketHandler';
+import '@/services/i18next';
+
 const queryClient = new QueryClient();
 
 export default function App() {

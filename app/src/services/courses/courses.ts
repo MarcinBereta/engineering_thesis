@@ -102,6 +102,7 @@ export const getMyCoursesGQL = graphql(`
         MyCourses {
             id
             name
+            category
             text {
                 id
                 type

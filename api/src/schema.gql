@@ -204,6 +204,7 @@ input CourseInput {
   name: String!
   text: [CourseItemInput!]!
   category: String!
+  language: String!
 }
 
 input CourseItemInput {
@@ -217,6 +218,7 @@ input EditCourseInput {
   category: String!
   text: [CourseItemInput!]!
   id: String!
+  language: String!
 }
 
 input VerifyCourseDto {

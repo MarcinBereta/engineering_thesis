@@ -48,6 +48,7 @@ model Course {
   Quiz        Quiz[]
   moderator   Moderator    @relation(fields: [moderatorId], references: [id])
   moderatorId String
+  language    String       @default("en")
 }
 
 model CourseItem {

@@ -12,14 +12,14 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 
-@Resolver((of) => Course)
+@Resolver(() => Course)
 @UseGuards(JwtAuthGuard)
 export class CoursesResolver {
     constructor(private courseService: CoursesService) {}
 
     @UseInterceptors(CacheInterceptor)
     @CacheKey('all_courses')
-    @Query((returns) => [Course])
+    @Query(() => [Course])
     async course() {
         console.log('all_courses');
         return await this.courseService.getAllCourses();
@@ -27,13 +27,13 @@ export class CoursesResolver {
 
     // @UseInterceptors(CacheInterceptor)
     // @CacheKey('dashboard_courses')
-    @Query((returns) => [ExtendedCourse])
+    @Query(() => [ExtendedCourse])
     async dashboardCourses() {
         console.log('dashboard_courses');
         return await this.courseService.getDashboardCourses();
     }
 
-    @Query((returns) => [Course])
+    @Query(() => [Course])
     async unVerifiedCourses(@Context() context) {
         if (
             context.req.user.role != 'ADMIN' &&
@@ -45,21 +45,21 @@ export class CoursesResolver {
         );
     }
 
-    @Query((returns) => [Course])
+    @Query(() => [Course])
     async getCoursesWithPagination(
         @Args('pagination') pagination: PaginationDto
     ) {
         return await this.courseService.getAllCoursesWithPagination(pagination);
     }
 
-    @Query((returns) => CountDto)
+    @Query(() => CountDto)
     async countCoursesWithPagination(
         @Args('pagination') pagination: PaginationDto
     ) {
         return await this.courseService.getCoursesCount(pagination);
     }
 
-    @Query((returns) => [Course])
+    @Query(() => [Course])
     async MyCourses(@Context() context) {
         return await this.courseService.getMyCourses(context.req.user.id);
     }

@@ -1,19 +1,30 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 
 interface QuizResultProps {
     route: any;
     navigation: NavigationProp<any>;
 }
 
-const QuizResult: React.FC<QuizResultProps> = ({ route, navigation }) => {
+type QuizResult = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'QuizResult'
+>;
+
+const QuizResult = ({ route, navigation }: QuizResult) => {
+    const { t } = useTranslation();
+
     const { score, total } = route.params;
 
     return (
         <View style={styles.container}>
             <Text style={styles.resultText}>
-                You answered {score} out of {total} questions correctly
+                {t('you_answered')} {score} {t('out_of').toLowerCase()} {total}{' '}
+                {t('questions_correctly').toLowerCase()}
             </Text>
             <Button
                 title="Go back to courses"

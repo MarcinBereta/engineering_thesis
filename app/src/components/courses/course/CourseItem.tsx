@@ -3,8 +3,12 @@ import { FlatList } from 'react-native-gesture-handler';
 import { CourseListItem } from './CourseListItem';
 import { fontPixel } from '../../../utils/Normalize';
 import { Layout } from '@/components/Layout';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-const Course = ({ route, navigation }: any) => {
+type course = NativeStackScreenProps<AuthenticatedRootStackParamList, 'course'>;
+
+const Course = ({ route, navigation }: course) => {
     const { course } = route.params;
     return (
         <Layout navigation={navigation} icon="course">

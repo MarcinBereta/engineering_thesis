@@ -6,8 +6,17 @@ import { getMyCoursesGQL } from '@/services/courses/courses';
 import { graphqlURL } from '@/services/settings';
 import request from 'graphql-request';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 
-const MyCourses = (props: any) => {
+type MyCourses = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'MyCourses'
+>;
+const MyCourses = (props: MyCourses) => {
+    const { t } = useTranslation();
+
     const { userInfo } = useContext(AuthContext);
 
     const { data, isLoading, refetch } = useQuery({
@@ -24,12 +33,12 @@ const MyCourses = (props: any) => {
     });
 
     if (isLoading || data == undefined) {
-        return <Text>Loading...</Text>;
+        return <Text>{t('loading')}...</Text>;
     }
 
     return (
         <View style={{ flexDirection: 'column', flex: 1 }}>
-            <Text>Course list: </Text>
+            <Text>{t('courses_list')}: </Text>
             <FlatList
                 data={data.MyCourses}
                 renderItem={({ item }) => (
@@ -74,7 +83,7 @@ const MyCourses = (props: any) => {
 
             {userInfo?.verified ? (
                 <Button
-                    title="Create course"
+                    title={t('create_course')}
                     onPress={() => {
                         props.navigation.push('createCourse');
                     }}

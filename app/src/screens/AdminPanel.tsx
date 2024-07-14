@@ -4,20 +4,27 @@ import { useContext } from 'react';
 import { fontPixel } from '../utils/Normalize';
 import { Layout } from '@/components/Layout';
 import { ListItem } from '@rneui/themed';
-
-const AdminPanel = (props: any) => {
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
+type AdminPanel = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'AdminPanel'
+>;
+const AdminPanel = (props: AdminPanel) => {
+    const { t } = useTranslation();
     const { userInfo } = useContext(AuthContext);
     const items = [];
     if (userInfo?.role == 'ADMIN' || userInfo?.role == 'MODERATOR') {
         items.push({
-            title: 'Verify courses',
+            title: t('verify_courses'),
             onPress: () => {
                 props.navigation.push('UnVerifiedCourses');
             },
         });
 
         items.push({
-            title: 'Verify users',
+            title: t('verify_users'),
             onPress: () => {
                 props.navigation.push('VerifyUsers');
             },
@@ -25,7 +32,7 @@ const AdminPanel = (props: any) => {
     }
     if (userInfo?.role == 'ADMIN') {
         items.push({
-            title: 'User list',
+            title: t('users_list'),
             onPress: () => {
                 props.navigation.push('UserList');
             },
@@ -40,7 +47,7 @@ const AdminPanel = (props: any) => {
                     marginBottom: 20,
                 }}
             >
-                ADMIN PANEL
+                {t('admin_panel')}
             </Text>
 
             {items.map((item, index) => (

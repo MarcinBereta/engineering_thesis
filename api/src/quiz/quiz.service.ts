@@ -161,7 +161,7 @@ export class QuizService {
     }
 
     async checkCourseExistence(courseId: string): Promise<boolean> {
-        let course = await this.prismaService.course.findUnique({
+        const course = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
             },
@@ -170,7 +170,7 @@ export class QuizService {
     }
 
     async mergeTexts(courseId: string): Promise<string> {
-        let course = await this.prismaService.course.findUnique({
+        const course = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
             },
@@ -187,7 +187,7 @@ export class QuizService {
         return mergedText;
     }
     async getCourseName(courseId: string): Promise<string> {
-        let course = await this.prismaService.course.findUnique({
+        const course = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
             },
@@ -196,8 +196,12 @@ export class QuizService {
     }
 
     async generateQuestions(courseId: string): Promise<string> {
-        let mergedText: string = await this.mergeTexts(courseId);
-
+        const mergedText: string = await this.mergeTexts(courseId);
+        const courseBasic = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
         const completion = await this.openai.chat.completions.create({
             messages: [
                 {
@@ -209,7 +213,9 @@ export class QuizService {
                 {
                     role: 'assistant',
                     content:
-                        'Create a quiz based on the text above (4 answers) exactly 10 questions and save it in a JSON file.(json with question, options and correct_anwser)',
+                        'Create a quiz based on the text above (4 answers) exactly 10 questions and save it in a JSON file.(json with question, options and correct_anwser) in the ' +
+                        courseBasic.language +
+                        'language',
                 },
             ],
             model: 'gpt-3.5-turbo',

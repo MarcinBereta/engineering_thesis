@@ -1,9 +1,9 @@
 import { View, Text, Button, TouchableOpacity, Dimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { fontPixel } from '../../utils/Normalize';
+import { fontPixel } from '../utils/Normalize';
 import { useContext, useState } from 'react';
-import { QuizQuestion } from './QuizQuestion';
-import { AuthContext } from '../../contexts/AuthContext';
+import { QuizQuestion } from '../components/quiz/QuizQuestion';
+import { AuthContext } from '../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
@@ -13,10 +13,12 @@ import {
     FriendUserFragmentGQL,
     getFriendsGQL,
 } from '@/services/friends/friends';
-import { Layout } from '../Layout';
-import { CustomButton } from '../CustomButton';
-import { useDebounce } from '@/utils/Debouncer';
+import { Layout } from '../components/Layout';
+import { CustomButton } from '../components/CustomButton';
 import { Avatar, Card } from '@rneui/themed';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 
 const shuffleArray = (array: string[]) => {
     return array.sort(() => Math.random() - 0.5);
@@ -29,8 +31,10 @@ export type extendedQuestion = ResultOf<typeof quizQuestionFragment> & {
 export type addQuizResultDto = VariablesOf<typeof addQUizResultGQL>;
 
 const { height, width } = Dimensions.get('window');
+type quiz = NativeStackScreenProps<AuthenticatedRootStackParamList, 'quiz'>;
 
-const QuizMain = ({ route, navigation }: any) => {
+const QuizMain = ({ route, navigation }: quiz) => {
+    const { t } = useTranslation();
     const { userInfo, socket } = useContext(AuthContext);
     const [friendSelect, setFriendSelect] = useState(false);
 
@@ -52,9 +56,6 @@ const QuizMain = ({ route, navigation }: any) => {
             request(graphqlURL, addQUizResultGQL, data, {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
-        // onSuccess: (data, variables, context) => {
-        //   navigation.push('QuizResult', data);
-        // },
     });
 
     const { quiz } = route.params;
@@ -107,7 +108,8 @@ const QuizMain = ({ route, navigation }: any) => {
                         margin: 10,
                     }}
                 >
-                    Question {currentQuestion + 1} of {questions.length}
+                    {t('question')} {currentQuestion + 1} {t('of')}{' '}
+                    {questions.length}
                 </Text>
                 <QuizQuestion
                     question={questions[currentQuestion]}
@@ -144,8 +146,8 @@ const QuizMain = ({ route, navigation }: any) => {
                         }}
                         title={`${
                             currentQuestion == questions.length - 1
-                                ? 'End quiz'
-                                : 'Next question'
+                                ? t('end_quiz')
+                                : t('next_question')
                         }`}
                     />
                     {currentQuestion != 0 && (
@@ -153,7 +155,7 @@ const QuizMain = ({ route, navigation }: any) => {
                             onPress={() => {
                                 setCurrentQuestion(currentQuestion - 1);
                             }}
-                            title="Previous question"
+                            title={t('previous_question')}
                         />
                     )}
                 </View>
@@ -175,7 +177,7 @@ const QuizMain = ({ route, navigation }: any) => {
                         fontWeight: 'bold',
                     }}
                 >
-                    Friends list
+                    {t('friend_list')}
                 </Text>
                 <FlatList
                     data={friends}
@@ -248,19 +250,19 @@ const QuizMain = ({ route, navigation }: any) => {
                     onPress={() => {
                         setStart(true);
                     }}
-                    title="Start quiz"
+                    title={t('start_quiz')}
                 />
                 <CustomButton
                     onPress={() => {
                         navigation.navigate('QuizSearch', { quiz });
                     }}
-                    title="Search for opoonents"
+                    title={t('search_for_opponents')}
                 />
                 <CustomButton
                     onPress={() => {
                         setFriendSelect(true);
                     }}
-                    title="Fight with friend"
+                    title={t('fight_with_friend')}
                 />
             </View>
         </Layout>

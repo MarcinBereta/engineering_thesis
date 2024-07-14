@@ -1,11 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button, Dimensions, FlatList, Text, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { DragItem } from './CourseDragItem';
-import { launchImageLibrary } from 'react-native-image-picker';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import {
-    addCourseGQL,
     addPhotos,
     courseFragment,
     editCourseGQL,
@@ -18,13 +16,16 @@ import { graphqlURL } from '@/services/settings';
 import { useMutation } from '@tanstack/react-query';
 import { ResultOf, VariablesOf, readFragment } from '@/graphql';
 import request from 'graphql-request';
-import { AppFile, addCourseDto } from './CourseForm';
+import { AppFile } from './CourseForm';
 import { Dialog } from '@rneui/themed';
 import { CustomButton } from '@/components/CustomButton';
-const { height, width } = Dimensions.get('window');
+import { useTranslation } from 'react-i18next';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+const { height } = Dimensions.get('window');
 
 export type CourseItem = {
-    type: 'text' | 'photo';
+    type: string;
     value: string;
     id: string;
     imageType?: string;
@@ -34,20 +35,24 @@ const generateRandomId = () => {
     return Math.random().toString(36).substring(7);
 };
 export type editCourseDto = VariablesOf<typeof editCourseGQL>;
-
-export const CourseEditForm = ({ route, navigation }: any) => {
+type EditCourse = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'EditCourse'
+>;
+export const CourseEditForm = ({ route, navigation }: EditCourse) => {
+    const { t } = useTranslation();
     const { course } = route.params;
 
     const { userInfo } = useContext(AuthContext);
     const [dragData, setData] = useState<CourseItem[]>(course.text);
     const [courseName, setCourseName] = useState<string>(course.name);
     const [category, setCategory] = useState(course.category);
-
     const [items, setItems] = useState<AppFile[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isTextFormOpen, setIsTextFormOpen] = useState(false);
     const [textForm, setTextForm] = useState('');
-    
+    const [language, setLanguage] = useState(course.language);
+
     const editCourseMutation = useMutation({
         mutationFn: async (data: editCourseDto) =>
             request(graphqlURL, editCourseGQL, data, {
@@ -125,6 +130,7 @@ export const CourseEditForm = ({ route, navigation }: any) => {
             text: data,
             id: course.id,
             category: category,
+            language: language,
         };
     };
 
@@ -172,12 +178,10 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                     textAlign: 'center',
                 }}
             >
-                Edit a Course
+                {t('edit_course')}
             </Text>
             <Text style={{ textAlign: 'center', color: 'gray' }}>
-                All the texts will be full size once created, you can drag and
-                drop all inputs and images to correct their position (in order
-                to drag close your keyboard)
+                {t('course_create_description')}
             </Text>
             <TextInput
                 style={{ fontSize: fontPixel(30), textAlign: 'center' }}
@@ -185,22 +189,37 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                 value={courseName}
                 onChangeText={(text) => setCourseName(text)}
             />
+            <Text>{t('category')}</Text>
             <RNPickerSelect
                 onValueChange={(value) => {
                     setCategory(value);
                 }}
                 items={[
-                    { label: 'MATH', value: 'MATH' },
-                    { label: 'SCIENCE', value: 'SCIENCE' },
-                    { label: 'HISTORY', value: 'HISTORY' },
-                    { label: 'GEOGRAPHY', value: 'GEOGRAPHY' },
-                    { label: 'ENGLISH', value: 'ENGLISH' },
-                    { label: 'ART', value: 'ART' },
-                    { label: 'MUSIC', value: 'MUSIC' },
-                    { label: 'SPORTS', value: 'SPORTS' },
-                    { label: 'OTHER', value: '' },
+                    { label: t('MATH'), value: 'MATH' },
+                    { label: t('SCIENCE'), value: 'SCIENCE' },
+                    { label: t('HISTORY'), value: 'HISTORY' },
+                    { label: t('GEOGRAPHY'), value: 'GEOGRAPHY' },
+                    { label: t('ENGLISH'), value: 'ENGLISH' },
+                    { label: t('ART'), value: 'ART' },
+                    { label: t('MUSIC'), value: 'MUSIC' },
+                    { label: t('SPORTS'), value: 'SPORTS' },
+                    { label: t('OTHER'), value: '' },
                 ]}
                 value={category}
+            />
+            <Text>{t('language')}</Text>
+            <RNPickerSelect
+                onValueChange={(value) => {
+                    setLanguage(value);
+                }}
+                items={[
+                    { label: t('English'), value: 'en' },
+                    { label: t('Polish'), value: 'pl' },
+                    { label: t('Spanish'), value: 'es' },
+                    { label: t('France'), value: 'fr' },
+                    { label: t('German'), value: 'de' },
+                ]}
+                value={language}
             />
             <DraggableFlatList
                 data={dragData}
@@ -242,7 +261,7 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                 }}
             >
                 <Dialog.Title
-                    title="Add new field"
+                    title={t('add_new_field')}
                     titleStyle={{ textAlign: 'center' }}
                 />
                 <View
@@ -256,7 +275,7 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                         onPress={() => {
                             uploadFile();
                         }}
-                        title="Add photo"
+                        title={t('add_photo')}
                     />
                     <CustomButton
                         onPress={() => {
@@ -264,7 +283,7 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                             setIsTextFormOpen(true);
                             setTextForm('');
                         }}
-                        title="Add text"
+                        title={t('add_text')}
                     />
                 </View>
             </Dialog>
@@ -279,8 +298,12 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                 <TextInput
                     value={textForm}
                     onChangeText={(text) => setTextForm(text)}
-                    style={{ fontSize: fontPixel(30), textAlign: 'center', maxHeight:height*0.6 }}
-                    placeholder="Text"
+                    style={{
+                        fontSize: fontPixel(30),
+                        textAlign: 'center',
+                        maxHeight: height * 0.6,
+                    }}
+                    placeholder={t('add_your_text_here')}
                     multiline={true}
                 />
                 <CustomButton
@@ -296,14 +319,14 @@ export const CourseEditForm = ({ route, navigation }: any) => {
                             ]);
                         setIsTextFormOpen(false);
                     }}
-                    title="Add"
+                    title={t('add')}
                 />
             </Dialog>
             <Button
                 onPress={() => {
                     uploadCourse();
                 }}
-                title="Edit Course"
+                title={t('edit_course')}
             />
         </ScrollView>
     );

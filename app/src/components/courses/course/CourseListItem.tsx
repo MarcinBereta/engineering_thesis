@@ -3,7 +3,7 @@ import constants from '../../../../constants';
 import { Card } from '@rneui/themed';
 export type courseItem = {
     id: string;
-    type: 'text' | 'photo';
+    type: string;
     value: string;
 };
 export const CourseListItem = ({ course: item }: { course: courseItem }) => {

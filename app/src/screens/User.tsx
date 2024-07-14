@@ -10,12 +10,18 @@ import { graphqlURL } from '@/services/settings';
 import { VariablesOf } from '@/graphql';
 import { CustomButton } from '@/components/CustomButton';
 import { Layout } from '@/components/Layout';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 
 export type verifyUserDataDto = VariablesOf<typeof updateUserDataGQL>;
+type UserPage = NativeStackScreenProps<AuthenticatedRootStackParamList, 'User'>;
+const UserPage = ({ route, navigation }: UserPage) => {
+    const { t } = useTranslation();
 
-const User = ({ route, navigation }: any) => {
     const { userInfo } = useContext(AuthContext);
-    const { user } = route.params;
+    const user = route.params.user;
+
     const [tempCategories, setTempCategories] = useState<
         { value: string; label: string; checked: boolean }[]
     >(() => {
@@ -70,7 +76,7 @@ const User = ({ route, navigation }: any) => {
         }
         return cats;
     });
-    const [userData, setUserData] = useState<UserInfo>(user);
+    const [userData, setUserData] = useState<Omit<UserInfo, 'token'>>(user);
     const [userRole, setUserRole] = useState(user.role);
 
     const updateUserDataMutation = useMutation({
@@ -79,7 +85,7 @@ const User = ({ route, navigation }: any) => {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
         onSuccess: (data, variables, context) => {
-            setUserData({ ...data.updateUser, token: userData.token });
+            setUserData({ ...data.updateUser });
             setUserRole(data.updateUser.role);
         },
     });
@@ -118,7 +124,7 @@ const User = ({ route, navigation }: any) => {
                     textAlign: 'center',
                 }}
             >
-                Email: {userData.email}
+                {t('email')}: {userData.email}
             </Text>
             {userInfo?.role == 'ADMIN' ? (
                 <RNPickerSelect
@@ -131,10 +137,9 @@ const User = ({ route, navigation }: any) => {
                         });
                     }}
                     items={[
-                        { label: 'ADMIN', value: 'ADMIN' },
-                        { label: 'MODERATOR', value: 'MODERATOR' },
-
-                        { label: 'USER', value: 'USER' },
+                        { label: t('admin'), value: 'ADMIN' },
+                        { label: t('moderator'), value: 'MODERATOR' },
+                        { label: t('user'), value: 'USER' },
                     ]}
                     value={userData.role}
                 />
@@ -150,10 +155,10 @@ const User = ({ route, navigation }: any) => {
                     });
                 }}
                 items={[
-                    { label: 'VERIFIED', value: 'VERIFIED' },
-                    { label: 'NOT VERIFIED', value: 'NOT_VERIFIED' },
+                    { label: t('verified'), value: 'VERIFIED' },
+                    { label: t('not_verified'), value: 'NOT_VERIFIED' },
                 ]}
-                value={userData.verified ? 'VERIFIED' : 'NOT_VERIFIED'}
+                value={userData.verified ? t('verified') : t('not_verified')}
             />
 
             {userRole == 'MODERATOR' || userRole == 'ADMIN' ? (
@@ -167,7 +172,7 @@ const User = ({ route, navigation }: any) => {
                             textAlign: 'center',
                         }}
                     >
-                        Moderator Categories
+                        {t('moderator_categories')}
                     </Text>
                     {categories
                         .filter((c) => c.checked)
@@ -182,7 +187,7 @@ const User = ({ route, navigation }: any) => {
                             );
                         })}
                     <CustomButton
-                        title="Add categories"
+                        title={t('add_categories')}
                         onPress={() => {
                             setIsModalOpen(true);
                         }}
@@ -211,7 +216,7 @@ const User = ({ route, navigation }: any) => {
                                     borderRadius: 10,
                                 }}
                             >
-                                <Text>Selected categories to add</Text>
+                                <Text>{t('select_categories_to_add')}</Text>
                                 {tempCategories.map((c) => {
                                     return (
                                         <TouchableOpacity
@@ -229,7 +234,7 @@ const User = ({ route, navigation }: any) => {
                                         </TouchableOpacity>
                                     );
                                 })}
-                                <Text>Remaining Categories</Text>
+                                <Text>{t('remaining_categories')}</Text>
                                 {categories
                                     .filter((c) => !c.checked)
                                     .filter(
@@ -271,7 +276,7 @@ const User = ({ route, navigation }: any) => {
                                     })}
 
                                 <CustomButton
-                                    title="Save"
+                                    title={t('save')}
                                     onPress={() => {
                                         setCategories((dt) => {
                                             return dt.map((cat) => {
@@ -296,11 +301,11 @@ const User = ({ route, navigation }: any) => {
             ) : null}
             <CustomButton
                 containerStyle={{ width: '50%', marginLeft: '25%' }}
-                title="Save profile"
+                title={t('save_profile')}
                 onPress={handleSave}
             />
         </Layout>
     );
 };
 
-export { User };
+export { UserPage };

@@ -6,6 +6,8 @@ import { QuizQuestion } from './QuizQuestion';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ResultOf } from '@/graphql';
 import { quizQuestionFragment } from '@/services/quiz/quiz';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Room = {
     id: string;
@@ -19,7 +21,12 @@ type Room = {
     questions: ResultOf<typeof quizQuestionFragment>[];
 };
 
-const QuizFriends = ({ route, navigation }: any) => {
+type QuizWithFriends = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'QuizWithFriends'
+>;
+
+const QuizFriends = ({ route, navigation }: QuizWithFriends) => {
     const { userInfo, socket } = useContext(AuthContext);
 
     const { quiz, friendId, invite } = route.params;

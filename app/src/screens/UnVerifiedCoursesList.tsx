@@ -1,6 +1,6 @@
-import { View, Text, Button, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
@@ -14,10 +14,20 @@ import { CourseListItem } from '@/components/courses/list/CourseListItem';
 import { CustomButton } from '@/components/CustomButton';
 import { Layout } from '@/components/Layout';
 import { normalizeText } from '@rneui/base';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 const { height } = Dimensions.get('window');
 
+type UnVerifiedCourses = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'UnVerifiedCourses'
+>;
+
 export type verifyCourseDto = VariablesOf<typeof verifyCourseGQL>;
-const UnVerifiedCoursesList = (props: any) => {
+const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
+    const { t } = useTranslation();
+
     const { userInfo } = useContext(AuthContext);
 
     const { data, isLoading, refetch } = useQuery({
@@ -32,6 +42,8 @@ const UnVerifiedCoursesList = (props: any) => {
                 }
             ),
     });
+
+    console.log(data);
 
     const verifyCourseMutation = useMutation({
         mutationFn: async (data: verifyCourseDto) =>
@@ -59,7 +71,15 @@ const UnVerifiedCoursesList = (props: any) => {
     return (
         <Layout navigation={props.navigation} icon="course">
             <View style={{ flexDirection: 'column', flex: 1 }}>
-            <Text style={{textAlign: 'center', fontWeight:'bold', fontSize:normalizeText(30)}}>Course list</Text>
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        fontSize: normalizeText(30),
+                    }}
+                >
+                    Course list
+                </Text>
                 <FlatList
                     data={data.unVerifiedCourses}
                     contentContainerStyle={{ maxHeight: height * 0.6 }}

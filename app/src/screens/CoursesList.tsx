@@ -14,12 +14,23 @@ import { SearchBar } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
 import { CourseListItem } from '@/components/courses/list/CourseListItem';
 import { normalizeText } from '@rneui/base';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthenticatedRootStackParamList } from './Navigator';
 
 const { height } = Dimensions.get('window');
 export type Course = ResultOf<
     typeof getCoursesWithPaginationGQL
 >['getCoursesWithPagination'][0];
-const CoursesList = (props: any) => {
+
+type CoursesList = NativeStackScreenProps<
+    AuthenticatedRootStackParamList,
+    'CoursesList'
+>;
+
+const CoursesList = (props: CoursesList) => {
+    const { t } = useTranslation();
+
     const { userInfo } = useContext(AuthContext);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -45,7 +56,7 @@ const CoursesList = (props: any) => {
     });
 
     if (isLoading || data == undefined) {
-        return <Text>Loading...</Text>;
+        return <Text>{t('loading')}...</Text>;
     }
 
     return (
@@ -57,12 +68,12 @@ const CoursesList = (props: any) => {
                     fontSize: normalizeText(30),
                 }}
             >
-                Course list{' '}
+                {t('courses_list')}
             </Text>
 
             <SearchBar
                 platform="android"
-                placeholder="Search"
+                placeholder={t('search')}
                 value={search}
                 onChangeText={(text) => {
                     setSearch(text);
