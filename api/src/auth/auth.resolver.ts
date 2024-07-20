@@ -34,4 +34,9 @@ export class AuthResolver {
     ): Promise<SigninResponse> {
         return this.authService.signin(context.user);
     }
+
+    @Mutation(() => SigninResponse)
+    async refreshAuthToken(@Args('refreshToken') refreshToken: string) {
+        return this.authService.refreshToken(refreshToken);
+    }
 }

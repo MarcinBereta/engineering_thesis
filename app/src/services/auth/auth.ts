@@ -12,6 +12,8 @@ export const registerGQL = graphql(`
                 verified
             }
             access_token
+            refresh_token
+            expires
         }
     }
 `);
@@ -28,6 +30,8 @@ export const loginGQL = graphql(`
                 verified
             }
             access_token
+            refresh_token
+            expires
         }
     }
 `);
@@ -44,6 +48,8 @@ export const loginGoogleGQL = graphql(`
                 verified
             }
             access_token
+            refresh_token
+            expires
         }
     }
 `);
@@ -57,6 +63,24 @@ export const refreshUserGQL = graphql(`
             role
             verified
             image
+        }
+    }
+`);
+
+export const refreshTokenGQL = graphql(`
+    mutation RefreshAuthToken($refreshToken: String!) {
+        refreshAuthToken(refreshToken: $refreshToken) {
+            user {
+                id
+                email
+                username
+                image
+                role
+                verified
+            }
+            access_token
+            refresh_token
+            expires
         }
     }
 `);

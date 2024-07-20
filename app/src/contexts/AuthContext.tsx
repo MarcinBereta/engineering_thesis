@@ -1,7 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import React, {  useState } from 'react';
-import { registerGQL, loginGQL, refreshUserGQL } from '../services/auth/auth';
+import {
+    registerGQL,
+    loginGQL,
+    refreshUserGQL,
+    refreshTokenGQL,
+} from '../services/auth/auth';
 import { Socket, io } from 'socket.io-client';
 import constants from '../../constants';
 import { useMutation } from '@tanstack/react-query';
@@ -72,6 +77,13 @@ export const AuthProvider = ({
                     token: 'Bearer ' + data.signup.access_token,
                 },
             });
+            await AsyncStorage.setItem(
+                'refreshTokenData',
+                JSON.stringify({
+                    refreshToken: data.signup.refresh_token,
+                    expires: data.signup.expires,
+                })
+            );
             setSocket(socket);
         },
         onError: async (data, variables, context) => {},
@@ -94,9 +106,53 @@ export const AuthProvider = ({
                     token: 'Bearer ' + data.signin.access_token,
                 },
             });
+            await AsyncStorage.setItem(
+                'refreshTokenData',
+                JSON.stringify({
+                    refreshToken: data.signin.refresh_token,
+                    expires: data.signin.expires,
+                })
+            );
             setSocket(socket);
         },
         onError: async (data, variables, context) => {},
+    });
+
+    const refreshTokenMutation = useMutation({
+        mutationFn: async (refreshToken: string) =>
+            request(
+                getConfig('backend', 'url') + '/graphql/',
+                refreshTokenGQL,
+                {
+                    refreshToken,
+                }
+            ),
+        onSuccess: async (data) => {
+            setError('');
+
+            const dataObj = {
+                ...data.refreshAuthToken.user,
+                token: data.refreshAuthToken.access_token,
+            };
+            await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
+            setUserInfo(dataObj);
+            const socket = io(constants.url, {
+                auth: {
+                    token: 'Bearer ' + data.refreshAuthToken.access_token,
+                },
+            });
+            await AsyncStorage.setItem(
+                'refreshTokenData',
+                JSON.stringify({
+                    refreshToken: data.refreshAuthToken.refresh_token,
+                    expires: data.refreshAuthToken.expires,
+                })
+            );
+            setSocket(socket);
+        },
+        onError: async (data) => {
+            console.log(data);
+        },
     });
 
     const refreshMutation = useMutation({
@@ -112,7 +168,6 @@ export const AuthProvider = ({
         onSuccess: async (data, variables, context) => {
             let userInfo = await AsyncStorage.getItem('userInfo');
             const parsedUserInfo = JSON.parse(userInfo as string) as UserInfo;
-            console.log(parsedUserInfo)
             setError('');
 
             const dataObj = {
@@ -138,13 +193,25 @@ export const AuthProvider = ({
             request(graphqlURL, loginGoogleGQL, data),
         onSuccess: async (data, variables, context) => {
             setError('');
-
             const dataObj = {
                 ...data.providerLogin.user,
                 token: data.providerLogin.access_token,
             };
             await AsyncStorage.setItem('userInfo', JSON.stringify(dataObj));
             setUserInfo(dataObj);
+            const socket = io(constants.url, {
+                auth: {
+                    token: 'Bearer ' + data.providerLogin.access_token,
+                },
+            });
+            await AsyncStorage.setItem(
+                'refreshTokenData',
+                JSON.stringify({
+                    refreshToken: data.providerLogin.refresh_token,
+                    expires: data.providerLogin.expires,
+                })
+            );
+            setSocket(socket);
         },
         onError: async (data, variables, context) => {},
     });
@@ -239,6 +306,19 @@ export const AuthProvider = ({
             const parsedUserInfo = JSON.parse(userInfo as string) as UserInfo;
 
             if (userInfo != null && userInfo != undefined) {
+                const refreshTokenData: {
+                    refreshToken: string;
+                    expires: Date;
+                } = JSON.parse(
+                    (await AsyncStorage.getItem('refreshTokenData')) as string
+                );
+
+                const maxRefreshDate = new Date(refreshTokenData.expires);
+                const now = new Date();
+                if (maxRefreshDate < now) {
+                    refreshTokenMutation.mutate(refreshTokenData.refreshToken);
+                    return;
+                }
                 refreshMutation.mutate(parsedUserInfo.token);
             }
         } catch (err) {
@@ -278,3 +358,7 @@ export const AuthProvider = ({
         </AuthContext.Provider>
     );
 };
+function getConfig(arg0: string, arg1: string) {
+    throw new Error('Function not implemented.');
+}
+

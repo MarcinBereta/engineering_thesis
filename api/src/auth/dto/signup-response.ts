@@ -21,5 +21,9 @@ export class SignupResponse {
     @Field()
     access_token: string;
     @Field()
+    refresh_token: string;
+    @Field()
+    expires: Date;
+    @Field()
     user: simpleUser;
 }

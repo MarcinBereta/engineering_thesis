@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    InternalServerErrorException,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/dto/user.entity';
@@ -14,6 +10,8 @@ import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class AuthService {
+    private tokenExpireTime: number = 30 * 24 * 60 * 60;
+
     constructor(
         private Prisma: PrismaService,
         private jwtService: JwtService,
@@ -47,13 +45,14 @@ export class AuthService {
                 username: user.username,
             },
         });
-        const username = user.username;
-        const access_token = await this.jwtService.sign({
-            username,
-            sub: newUser.id,
-        });
+        const { access_token, refresh_token, expires } =
+            await this.generateToken({
+                username: user.username,
+                sub: newUser.id,
+            });
+
         if (!access_token) {
-            throw new InternalServerErrorException();
+            throw new GraphQLError('Failed to create access token');
         }
         return {
             user: {
@@ -65,6 +64,8 @@ export class AuthService {
                 role: newUser.role,
             },
             access_token: access_token,
+            refresh_token,
+            expires,
         };
     }
 
@@ -87,13 +88,14 @@ export class AuthService {
             },
         });
         if (userInDb) {
-            const username = userInDb.username;
-            const access_token = await this.jwtService.sign({
-                username,
-                sub: userInDb.id,
-            });
+            const { access_token, refresh_token, expires } =
+                await this.generateToken({
+                    username: userInDb.username,
+                    sub: userInDb.id,
+                });
+
             if (!access_token) {
-                throw new InternalServerErrorException();
+                throw new GraphQLError('Failed to create access token');
             }
             return {
                 user: {
@@ -105,6 +107,8 @@ export class AuthService {
                     role: userInDb.role,
                 },
                 access_token: access_token,
+                refresh_token,
+                expires,
             };
         }
         const newUser = await this.Prisma.user.create({
@@ -114,13 +118,14 @@ export class AuthService {
                 image: input.image,
             },
         });
-        const username = input.username;
-        const access_token = await this.jwtService.sign({
-            username,
-            sub: newUser.id,
-        });
+        const { access_token, refresh_token, expires } =
+            await this.generateToken({
+                username: newUser.username,
+                sub: newUser.id,
+            });
+
         if (!access_token) {
-            throw new InternalServerErrorException();
+            throw new GraphQLError('Failed to create access token');
         }
         return {
             user: {
@@ -132,24 +137,28 @@ export class AuthService {
                 role: newUser.role,
             },
             access_token: access_token,
+            refresh_token,
+            expires,
         };
     }
 
     async signin(user: User) {
-        const { username } = user;
-        const access_token = await this.jwtService.sign({
-            username,
-            sub: user.id,
-        });
-        if (!access_token) {
-            throw new InternalServerErrorException();
-        }
         const newUser = await this.Prisma.user.findUnique({
             where: {
                 id: user.id,
             },
         });
 
+        const { access_token, refresh_token, expires } =
+            await this.generateToken({
+                username: newUser.username,
+                sub: newUser.id,
+            });
+
+        if (!access_token) {
+            throw new GraphQLError('Failed to create access token');
+        }
+
         return {
             user: {
                 id: newUser.id,
@@ -159,7 +168,9 @@ export class AuthService {
                 verified: newUser.verified,
                 role: newUser.role,
             },
-            access_token: access_token,
+            access_token,
+            refresh_token,
+            expires,
         };
     }
 
@@ -173,5 +184,48 @@ export class AuthService {
 
     async getUserById(id: string): Promise<User> {
         return await this.UserService.getUserById(id);
+    }
+
+    private validateRefreshToken(refreshToken: string) {
+        try {
+            const decoded = this.jwtService.verify(refreshToken);
+            if (decoded.sub) {
+                return decoded;
+            }
+
+            throw new UnauthorizedException('Invalid refresh token');
+        } catch (error) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+    }
+
+    async refreshToken(refreshToken: string) {
+        const decoded = this.validateRefreshToken(refreshToken);
+        const user = await this.UserService.getUserById(decoded.sub);
+        const { access_token, refresh_token, expires } =
+            await this.generateToken({
+                username: user.username,
+                sub: user.id,
+            });
+        return {
+            user: user,
+            access_token,
+            refresh_token,
+            expires,
+        };
+    }
+
+    async generateToken(userObject: { username: string; sub: string }) {
+        const access_token = await this.jwtService.sign(userObject, {
+            expiresIn: this.tokenExpireTime,
+        });
+        const refresh_token = await this.jwtService.sign(userObject, {
+            expiresIn: this.tokenExpireTime * 6,
+        });
+        return {
+            access_token,
+            refresh_token,
+            expires: new Date(Date.now() + this.tokenExpireTime * 1000),
+        };
     }
 }

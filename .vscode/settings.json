@@ -1,5 +1,5 @@
 {
-    "cSpell.words": ["itemik", "Signin", "tada"],
+    "cSpell.words": ["itemik", "Signin", "signup", "tada"],
     "typescript.tsdk": "app/node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true
 }

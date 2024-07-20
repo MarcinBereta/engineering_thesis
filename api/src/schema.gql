@@ -39,6 +39,8 @@ type simpleUser {
 
 type SignupResponse {
   access_token: String!
+  refresh_token: String!
+  expires: DateTime!
   user: simpleUser!
 }
 
@@ -62,6 +64,8 @@ type CountDto {
 
 type SigninResponse {
   access_token: String!
+  refresh_token: String!
+  expires: DateTime!
   user: simpleUser!
 }
 
@@ -155,6 +159,7 @@ type Mutation {
   signup(registerUserInput: SingUpUserInput!): SignupResponse!
   providerLogin(providerUserInput: ProviderInput!): SigninResponse!
   signin(loginUserInput: SigninUserInput!): SigninResponse!
+  refreshAuthToken(refreshToken: String!): SigninResponse!
   updateUser(UserEdit: UserEdit!): User!
   addVerificationForm(VerificationForm: VerificationForm!): User!
   verifyUser(VerifyUser: VerifyUser!): User!

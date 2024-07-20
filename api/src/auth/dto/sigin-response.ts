@@ -5,6 +5,10 @@ import { simpleUser } from './signup-response';
 export class SigninResponse {
     @Field()
     access_token: string;
+    @Field()
+    refresh_token: string;
+    @Field()
+    expires: Date;
 
     @Field()
     user: simpleUser;
