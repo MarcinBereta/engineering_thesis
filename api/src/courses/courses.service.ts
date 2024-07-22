@@ -386,6 +386,7 @@ export class CoursesService {
     }
 
     async verifyCourse(courseId: string) {
+        await this.quizService.addQuizToDataBase(courseId);
         const course = await this.prismaService.course.update({
             where: {
                 id: courseId,
@@ -394,9 +395,9 @@ export class CoursesService {
                 verified: true,
             },
         });
-        await this.quizService.addQuizToDataBase(courseId);
         await this.cacheManager.del('my_courses/' + course.creatorId);
         await this.cacheManager.del('unverified_courses/' + course.moderatorId);
+        await this.cacheManager.del('all_courses');
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
         for (const key of keys) {
@@ -421,7 +422,7 @@ export class CoursesService {
             where: {
                 verified: true,
             },
-            take: 5,
+            // take: 5,
         });
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;

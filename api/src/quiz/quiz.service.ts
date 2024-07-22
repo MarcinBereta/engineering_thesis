@@ -18,7 +18,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -194,9 +194,19 @@ export class QuizService {
         });
         return course.name;
     }
+    async getNumberOfQuestions(textLenght: number, baseLength: number = 2000): Promise<number> {
+        if (textLenght < baseLength) {
+            return 10;
+        }
+        return Math.floor(textLenght / 300) + 10; // for longer courses we add more questions
+    }
 
     async generateQuestions(courseId: string): Promise<string> {
         const mergedText: string = await this.mergeTexts(courseId);
+        let courseLength = mergedText.length;
+        let numberOfQuestions = 0;
+        numberOfQuestions = await this.getNumberOfQuestions(courseLength);
+
         const courseBasic = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
@@ -213,25 +223,25 @@ export class QuizService {
                 {
                     role: 'assistant',
                     content:
-                        'Create a quiz based on the text above (4 answers) exactly 10 questions and save it in a JSON file.(json with question, options and correct_anwser) in the ' +
+                        'Create a quiz based on the text above (4 answers) exactly ' + numberOfQuestions + ' questions and save it in a JSON file.(json with question, options and correct_anwser) in the ' +
                         courseBasic.language +
                         'language',
                 },
             ],
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o',
             response_format: { type: 'json_object' },
         });
         return completion.choices[0].message.content;
     }
 
-    async verifyQuiz(quizJson): Promise<boolean> {
+    async verifyQuiz(quizJson, numberOfQuestions): Promise<boolean> {
         try {
             if (
                 !quizJson.quiz ||
                 !Array.isArray(quizJson.quiz) ||
-                quizJson.quiz.length !== 10
+                quizJson.quiz.length !== numberOfQuestions
             ) {
-                console.log('There must be exactly 10 questions in the quiz.');
+                console.log('There must be exactly' + numberOfQuestions + 'questions in the quiz.');
                 return false;
             }
 
@@ -274,14 +284,14 @@ export class QuizService {
                 totalCorrectAnswers++;
             });
 
-            if (totalOptions !== 40) {
-                console.log('There must be exactly 40 options in total.');
-                throw new Error('There must be exactly 40 options in total.');
+            if (totalOptions !== 4 * numberOfQuestions) {
+                console.log('There must be exactly ' + 4 * numberOfQuestions + 'options in total.');
+                throw new Error('There must be exactly ' + 4 * numberOfQuestions + ' options in total.');
             }
 
-            if (totalCorrectAnswers !== 10) {
-                console.log('There must be exactly 10 correct answers.');
-                throw new Error('There must be exactly 10 correct answers.');
+            if (totalCorrectAnswers !== numberOfQuestions) {
+                console.log('There must be exactly ' + numberOfQuestions + ' correct answers.');
+                throw new Error('There must be exactly ' + numberOfQuestions + ' correct answers.');
             }
 
             return true;
@@ -295,15 +305,19 @@ export class QuizService {
         if (!this.checkCourseExistence(courseId)) {
             throw new Error('The course does not exist.');
         }
+        const mergedText: string = await this.mergeTexts(courseId);
+        let courseLength = mergedText.length;
+        let numberOfQuestions = 0;
+        numberOfQuestions = await this.getNumberOfQuestions(courseLength);
         const questions = await this.generateQuestions(courseId);
         const questionsJson = JSON.parse(questions);
-        let verified = await this.verifyQuiz(questionsJson);
+        let verified = await this.verifyQuiz(questionsJson, numberOfQuestions);
         let tries = 2;
         while (!verified) {
             if (tries > 0) {
                 const questions = await this.generateQuestions(courseId);
                 const questionsJson = JSON.parse(questions);
-                verified = await this.verifyQuiz(questionsJson);
+                verified = await this.verifyQuiz(questionsJson, numberOfQuestions);
                 tries--;
             } else {
                 throw new Error('Invalid data format.');
