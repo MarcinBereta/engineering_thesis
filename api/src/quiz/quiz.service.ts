@@ -198,7 +198,7 @@ export class QuizService {
         if (textLenght < baseLength) {
             return 10;
         }
-        return Math.floor(textLenght / 300) + 10; // for longer courses we add more questions
+        return Math.min(Math.floor(textLenght / 1000) + 10, 20); // for longer courses we add more questions
     }
 
     async generateQuestions(courseId: string): Promise<string> {
@@ -206,7 +206,7 @@ export class QuizService {
         let courseLength = mergedText.length;
         let numberOfQuestions = 0;
         numberOfQuestions = await this.getNumberOfQuestions(courseLength);
-
+        console.log(numberOfQuestions);
         const courseBasic = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
@@ -235,13 +235,15 @@ export class QuizService {
     }
 
     async verifyQuiz(quizJson: any, numberOfQuestions: number): Promise<boolean> {
+        console.log('Number of questions: ', numberOfQuestions);
         try {
             if (
                 !quizJson.quiz ||
                 !Array.isArray(quizJson.quiz) ||
                 quizJson.quiz.length !== numberOfQuestions
             ) {
-                console.log('There must be exactly' + numberOfQuestions + 'questions in the quiz.');
+                console.log('There must be exactly ' + numberOfQuestions + ' questions in the quiz.');
+                console.log('There is exacly ' + quizJson.quiz.length + ' questions')
                 return false;
             }
 
@@ -349,9 +351,17 @@ export class QuizService {
                     UserScores: true,
                 },
             });
-            console.log('QUIZ READY');
+            console.log('QUIZ READY'); // TODO: frontend error communication
 
-            this.cacheManager.del('all_quizzes');
+            // this.cacheManager.del('all_quizzes/');
+            const keys = await this.cacheManager.store.keys();
+            const cachesToDelete = [];
+            for (const key of keys) {
+                if (key.includes('all_quizzes')) {
+                    cachesToDelete.push(this.cacheManager.del(key));
+                }
+            }
+            await Promise.all(cachesToDelete);
 
             return quiz;
         } else {

@@ -20,7 +20,7 @@ export class CoursesService {
         private prismaService: PrismaService,
         private quizService: QuizService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async processCourse(course: EditCourseInput | CourseInput, id: string) {
         const courseItemsToAdd = [];
@@ -36,10 +36,9 @@ export class CoursesService {
                 } else {
                     const fileName = join(
                         `public/${id}`,
-                        `image-${i}.${
-                            course.text[i].value == 'jpg'
-                                ? 'jpeg'
-                                : course.text[i].value
+                        `image-${i}.${course.text[i].value == 'jpg'
+                            ? 'jpeg'
+                            : course.text[i].value
                         }`
                     );
 
@@ -151,7 +150,7 @@ export class CoursesService {
         });
     }
 
-    private async createSummary(courseId:string){
+    private async createSummary(courseId: string) {
         const course = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
@@ -160,8 +159,8 @@ export class CoursesService {
                 text: true,
             },
         });
-        const text = course.text.filter((t=>t.type=="text")).map((item) => item.value).join(' ');
-        const response =await this.openai.chat.completions.create({
+        const text = course.text.filter((t => t.type == "text")).map((item) => item.value).join(' ');
+        const response = await this.openai.chat.completions.create({
             messages: [
                 {
                     role: 'system',
@@ -172,19 +171,19 @@ export class CoursesService {
                 {
                     role: 'assistant',
                     content:
-                        'Please summarize the text in a few sentences.',
+                        'Please summarize the text in a few sentences. (max length: 200 characters)',
                 },
             ],
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             response_format: { type: 'text' },
         });
 
         await this.prismaService.course.update({
-            where:{
-                id:courseId
+            where: {
+                id: courseId
             },
-            data:{
-                summary:response.choices[0].message.content
+            data: {
+                summary: response.choices[0].message.content
             }
         })
 
@@ -397,7 +396,8 @@ export class CoursesService {
         });
         await this.cacheManager.del('my_courses/' + course.creatorId);
         await this.cacheManager.del('unverified_courses/' + course.moderatorId);
-        await this.cacheManager.del('all_courses');
+        await this.cacheManager.del('dashboard_courses');
+
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
         for (const key of keys) {
@@ -409,7 +409,7 @@ export class CoursesService {
         return course;
     }
 
-    async getDashboardCourses(){
+    async getDashboardCourses() {
         const cachedCourses = await this.cacheManager.get('dashboard_courses');
         if (cachedCourses) {
             return cachedCourses;
