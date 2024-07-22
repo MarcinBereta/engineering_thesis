@@ -228,13 +228,13 @@ export class QuizService {
                         'language',
                 },
             ],
-            model: 'gpt-4o',
+            model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
             response_format: { type: 'json_object' },
         });
         return completion.choices[0].message.content;
     }
 
-    async verifyQuiz(quizJson, numberOfQuestions): Promise<boolean> {
+    async verifyQuiz(quizJson: any, numberOfQuestions: number): Promise<boolean> {
         try {
             if (
                 !quizJson.quiz ||
@@ -248,7 +248,7 @@ export class QuizService {
             let totalOptions = 0;
             let totalCorrectAnswers = 0;
 
-            quizJson.quiz.forEach((question, index) => {
+            quizJson.quiz.forEach((question: any, index: number) => {
                 if (
                     typeof question.question !== 'string' ||
                     !question.question.trim()

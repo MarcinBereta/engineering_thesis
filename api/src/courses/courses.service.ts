@@ -422,7 +422,7 @@ export class CoursesService {
             where: {
                 verified: true,
             },
-            // take: 5,
+            take: 5,
         });
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;
