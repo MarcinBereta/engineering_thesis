@@ -212,6 +212,50 @@ export class QuizService {
                 id: courseId,
             },
         });
+        // maybe a good idea is add difficulty level and then add more questions based on that
+        const category = courseBasic.category;
+        console.log(category);
+
+        // depends on category we can add some specific parameters to API
+        let specificParameters = '';
+        enum Category {
+            MATH = 'math',
+            HISTORY = 'history',
+            GEOGRAPHY = 'geograpy',
+            ENGLISH = 'english',
+            ART = 'art',
+            MUSIC = 'music',
+            SPORTS = 'sports',
+            OTHER = 'other',
+        }
+        // will be changed in the future
+        switch (category) {
+            case Category.MATH as string:
+                specificParameters = 'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                break;
+            case Category.HISTORY as string:
+                specificParameters = 'Please do not add to many questions with dates. Be more specific about events and people.';
+                break;
+            case Category.GEOGRAPHY as string:
+                specificParameters = 'Be concise and specific about locations and events depending on the course.';
+                break;
+            case Category.ENGLISH as string:
+                specificParameters = 'Please add questions about grammar, vocabulary, literature, etc. based on the text above.';
+                break;
+            case Category.ART as string:
+                specificParameters = 'Please add questions about art history, techniques, artists, etc. based on the text above.';
+                break;
+            case Category.SPORTS as string:
+                specificParameters = 'Please add questions about sports history, rules, players, etc. based on the text above.';
+                break;
+            case Category.MUSIC as string:
+                specificParameters = 'Please add questions about music history, genres, artists, etc. based on the text above.';
+                break;
+            case Category.OTHER as string:
+                specificParameters = 'Use only text above.';
+                break;
+        }
+
         const completion = await this.openai.chat.completions.create({
             messages: [
                 {
@@ -225,7 +269,7 @@ export class QuizService {
                     content:
                         'Create a quiz based on the text above (4 answers) exactly ' + numberOfQuestions + ' questions and save it in a JSON file.(json with question, options and correct_anwser) in the ' +
                         courseBasic.language +
-                        'language',
+                        'language. ' + specificParameters,
                 },
             ],
             model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
