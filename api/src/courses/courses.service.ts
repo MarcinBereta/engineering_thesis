@@ -107,7 +107,9 @@ export class CoursesService {
         if (!user.verified) {
             throw new Error('User is not verified');
         }
-
+        if (course.category == null || course.category as string == '') {
+            throw new Error('Category is required');
+        }
         const moderators = await this.prismaService.moderator.findMany({
             where: {
                 categories: {
@@ -125,7 +127,6 @@ export class CoursesService {
       select * from "Moderator" order by array_length(categories, 1) desc limit 1`;
             moderator = (await this.prismaService.$queryRaw(query))[0];
         }
-
         const newCourse = await this.prismaService.course.create({
             data: {
                 name: course.name,
@@ -366,7 +367,6 @@ export class CoursesService {
         if (cachedCourses) {
             return cachedCourses;
         }
-
         const courses = await this.prismaService.course.findMany({
             where: {
                 verified: false,
@@ -385,6 +385,16 @@ export class CoursesService {
     }
 
     async verifyCourse(courseId: string) {
+        const courseToVerify = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+
+        if (courseToVerify.verified) {
+            throw new Error('Course is already verified');
+        }
+
         await this.quizService.addQuizToDataBase(courseId);
         const course = await this.prismaService.course.update({
             where: {
@@ -394,8 +404,15 @@ export class CoursesService {
                 verified: true,
             },
         });
+
+        const moderator = await this.prismaService.moderator.findUnique({
+            where: {
+                id: course.moderatorId
+            }
+        });
+
         await this.cacheManager.del('my_courses/' + course.creatorId);
-        await this.cacheManager.del('unverified_courses/' + course.moderatorId);
+        await this.cacheManager.del('unverified_courses/' + moderator.userId);
         await this.cacheManager.del('dashboard_courses');
 
         const keys = await this.cacheManager.store.keys();
