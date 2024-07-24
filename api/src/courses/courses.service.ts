@@ -360,6 +360,8 @@ export class CoursesService {
     }
 
     async getUnVerifiedCourses(userId: string) {
+        console.log('getUnVerifiedCourses', userId);
+        await this.cacheManager.del('unverified_courses/' + userId); //temporary 
         const cachedCourses = await this.cacheManager.get(
             'unverified_courses/' + userId
         );

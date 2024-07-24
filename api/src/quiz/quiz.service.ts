@@ -293,6 +293,7 @@ export class QuizService {
 
             let totalOptions = 0;
             let totalCorrectAnswers = 0;
+            const uniqueQuestions = new Set<string>();
 
             quizJson.quiz.forEach((question: any, index: number) => {
                 if (
@@ -301,6 +302,19 @@ export class QuizService {
                 ) {
                     console.log(`Question at index ${index} is invalid.`);
                     throw new Error(`Question at index ${index} is invalid.`);
+                }
+
+                const uniqueOptions = new Set(question.options);
+                if (uniqueOptions.size !== question.options.length) {
+                    console.log(`Options in question at index ${index} must be unique.`);
+                    throw new Error(`Options in question at index ${index} must be unique.`);
+                }
+
+                if (uniqueQuestions.has(question.question)) {
+                    console.log(`Question at index ${index} is a duplicate.`);
+                    throw new Error(`Question at index ${index} is a duplicate.`);
+                } else {
+                    uniqueQuestions.add(question.question);
                 }
 
                 if (
@@ -339,6 +353,7 @@ export class QuizService {
                 console.log('There must be exactly ' + numberOfQuestions + ' correct answers.');
                 throw new Error('There must be exactly ' + numberOfQuestions + ' correct answers.');
             }
+
 
             return true;
         } catch (error) {
