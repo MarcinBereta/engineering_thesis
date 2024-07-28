@@ -49,6 +49,7 @@ export const CourseForm = (props: CourseForm) => {
     const [courseName, setCourseName] = useState<string>('');
     const [items, setItems] = useState<AppFile[]>([]);
     const [category, setCategory] = useState('');
+    const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isTextFormOpen, setIsTextFormOpen] = useState(false);
     const [textForm, setTextForm] = useState('');
@@ -132,6 +133,10 @@ export const CourseForm = (props: CourseForm) => {
             language: language,
         };
     };
+    const handleCategoryChange = (value: string) => {
+        setCategory(value);
+        setIsCreateButtonDisabled(value === 'Choose category');
+    };
 
     const uploadPhotos = async (course: ResultOf<typeof courseFragment>) => {
         const photosToUpload: File[] = [];
@@ -194,9 +199,7 @@ export const CourseForm = (props: CourseForm) => {
                 />
                 <Text>{t('category')}</Text>
                 <RNPickerSelect
-                    onValueChange={(value) => {
-                        setCategory(value);
-                    }}
+                    onValueChange={handleCategoryChange}
                     items={[
                         { label: t('MATH'), value: 'MATH' },
                         { label: t('SCIENCE'), value: 'SCIENCE' },
@@ -206,7 +209,8 @@ export const CourseForm = (props: CourseForm) => {
                         { label: t('ART'), value: 'ART' },
                         { label: t('MUSIC'), value: 'MUSIC' },
                         { label: t('SPORTS'), value: 'SPORTS' },
-                        { label: t('OTHER'), value: '' },
+                        { label: t('OTHER'), value: 'OTHER' },
+                        { label: t('Choose category'), value: '' },
                     ]}
                     value={category}
                 />
@@ -341,9 +345,12 @@ export const CourseForm = (props: CourseForm) => {
 
                     <CustomButton
                         onPress={() => {
-                            uploadCourse();
+                            if (!isCreateButtonDisabled) {
+                                uploadCourse();
+                            }
                         }}
-                        title={t('create_course')}
+                        title="Create"
+                        disabled={isCreateButtonDisabled}
                     />
                 </View>
             </View>

@@ -15,7 +15,7 @@ export const Pagination = ({
     changePage: (page: number) => void;
 }) => {
     const { t } = useTranslation();
-    const maxPages = Math.max(Math.ceil(count / pageSize), 1);
+    const maxPages = Math.max(Math.ceil(count / pageSize), 1); 
     return (
         <View
             style={{

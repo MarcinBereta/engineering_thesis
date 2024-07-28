@@ -18,7 +18,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -194,14 +194,62 @@ export class QuizService {
         });
         return course.name;
     }
+    async getNumberOfQuestions(textLenght: number, baseLength: number = 2000): Promise<number> {
+        if (textLenght < baseLength) {
+            return 10;
+        }
+        return Math.min(Math.floor(textLenght / 1000) + 10, 20); // for longer courses we add more questions
+    }
 
     async generateQuestions(courseId: string): Promise<string> {
         const mergedText: string = await this.mergeTexts(courseId);
+        let courseLength = mergedText.length;
+        let numberOfQuestions = 0;
+        numberOfQuestions = await this.getNumberOfQuestions(courseLength);
+        console.log(numberOfQuestions);
         const courseBasic = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
             },
         });
+        const category = courseBasic.category;
+        console.log(category);
+
+        // depends on category we can add some specific parameters to API
+        let specificParameters = '';
+        switch (category) {
+            case 'MATH':
+                specificParameters = 'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                break;
+            case 'HISTORY':
+                specificParameters = 'Please do not add to many questions with dates. Be more specific about events and people.';
+                break;
+            case 'GEOGRAPHY':
+                specificParameters = 'Be concise and specific about locations and events depending on the course.';
+                break;
+            case 'ENGLISH':
+                specificParameters = 'Please add questions about grammar, vocabulary, literature, etc. based on the text above.';
+                break;
+            case 'ART':
+                specificParameters = 'Please add questions about art history, techniques, artists, etc. based on the text above.';
+                break;
+            case 'SPORTS':
+                specificParameters = 'Please add questions about sports history, rules, players, etc. based on the text above.';
+                break;
+            case 'SCIENCE':
+                specificParameters = 'Please add questions about science history, theories, scientists, etc. based on the text above.';
+                break;
+            case 'MUSIC':
+                specificParameters = 'Please add questions about music history, genres, artists, etc. based on the text above.';
+                break;
+            case 'OTHER' as string:
+                specificParameters = 'Make sure that questions are based on the text above.';
+                break;
+            default:
+                specificParameters = 'Use only text above.';
+                break;
+        }
+        console.log(specificParameters)
         const completion = await this.openai.chat.completions.create({
             messages: [
                 {
@@ -213,38 +261,54 @@ export class QuizService {
                 {
                     role: 'assistant',
                     content:
-                        'Create a quiz based on the text above (4 answers) exactly 10 questions and save it in a JSON file.(json with question, options and correct_anwser) in the ' +
+                        'Create a quiz based on the text above (4 answers) exactly ' + numberOfQuestions + ' questions and save it in a JSON file.(json with question, options and correct_anwser) in the ' +
                         courseBasic.language +
-                        'language',
+                        'language. ' + specificParameters,
                 },
             ],
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
             response_format: { type: 'json_object' },
         });
         return completion.choices[0].message.content;
     }
 
-    async verifyQuiz(quizJson): Promise<boolean> {
+    async verifyQuiz(quizJson: any, numberOfQuestions: number): Promise<boolean> {
+        console.log('Number of questions: ', numberOfQuestions);
         try {
             if (
                 !quizJson.quiz ||
                 !Array.isArray(quizJson.quiz) ||
-                quizJson.quiz.length !== 10
+                quizJson.quiz.length !== numberOfQuestions
             ) {
-                console.log('There must be exactly 10 questions in the quiz.');
+                console.log('There must be exactly ' + numberOfQuestions + ' questions in the quiz.');
+                console.log('There is exacly ' + quizJson.quiz.length + ' questions')
                 return false;
             }
 
             let totalOptions = 0;
             let totalCorrectAnswers = 0;
+            const uniqueQuestions = new Set<string>();
 
-            quizJson.quiz.forEach((question, index) => {
+            quizJson.quiz.forEach((question: any, index: number) => {
                 if (
                     typeof question.question !== 'string' ||
                     !question.question.trim()
                 ) {
                     console.log(`Question at index ${index} is invalid.`);
                     throw new Error(`Question at index ${index} is invalid.`);
+                }
+
+                const uniqueOptions = new Set(question.options);
+                if (uniqueOptions.size !== question.options.length) {
+                    console.log(`Options in question at index ${index} must be unique.`);
+                    throw new Error(`Options in question at index ${index} must be unique.`);
+                }
+
+                if (uniqueQuestions.has(question.question)) {
+                    console.log(`Question at index ${index} is a duplicate.`);
+                    throw new Error(`Question at index ${index} is a duplicate.`);
+                } else {
+                    uniqueQuestions.add(question.question);
                 }
 
                 if (
@@ -274,15 +338,16 @@ export class QuizService {
                 totalCorrectAnswers++;
             });
 
-            if (totalOptions !== 40) {
-                console.log('There must be exactly 40 options in total.');
-                throw new Error('There must be exactly 40 options in total.');
+            if (totalOptions !== 4 * numberOfQuestions) {
+                console.log('There must be exactly ' + 4 * numberOfQuestions + 'options in total.');
+                throw new Error('There must be exactly ' + 4 * numberOfQuestions + ' options in total.');
             }
 
-            if (totalCorrectAnswers !== 10) {
-                console.log('There must be exactly 10 correct answers.');
-                throw new Error('There must be exactly 10 correct answers.');
+            if (totalCorrectAnswers !== numberOfQuestions) {
+                console.log('There must be exactly ' + numberOfQuestions + ' correct answers.');
+                throw new Error('There must be exactly ' + numberOfQuestions + ' correct answers.');
             }
+
 
             return true;
         } catch (error) {
@@ -295,15 +360,19 @@ export class QuizService {
         if (!this.checkCourseExistence(courseId)) {
             throw new Error('The course does not exist.');
         }
+        const mergedText: string = await this.mergeTexts(courseId);
+        let courseLength = mergedText.length;
+        let numberOfQuestions = 0;
+        numberOfQuestions = await this.getNumberOfQuestions(courseLength);
         const questions = await this.generateQuestions(courseId);
         const questionsJson = JSON.parse(questions);
-        let verified = await this.verifyQuiz(questionsJson);
+        let verified = await this.verifyQuiz(questionsJson, numberOfQuestions);
         let tries = 2;
         while (!verified) {
             if (tries > 0) {
                 const questions = await this.generateQuestions(courseId);
                 const questionsJson = JSON.parse(questions);
-                verified = await this.verifyQuiz(questionsJson);
+                verified = await this.verifyQuiz(questionsJson, numberOfQuestions);
                 tries--;
             } else {
                 throw new Error('Invalid data format.');
@@ -335,9 +404,17 @@ export class QuizService {
                     UserScores: true,
                 },
             });
-            console.log('QUIZ READY');
+            console.log('QUIZ READY'); // TODO: frontend error communication
 
-            this.cacheManager.del('all_quizzes');
+            // this.cacheManager.del('all_quizzes/');
+            const keys = await this.cacheManager.store.keys();
+            const cachesToDelete = [];
+            for (const key of keys) {
+                if (key.includes('all_quizzes')) {
+                    cachesToDelete.push(this.cacheManager.del(key));
+                }
+            }
+            await Promise.all(cachesToDelete);
 
             return quiz;
         } else {
