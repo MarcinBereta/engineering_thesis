@@ -10,6 +10,8 @@ export class SimpleCourse {
     summary: string;
     @Field()
     category: Category;
+    @Field({ nullable: true })
+    tag: string;
 }
 
 @ObjectType()

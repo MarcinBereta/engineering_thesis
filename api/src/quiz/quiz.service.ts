@@ -249,7 +249,6 @@ export class QuizService {
                 specificParameters = 'Use only text above.';
                 break;
         }
-        console.log(specificParameters)
         const completion = await this.openai.chat.completions.create({
             messages: [
                 {

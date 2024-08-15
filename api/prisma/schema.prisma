@@ -43,6 +43,7 @@ model Course {
   verified    Boolean      @default(false)
   summary     String       @default("")
   category    Category
+  tag         String       @default("Other")
   creator     User         @relation(fields: [creatorId], references: [id])
   text        CourseItem[]
   Quiz        Quiz[]

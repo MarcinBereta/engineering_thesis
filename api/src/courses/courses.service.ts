@@ -138,8 +138,7 @@ export class CoursesService {
         });
 
         await this.processCourse(course, newCourse.id);
-
-        await this.createSummary(newCourse.id);
+        await this.createSummaryAndTag(newCourse.id);
 
         return await this.prismaService.course.findUnique({
             where: {
@@ -151,7 +150,57 @@ export class CoursesService {
         });
     }
 
-    private async createSummary(courseId: string) {
+    private async getAndCheckOptions(category: string, getOrCheck: boolean, tag: string) {
+        // true for get, false for check
+        let specificOptions = ''
+        switch (category) {
+            case 'MATH':
+                specificOptions = 'Algebra, Analytics, Statistics, Probability, Trigonometric, Other';
+                break;
+            case 'HISTORY':
+                specificOptions = 'Prehistory, Antiquity, Middle Ages, Modern period, Contemporary period, Wars and conflicts, Historical Figures, Other';
+                break;
+            case 'GEOGRAPHY':
+                specificOptions = 'Social, Economic, Political, Cartography, Climatology, Other';
+                break;
+            case 'ENGLISH':
+                specificOptions = 'Grammar, Vocabluary, Culture, Writing, Reading, Conversations, Other';
+                break;
+            case 'ART':
+                specificOptions = 'Painting, Sculpture, Architecture, Literature, Music, Theatre, Other';
+                break;
+            case 'SPORTS':
+                specificOptions = 'Individual, Team, Water, Winter, Motor, Extreme, Other';
+                break;
+            case 'SCIENCE':
+                specificOptions = 'Physics, Chemisrty, Biology, Astronomy, Earth, Environment, Other';
+                break;
+            case 'MUSIC':
+                specificOptions = 'Rock, Pop, Classical, Dance, Country, Jazz, Rap, HipHop, Other';
+                break;
+            case 'OTHER':
+                specificOptions = 'Other';
+                break;
+            default:
+                specificOptions = 'Other';
+                break;
+        }
+        if (getOrCheck) {
+            return specificOptions;
+        }
+        else {
+            // check if tag is in specific options
+            if (specificOptions.includes(tag)) {
+                return tag;
+            }
+            else {
+                return "Other";
+            }
+        }
+    }
+
+
+    private async createSummaryAndTag(courseId: string) {
         const course = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
@@ -160,6 +209,10 @@ export class CoursesService {
                 text: true,
             },
         });
+
+        const category = course.category;
+        const choices = await this.getAndCheckOptions(category, true, "");
+
         const text = course.text.filter((t => t.type == "text")).map((item) => item.value).join(' ');
         const response = await this.openai.chat.completions.create({
             messages: [
@@ -179,12 +232,37 @@ export class CoursesService {
             response_format: { type: 'text' },
         });
 
+        let summary = ''
+        summary += response.choices[0].message.content;
+
+        const response_tag = await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'You are a helpful assistant designed to choose tag from the following options.',
+                },
+                { role: 'user', content: text },
+                {
+                    role: 'assistant',
+                    content:
+                        'Choose tag for this text from the following options: ' + choices + " . (Write only tag)",
+                },
+            ],
+            model: 'gpt-4o-mini',
+            response_format: { type: 'text' },
+        });
+
+        let tag = ''
+        tag += response_tag.choices[0].message.content;
+        const check_tag = await this.getAndCheckOptions(category, false, tag)
         await this.prismaService.course.update({
             where: {
                 id: courseId
             },
             data: {
-                summary: response.choices[0].message.content
+                summary: summary,
+                tag: check_tag
             }
         })
 
@@ -232,7 +310,7 @@ export class CoursesService {
             'unverified_courses/' + courseToEdit.moderatorId
         );
 
-        await this.createSummary(course.id);
+        await this.createSummaryAndTag(course.id);
         return await this.prismaService.course.findUnique({
             where: {
                 id: course.id,
