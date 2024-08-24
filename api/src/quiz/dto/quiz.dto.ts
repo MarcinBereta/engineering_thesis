@@ -40,5 +40,7 @@ export class UserScore {
     @Field()
     score: number;
     @Field()
+    noQuest: number;
+    @Field()
     createdAt: Date;
 }
