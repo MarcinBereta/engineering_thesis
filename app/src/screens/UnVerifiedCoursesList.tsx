@@ -1,6 +1,6 @@
 import { View, Text, Dimensions } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
@@ -25,12 +25,29 @@ type UnVerifiedCourses = NativeStackScreenProps<
 >;
 
 export type verifyCourseDto = VariablesOf<typeof verifyCourseGQL>;
+
+const ProgressBar = ({ progress }: { progress: number }) => {
+    return (
+        <View style={{ width: '100%', backgroundColor: '#e0e0df', borderRadius: 5 }}>
+            <View
+                style={{
+                    width: `${progress}%`,
+                    height: 10,
+                    backgroundColor: '#76c7c0',
+                    borderRadius: 5,
+                }}
+            ></View>
+        </View>
+    );
+};
+
 const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
     const { t } = useTranslation();
-
     const { userInfo } = useContext(AuthContext);
+    const [isLoading, setIsLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
 
-    const { data, isLoading, refetch } = useQuery({
+    const { data, refetch } = useQuery({
         queryKey: ['userId'],
         queryFn: async () =>
             request(
@@ -43,22 +60,38 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
             ),
     });
 
-    console.log(data);
-
     const verifyCourseMutation = useMutation({
-        mutationFn: async (data: verifyCourseDto) =>
-            request(graphqlURL, verifyCourseGQL, data, {
+        mutationFn: async (data: verifyCourseDto) => {
+            const result = await request(graphqlURL, verifyCourseGQL, data, {
                 Authorization: 'Bearer ' + userInfo?.token,
-            }),
+            });
+            return result;
+        },
+        onMutate: () => {
+            setIsLoading(true);
+            setProgress(0);
+            const interval = setInterval(() => {
+                setProgress((prev) => {
+                    if (prev < 90) {
+                        return prev + 10;
+                    } else {
+                        clearInterval(interval);
+                        return prev;
+                    }
+                });
+            }, 500);
+        },
         onSuccess: (data, variables, context) => {
+            setProgress(100); // Complete progress
+            setIsLoading(false);
             props.navigation.push('CoursesList');
             refetch();
         },
+        onError: () => {
+            setIsLoading(false);
+            setProgress(0);
+        },
     });
-
-    if (isLoading || data == undefined) {
-        return <Text>Loading...</Text>;
-    }
 
     const handleVerify = async (courseId: string) => {
         verifyCourseMutation.mutate({
@@ -67,6 +100,15 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
             },
         });
     };
+
+    if (isLoading || data == undefined) {
+        return (
+            <View>
+                <Text>Quiz generation...</Text>
+                <ProgressBar progress={progress} />
+            </View>
+        );
+    }
 
     return (
         <Layout navigation={props.navigation} icon="course">
@@ -80,6 +122,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                 >
                     Course list
                 </Text>
+                {isLoading && <ProgressBar progress={progress} />}
                 <FlatList
                     data={data.unVerifiedCourses}
                     contentContainerStyle={{ maxHeight: height * 0.6 }}
