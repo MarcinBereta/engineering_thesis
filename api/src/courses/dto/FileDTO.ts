@@ -2,9 +2,9 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class FileDTO {
     @Field()
-    filename: String;
+    filename: string;
     @Field()
-    mimetype: String;
+    mimetype: string;
     @Field()
-    encoding: String;
+    encoding: string;
 }

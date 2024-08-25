@@ -1,12 +1,12 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { Quiz } from './dto/quiz.dto';
+import { Quiz, RecreateQuizDto } from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { AddScore } from './dto/addScore.dto';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
-
+import { QuizUpdateDto } from '../quiz/dto/quiz.update';
 @Resolver(() => Quiz)
 @UseGuards(JwtAuthGuard)
 export class QuizResolver {
@@ -51,5 +51,20 @@ export class QuizResolver {
         @Context() context
     ) {
         return this.quizService.addUserScore(addScore, context.req.user.id);
+    }
+
+    @Mutation(() => Quiz)
+    async RecreateQuiz(@Args('recreateQuiz') recreateDto: RecreateQuizDto) {
+        return this.quizService.recreateQuiz(
+            recreateDto.quizOptions,
+            recreateDto.quizId,
+            recreateDto.questionCount,
+            recreateDto.answerCount
+        );
+    }
+
+    @Mutation(() => Quiz)
+    async updateQuiz(@Args('updateQuiz') quizUpdate: QuizUpdateDto) {
+        return this.quizService.updateQuizQuestions(quizUpdate);
     }
 }

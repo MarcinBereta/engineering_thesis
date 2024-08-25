@@ -75,8 +75,8 @@ model Question {
   quizId   String
   question String
   answers  String[]
-  correct  String
-
+  correct  String[]
+  type     QuestionType @default(SINGLE_ANSWER)
   Quiz Quiz @relation(fields: [quizId], references: [id])
 }
 
@@ -151,4 +151,16 @@ enum Category {
   MUSIC
   SPORTS
   OTHER
+}
+
+enum QuizOptions {
+  EXCLUDE_DATES
+  MULTIPLE_CHOICES
+  TRUE_FALSE
+}
+
+enum QuestionType {
+  SINGLE_ANSWER
+  MULTIPLE_ANSWER
+  TRUE_FALSE
 }

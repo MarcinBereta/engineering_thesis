@@ -27,6 +27,7 @@ import { ResultOf } from 'gql.tada';
 import { quizQuestionFragment } from '@/services/quiz/quiz';
 import { UserPage } from './User';
 import { UserSettings } from './UserSettings';
+import QuizEdit from './QuizEdit';
 
 const Stack = createNativeStackNavigator();
 
@@ -76,6 +77,7 @@ export type AuthenticatedRootStackParamList = {
     createCourse: undefined;
     course: { course: Course };
     quiz: { quiz: Quiz };
+    QuizEdit: { quiz: Quiz };
     QuizSearch: { quiz: Quiz };
     QuizWithFriends: { quiz: Quiz; friendId: string; invite: boolean };
     QuizResult: { score: number; total: number };
@@ -143,6 +145,10 @@ const Navigator = ({}: {}) => {
                         <AuthenticatedStack.Screen
                             component={QuizMain}
                             name="quiz"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={QuizEdit}
+                            name="QuizEdit"
                         />
                         <AuthenticatedStack.Screen
                             component={QuizSocket}

@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { SimpleCourse } from 'src/courses/dto/CourseDTO';
 
 @ObjectType()
@@ -9,11 +9,11 @@ export class Quiz {
     courseId: string;
     @Field()
     name: string;
-    @Field((type) => [Question])
+    @Field(() => [Question])
     questions: Question[];
-    @Field((type) => [UserScore])
+    @Field(() => [UserScore])
     UserScores: UserScore[];
-    @Field((type) => SimpleCourse, { nullable: true })
+    @Field(() => SimpleCourse, { nullable: true })
     course?: SimpleCourse;
 }
 
@@ -25,10 +25,12 @@ export class Question {
     quizId: string;
     @Field()
     question: string;
-    @Field((type) => [String])
+    @Field(() => [String])
     answers: string[];
-    @Field()
-    correct: string;
+    @Field(() => [String])
+    correct: string[];
+    @Field(() => String)
+    type: string;
 }
 
 @ObjectType()
@@ -41,4 +43,16 @@ export class UserScore {
     score: number;
     @Field()
     createdAt: Date;
+}
+
+@InputType()
+export class RecreateQuizDto {
+    @Field()
+    quizId: string;
+    @Field()
+    questionCount: number;
+    @Field()
+    answerCount: number;
+    @Field(() => [String])
+    quizOptions: string[];
 }

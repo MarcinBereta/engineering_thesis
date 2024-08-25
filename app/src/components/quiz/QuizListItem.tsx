@@ -4,6 +4,7 @@ import { Card } from '@rneui/themed';
 import { NavigationType } from '../Navbar';
 import { ResultOf } from 'gql.tada';
 import { useTranslation } from 'react-i18next';
+import { Touchable } from 'react-native';
 
 const QuizzesListItem = ({
     navigation,
@@ -50,6 +51,30 @@ const QuizzesListItem = ({
                         <Text> {t(item.course?.category as string)}</Text>
                     </View>
                 </View>
+                <TouchableOpacity
+                    style={{
+                        width: '80%',
+                        padding: 5,
+                        backgroundColor: 'lightblue',
+                        marginLeft: '10%',
+                        borderRadius: 20,
+                        marginTop: 20,
+                    }}
+                    onPress={() => {
+                        navigation.push('QuizEdit', { quiz: item });
+                    }}
+                >
+                    <Text
+                        style={{
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            fontSize: 15,
+                            color: 'white',
+                        }}
+                    >
+                        Edit quiz
+                    </Text>
+                </TouchableOpacity>
             </TouchableOpacity>
         </Card>
     );

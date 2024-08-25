@@ -172,6 +172,7 @@ export const CourseForm = (props: CourseForm) => {
     };
 
     const uploadCourse = async () => {
+        console.log('CREATE');
         addCourseMutation.mutate({
             CourseInput: parseData(),
         });

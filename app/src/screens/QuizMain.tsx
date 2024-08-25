@@ -25,7 +25,7 @@ const shuffleArray = (array: string[]) => {
 };
 
 export type extendedQuestion = ResultOf<typeof quizQuestionFragment> & {
-    userAnswer: string;
+    userAnswer: string[];
 };
 
 export type addQuizResultDto = VariablesOf<typeof addQUizResultGQL>;
@@ -64,7 +64,7 @@ const QuizMain = ({ route, navigation }: quiz) => {
             (question: ResultOf<typeof quizQuestionFragment>) => {
                 return {
                     ...question,
-                    userAnswer: '',
+                    userAnswer: [''],
                     answers: shuffleArray(question.answers),
                 };
             }
@@ -77,8 +77,13 @@ const QuizMain = ({ route, navigation }: quiz) => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const handleEndQuiz = async () => {
         if (userInfo == null) return;
-        const correctAnswers = questions.filter(
-            (question) => question.userAnswer === question.correct
+
+        const correctAnswers = questions.filter((question) =>
+            question.type === 'SINGLE' || question.type === 'TRUE_FALSE'
+                ? question.correct.includes(question.userAnswer[0])
+                : question.answers.every((answer) =>
+                      question.userAnswer.includes(answer)
+                  )
         );
         let correct = correctAnswers.length;
         let all = questions.length;
@@ -117,7 +122,30 @@ const QuizMain = ({ route, navigation }: quiz) => {
                     setAnswer={(answer: string, index: number) => {
                         const newQuestions = questions.map((question, i) => {
                             if (i === index) {
-                                return { ...question, userAnswer: answer };
+                                if (question.type === 'MULTIPLE') {
+                                    if (question.userAnswer.includes(answer)) {
+                                        return {
+                                            ...question,
+                                            userAnswer:
+                                                question.userAnswer.filter(
+                                                    (ans) => ans != answer
+                                                ),
+                                        };
+                                    } else {
+                                        return {
+                                            ...question,
+                                            userAnswer: [
+                                                ...question.userAnswer,
+                                                answer,
+                                            ],
+                                        };
+                                    }
+                                } else {
+                                    return {
+                                        ...question,
+                                        userAnswer: [answer],
+                                    };
+                                }
                             }
                             return question;
                         });

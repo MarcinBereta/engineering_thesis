@@ -42,7 +42,7 @@ export class SocketService {
             this.queues.set(quizId, []);
         }
 
-        let quiz = this.queues.get(quizId);
+        const quiz = this.queues.get(quizId);
         if (quiz.length == 0) {
             quiz.push({
                 user: userId,
@@ -50,7 +50,7 @@ export class SocketService {
             });
         } else {
             //get 1st user in queue
-            let user = quiz.shift();
+            const user = quiz.shift();
             this.createRoom(
                 [
                     user,
@@ -90,7 +90,7 @@ export class SocketService {
     }
 
     async acceptFight(socket: Socket, userId: string, friendId: string) {
-        let data = this.waiting.get(friendId);
+        const data = this.waiting.get(friendId);
         if (data.friendId == userId)
             this.createRoom(
                 [
@@ -108,15 +108,15 @@ export class SocketService {
     }
 
     async declineFight(socket: Socket, userId: string, friendId: string) {
-        let data = this.waiting.get(friendId);
+        const data = this.waiting.get(friendId);
         if (data.friendId == userId) {
             data.socket.emit('fightCanceled');
         }
     }
 
     async leaveQueue(socket: Socket, quizId: string, userId: string) {
-        let quiz = this.queues.get(quizId);
-        let userIndex = quiz.findIndex((user) => user.user === userId);
+        const quiz = this.queues.get(quizId);
+        const userIndex = quiz.findIndex((user) => user.user === userId);
         if (userIndex != -1) {
             quiz.splice(userIndex, 1);
         }
@@ -129,7 +129,7 @@ export class SocketService {
         }[],
         quizId: string
     ) {
-        let roomId = randomUUID();
+        const roomId = randomUUID();
         const usersData = await this.prismaService.user.findMany({
             where: {
                 id: {
@@ -145,14 +145,14 @@ export class SocketService {
                 questions: true,
             },
         });
-        let room = new Room();
+        const room = new Room();
         room.questionIndex = 0;
         room.id = roomId;
         room.users = usersData.map((user) => {
             return { id: user.id, username: user.username, score: 0 };
         });
         room.quizId = quizId;
-        for (let q of quiz.questions) {
+        for (const q of quiz.questions) {
             q.answers = q.answers.sort(() => Math.random() - 0.5);
         }
         room.questions = quiz.questions.sort(() => Math.random() - 0.5);
@@ -168,16 +168,16 @@ export class SocketService {
     }
 
     async handleGameStart(roomId: string) {
-        let room = this.rooms.get(roomId);
-        let question = room.questions[room.questionIndex];
+        const room = this.rooms.get(roomId);
+        const question = room.questions[room.questionIndex];
         this.server.to(roomId).emit('question', question);
         await delay(5000);
         this.handleRoundEnd(roomId);
     }
 
     async handleRoundEnd(roomId: string) {
-        let room = this.rooms.get(roomId);
-        let question = room.questions[room.questionIndex];
+        const room = this.rooms.get(roomId);
+        const question = room.questions[room.questionIndex];
         this.server.to(roomId).emit('questionEnd', question.correct);
         room.questionIndex++;
 
@@ -190,11 +190,21 @@ export class SocketService {
         }
     }
 
-    async handleAnswer(roomId: string, userId: string, answer: string) {
-        let room = this.rooms.get(roomId);
-        let question = room.questions[room.questionIndex];
-        if (question.correct === answer) {
-            let user = room.users.find((user) => user.id === userId);
+    async handleAnswer(roomId: string, userId: string, answer: string[]) {
+        const room = this.rooms.get(roomId);
+        const question = room.questions[room.questionIndex];
+        let isCorrect = true;
+        if (question.type === 'MULTIPLE_ANSWER') {
+            isCorrect = question.correct.every((correct) =>
+                answer.includes(correct)
+            );
+        } else {
+            isCorrect = question.correct.every((correct) =>
+                answer.includes(correct)
+            );
+        }
+        if (isCorrect) {
+            const user = room.users.find((user) => user.id === userId);
             user.score++;
         }
     }
