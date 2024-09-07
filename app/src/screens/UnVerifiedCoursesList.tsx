@@ -132,7 +132,9 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                             navigation={props.navigation}
                         >
                             <CustomButton
-                                onPress={() => {
+                                onPress={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                     handleVerify(item?.id || '');
                                 }}
                                 title="Verify"

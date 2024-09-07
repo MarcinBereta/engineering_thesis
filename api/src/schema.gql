@@ -121,7 +121,8 @@ type Question {
   quizId: String!
   question: String!
   answers: [String!]!
-  correct: String!
+  correct: [String!]!
+  type: String!
 }
 
 type UserScore {
@@ -175,6 +176,8 @@ type Mutation {
   editCourse(editCourse: EditCourseInput!): Course!
   verifyCourse(verifyCourse: VerifyCourseDto!): Course!
   addUserScore(addScore: AddScore!): Quiz!
+  RecreateQuiz(recreateQuiz: RecreateQuizDto!): Quiz!
+  updateQuiz(updateQuiz: QuizUpdateDto!): Quiz!
 }
 
 input SingUpUserInput {
@@ -238,4 +241,25 @@ input AddScore {
   userId: String!
   quizId: String!
   score: Float!
+}
+
+input RecreateQuizDto {
+  quizId: String!
+  questionCount: Float!
+  answerCount: Float!
+  quizOptions: [String!]!
+}
+
+input QuizUpdateDto {
+  id: String!
+  questions: [QuestionUpdateDto!]!
+}
+
+input QuestionUpdateDto {
+  id: String!
+  quizId: String!
+  question: String!
+  answers: [String!]!
+  correct: [String!]!
+  type: String!
 }
