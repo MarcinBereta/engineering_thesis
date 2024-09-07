@@ -102,7 +102,6 @@ export class CoursesService {
             }
         }
     }
-
     async addCourse(course: CourseInput, user: simpleUser) {
         if (!user.verified) {
             throw new Error('User is not verified');
@@ -138,8 +137,7 @@ export class CoursesService {
         });
 
         await this.processCourse(course, newCourse.id);
-
-        await this.createSummary(newCourse.id);
+        await this.createSummaryAndTag(newCourse.id);
 
         return await this.prismaService.course.findUnique({
             where: {
@@ -151,7 +149,57 @@ export class CoursesService {
         });
     }
 
-    private async createSummary(courseId: string) {
+    private async getAndCheckOptions(category: string, getOrCheck: boolean, tag: string) {
+        // true for get, false for check
+        let specificOptions = ''
+        switch (category) {
+            case 'MATH':
+                specificOptions = 'Algebra, Analytics, Statistics, Probability, Trigonometric, Other';
+                break;
+            case 'HISTORY':
+                specificOptions = 'Prehistory, Antiquity, Middle Ages, Modern period, Contemporary period, Wars and conflicts, Historical Figures, Other';
+                break;
+            case 'GEOGRAPHY':
+                specificOptions = 'Social, Economic, Political, Cartography, Climatology, Other';
+                break;
+            case 'ENGLISH':
+                specificOptions = 'Grammar, Vocabluary, Culture, Writing, Reading, Conversations, Other';
+                break;
+            case 'ART':
+                specificOptions = 'Painting, Sculpture, Architecture, Literature, Music, Theatre, Other';
+                break;
+            case 'SPORTS':
+                specificOptions = 'Individual, Team, Water, Winter, Motor, Extreme, Other';
+                break;
+            case 'SCIENCE':
+                specificOptions = 'Physics, Chemisrty, Biology, Astronomy, Earth, Environment, Other';
+                break;
+            case 'MUSIC':
+                specificOptions = 'Rock, Pop, Classical, Dance, Country, Jazz, Rap, HipHop, Other';
+                break;
+            case 'OTHER':
+                specificOptions = 'Other';
+                break;
+            default:
+                specificOptions = 'Other';
+                break;
+        }
+        if (getOrCheck) {
+            return specificOptions;
+        }
+        else {
+            // check if tag is in specific options
+            if (specificOptions.includes(tag)) {
+                return tag;
+            }
+            else {
+                return "Other";
+            }
+        }
+    }
+
+
+    private async createSummaryAndTag(courseId: string) {
         const course = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
@@ -160,6 +208,10 @@ export class CoursesService {
                 text: true,
             },
         });
+
+        const category = course.category;
+        const choices = await this.getAndCheckOptions(category, true, "");
+
         const text = course.text.filter((t => t.type == "text")).map((item) => item.value).join(' ');
         const response = await this.openai.chat.completions.create({
             messages: [
@@ -179,12 +231,37 @@ export class CoursesService {
             response_format: { type: 'text' },
         });
 
+        let summary = ''
+        summary += response.choices[0].message.content;
+
+        const response_tag = await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'You are a helpful assistant designed to choose tag from the following options.',
+                },
+                { role: 'user', content: text },
+                {
+                    role: 'assistant',
+                    content:
+                        'Choose tag for this text from the following options: ' + choices + " . (Write only tag)",
+                },
+            ],
+            model: 'gpt-4o-mini',
+            response_format: { type: 'text' },
+        });
+
+        let tag = ''
+        tag += response_tag.choices[0].message.content;
+        const check_tag = await this.getAndCheckOptions(category, false, tag)
         await this.prismaService.course.update({
             where: {
                 id: courseId
             },
             data: {
-                summary: response.choices[0].message.content
+                summary: summary,
+                tag: check_tag
             }
         })
 
@@ -232,7 +309,7 @@ export class CoursesService {
             'unverified_courses/' + courseToEdit.moderatorId
         );
 
-        await this.createSummary(course.id);
+        await this.createSummaryAndTag(course.id);
         return await this.prismaService.course.findUnique({
             where: {
                 id: course.id,
@@ -360,7 +437,6 @@ export class CoursesService {
     }
 
     async getUnVerifiedCourses(userId: string) {
-        console.log('getUnVerifiedCourses', userId);
         await this.cacheManager.del('unverified_courses/' + userId); //temporary 
         const cachedCourses = await this.cacheManager.get(
             'unverified_courses/' + userId
@@ -445,5 +521,47 @@ export class CoursesService {
         });
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;
+    }
+    // have to be tested - maybe in the future this will be more complicated
+    async getMostFitCourse(userID: string): Promise<any> {
+        try {
+            // get category iwth most games played by user with userID
+            const bestCategory = await this.prismaService.$queryRaw`
+            select "category" from "Course" where id in ( select "courseId" from "Quiz" where id = (
+                select "quizId" from "UserScores" where "userId" = ${userID} limit 1
+                )) group by "category" order by count(*) desc limit 1`;
+            // get tag with most games played in Category by user with userID          
+            const bestTag = await this.prismaService.$queryRaw`
+            select "tag" from "Course" where category::text = ${bestCategory[0].category} and id in ( select "courseId" from "Quiz" where id = (
+                select "quizId" from "UserScores" where "userId" = ${userID} limit 1
+                )) group by "tag" order by count(*) desc limit 1`;
+            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category
+            const mostPopularCourse = await this.prismaService.$queryRaw`
+            select * from "Course" where tag = ${bestTag[0].tag} and id not in ( select "courseId" from "Quiz" where id in (
+                select "quizId" from "UserScores" where "userId" = ${userID}
+                ) )order by (
+                select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
+            ) desc limit 1`;
+            if ((mostPopularCourse as any[]).length == 0) {
+                const mostPopularCourseByCategory = await this.prismaService.$queryRaw`
+                select * from "Course" where category::text = ${bestCategory[0].category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
+                    select "quizId" from "UserScores" where "userId" = ${userID}
+                    ) )order by (
+                    select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
+                ) desc limit 1`;
+                if ((mostPopularCourseByCategory as any[]).length == 0) {
+                    // return random course
+                    const randomCourse = await this.prismaService.$queryRaw`
+            select * from "Course" where verified = true order by random() limit 1`;
+                    return randomCourse[0] || null;
+                }
+                return mostPopularCourseByCategory[0] || null;
+            }
+            return mostPopularCourse[0] || null;
+        }
+        catch (e) {
+            console.log(e)
+            return null
+        }
     }
 }

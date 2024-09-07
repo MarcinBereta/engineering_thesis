@@ -30,25 +30,27 @@ model User {
   Friends_request         Friends[]          @relation(name: "friends_friends")
   VerificationForm        VerificationForm[]
   Moderator               Moderator[]
+  Achievement             Achievement[]
   FriendsRequests         FriendsRequests[]  @relation(name: "friends_requests_user")
   FriendsRequests_friends FriendsRequests[]  @relation(name: "friends_requests_friend")
 }
 
 model Course {
-  id          String       @id @default(uuid())
-  name        String
-  creatorId   String
-  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
-  verified    Boolean      @default(false)
-  summary     String       @default("")
-  category    Category
-  creator     User         @relation(fields: [creatorId], references: [id])
-  text        CourseItem[]
-  Quiz        Quiz[]
-  moderator   Moderator    @relation(fields: [moderatorId], references: [id])
-  moderatorId String
-  language    String       @default("en")
+  id           String        @id @default(uuid())
+  name         String
+  creatorId    String
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+  verified     Boolean       @default(false)
+  summary      String        @default("")
+  category     Category
+  tag          String        @default("Other")
+  creator      User          @relation(fields: [creatorId], references: [id])
+  text         CourseItem[]
+  Quiz         Quiz[]
+  moderator    Moderator     @relation(fields: [moderatorId], references: [id])
+  moderatorId  String
+  language     String        @default("en")
 }
 
 model CourseItem {
@@ -85,6 +87,7 @@ model UserScores {
   userId    String
   quizId    String
   score     Int
+  noQuest   Int
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   User      User     @relation(fields: [userId], references: [id])
@@ -130,9 +133,29 @@ model Moderator {
   Course     Course[]
 }
 
+model Achievement {
+  id        String   @id @default(uuid())
+  userId    String
+  award     AchievementType
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  User      User     @relation(fields: [userId], references: [id])
+}
+
 enum CourseItemType {
   photo
   text
+}
+
+enum AchievementType {
+  numberOfFriends10
+  numberOfFriends100
+  numberOfGames1000
+  numberOfGames10000
+  numberOfCreatedCourses10
+  numberOfCreatedCourses100
+  getVerification
+  getFirstFriend
 }
 
 enum Role {

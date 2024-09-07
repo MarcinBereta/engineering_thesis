@@ -74,6 +74,7 @@ type SimpleCourse {
   name: String!
   summary: String
   category: String!
+  tag: String
 }
 
 type Course {
@@ -81,6 +82,7 @@ type Course {
   name: String!
   summary: String
   category: String!
+  tag: String
   text: [CourseItem!]!
 }
 
@@ -94,6 +96,7 @@ type ExtendedCourse {
   name: String!
   summary: String
   category: String!
+  tag: String
   text: [CourseItem!]!
   creator: CourseCreator!
 }
@@ -126,6 +129,7 @@ type UserScore {
   userId: String!
   quizId: String!
   score: Float!
+  noQuest: Float!
   createdAt: DateTime!
 }
 

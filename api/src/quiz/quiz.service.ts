@@ -265,7 +265,7 @@ export class QuizService {
                 specificParameters = 'Use only text above.';
                 break;
         }
-
+      
         const completion = await this.openai.chat.completions.create({
             messages: [
                 {
@@ -715,6 +715,12 @@ export class QuizService {
     }
 
     async addUserScore(addScore: AddScore, userId: string): Promise<Quiz> {
+        const numberOfQuestions = await this.prismaService.question.count({
+            where: {
+                quizId: addScore.quizId,
+            },
+        })
+
         return this.prismaService.quiz.update({
             where: {
                 id: addScore.quizId,
@@ -724,6 +730,7 @@ export class QuizService {
                     create: {
                         userId: userId,
                         score: addScore.score,
+                        noQuest: numberOfQuestions,
                     },
                 },
             },
@@ -733,4 +740,114 @@ export class QuizService {
             },
         });
     }
+    // Stats
+    /*
+    Stats:
+    - Number of games played each category
+    - Number of games as whole
+    - Number of friends
+    - Number of created quizes
+    */
+    async getAllUserGames(userID: string): Promise<number> {
+        return await this.prismaService.userScores.count({
+            where: {
+                userId: userID
+            }
+        });
+    }
+    async getAllUserFriends(userID: string): Promise<number> {
+        return await this.prismaService.friends.count({
+            where: {
+                userId: userID
+            }
+        });
+    }
+    async getMaxedQuizes(userID: string): Promise<number> {
+        const userScores = await this.prismaService.userScores.findMany({
+            where: {
+                userId: userID
+            },
+            select: {
+                score: true,
+                noQuest: true
+            }
+        });
+
+        const maxedQuizes = userScores.filter(scoreRecord => scoreRecord.score === scoreRecord.noQuest);
+        return maxedQuizes.length;
+    }
+
+    async getCreatedCourses(userID: string): Promise<number> {
+        return await this.prismaService.course.count({
+            where: {
+                creatorId: userID
+            }
+        });
+    }
+    // Achievements
+    /*
+    Achivements:
+    - Number of games 1 - 1000
+    - Number of games 2 - 10000
+    - Number of friends 1 - 10
+    - Number of friends 2 - 100
+    - NUmber of created courses 1 - 10
+    - Number of created courses 2 - 100
+    - Get verification 
+    - Get 100% in quiz 1 - 10
+    - Get 100% in quiz 2 - 100
+    - Get first friend
+    */
+    async checkAchivements(userID: string) {
+        const userGames = await this.getAllUserGames(userID);
+        const userFriends = await this.getAllUserFriends(userID);
+        const userQuizes = await this.getMaxedQuizes(userID);
+        const userCourses = await this.getCreatedCourses(userID);
+        const userAchivements = [];
+        if (userGames >= 1 && userGames <= 1000) {
+            userAchivements.push('Number of games 1 - 1000');
+        }
+        if (userGames >= 2 && userGames <= 10000) {
+            userAchivements.push('Number of games 2 - 10000');
+        }
+        if (userFriends >= 1 && userFriends <= 10) {
+            userAchivements.push('Number of friends 1 - 10');
+        }
+        if (userFriends >= 2 && userFriends <= 100) {
+            userAchivements.push('Number of friends 2 - 100');
+        }
+        if (userCourses >= 1 && userCourses <= 10) {
+            userAchivements.push('Number of created courses 1 - 10');
+        }
+        if (userCourses >= 2 && userCourses <= 100) {
+            userAchivements.push('Number of created courses 2 - 100');
+        }
+        if (userQuizes >= 1 && userQuizes <= 10) {
+            userAchivements.push('Get 100% in quiz 1 - 10');
+        }
+        if (userQuizes >= 2 && userQuizes <= 100) {
+            userAchivements.push('Get 100% in quiz 2 - 100');
+        }
+        if (userFriends >= 1) {
+            userAchivements.push('Get first friend');
+        }
+        return userAchivements
+    }
+    //    async getToDataBase(userAchivements: string, userID: string): Promise<void> {
+    //         const user = await this.prismaService.user.findUnique({
+    //             where: {
+    //                 id: userID,
+    //             },
+    //         });
+    //         if (user) {
+    //             await this.prismaService.user.update({
+    //                 where: {
+    //                     id: userID,
+    //                 },
+    //                 data: {
+    //                     achivements: {
+    //                         set: userAchivements,
+    //                     },
+    //                 },
+    //    }
 }
