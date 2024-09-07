@@ -78,13 +78,15 @@ const QuizMain = ({ route, navigation }: quiz) => {
     const handleEndQuiz = async () => {
         if (userInfo == null) return;
 
-        const correctAnswers = questions.filter((question) =>
-            question.type === 'SINGLE' || question.type === 'TRUE_FALSE'
-                ? question.correct.includes(question.userAnswer[0])
-                : question.answers.every((answer) =>
-                      question.userAnswer.includes(answer)
-                  )
-        );
+        const correctAnswers = questions.filter((question) => {
+            if (question.type === 'SINGLE' || question.type === 'TRUE_FALSE') {
+                return question.correct[0] === question.userAnswer[0];
+            } else {
+                return question.correct.every((answer) =>
+                    question.userAnswer.includes(answer)
+                );
+            }
+        });
         let correct = correctAnswers.length;
         let all = questions.length;
         setStart(false);
@@ -172,11 +174,10 @@ const QuizMain = ({ route, navigation }: quiz) => {
                                 setCurrentQuestion(currentQuestion + 1);
                             }
                         }}
-                        title={`${
-                            currentQuestion == questions.length - 1
-                                ? t('end_quiz')
-                                : t('next_question')
-                        }`}
+                        title={`${currentQuestion == questions.length - 1
+                            ? t('end_quiz')
+                            : t('next_question')
+                            }`}
                     />
                     {currentQuestion != 0 && (
                         <CustomButton

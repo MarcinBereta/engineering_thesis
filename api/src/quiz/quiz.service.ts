@@ -25,7 +25,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -265,7 +265,7 @@ export class QuizService {
                 specificParameters = 'Use only text above.';
                 break;
         }
-      
+
         const completion = await this.openai.chat.completions.create({
             messages: [
                 {
@@ -305,8 +305,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' questions in the quiz.'
+                    numberOfQuestions +
+                    ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -379,26 +379,26 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            'options in total.'
+                        4 * numberOfQuestions +
+                        'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            ' options in total.'
+                        4 * numberOfQuestions +
+                        ' options in total.'
                     );
                 }
 
             if (totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
             }
 
@@ -720,7 +720,8 @@ export class QuizService {
                 quizId: addScore.quizId,
             },
         })
-
+        console.log('Number of questions: ', numberOfQuestions);
+        console.log('Score: ', addScore.score);
         return this.prismaService.quiz.update({
             where: {
                 id: addScore.quizId,
