@@ -164,6 +164,17 @@ export const dashboardDataGQL = graphql(
             getUserFriends {
                 ...FriendUserFragment
             }
+            getMostFitCourse {
+                id
+                name
+                summary
+                category
+                text {
+                    id
+                    type
+                    value
+                }
+            }
         }
     `,
     [FriendUserFragmentGQL, quizQuestionFragment]

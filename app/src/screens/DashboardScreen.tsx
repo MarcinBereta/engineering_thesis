@@ -7,6 +7,7 @@ import { Layout } from '@/components/Layout';
 import { Avatar, Icon } from '@rneui/themed';
 import { DashboardCourseSection } from '@/components/dashboard/CourseSection';
 import { DashboardQuizSection } from '@/components/dashboard/QuizSection';
+import {DashboardFitableCourseSection} from '@/components/dashboard/FitableCourseSection';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
@@ -42,7 +43,7 @@ const DashboardScreen = (props: DashboardScreen) => {
     useEffect(() => {
         setNavigationRef(props.navigation);
     }, []);
-
+    console.log(data);
     if (userInfo === null || data === undefined) {
         return null;
     }
@@ -110,6 +111,10 @@ const DashboardScreen = (props: DashboardScreen) => {
                         maxHeight: height * 0.7,
                     }}
                 >
+                    <DashboardFitableCourseSection
+                        navigation={props.navigation}
+                        course={data?.getMostFitCourse}
+                    />
                     <DashboardCourseSection
                         navigation={props.navigation}
                         courses={data?.dashboardCourses}
