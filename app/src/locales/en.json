@@ -70,10 +70,11 @@
     "save": "Save",
     "save_profile": "Save profile",
     "English": "English",
-    "Polish": "Polish",
-    "Spanish": "Spanish",
-    "France": "France",
-    "German": "German",
+    "Polish": "Polski",
+    "Spanish": "Español",
+    "France": "Français",
+    "German": "Deutsch",
+    "Chinese": "中文",
     "userSettings": "User settings",
     "language": "Language"
 }
