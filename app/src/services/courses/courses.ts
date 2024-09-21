@@ -69,6 +69,7 @@ export const getCoursesWithPaginationGQL = graphql(`
             id
             name
             summary
+            category
             text {
                 id
                 type
