@@ -534,53 +534,85 @@ export class CoursesService {
             take: 1,
         });
         try {
-            // get category with most games played by user with userID
-            const bestCategory = await this.prismaService.$queryRaw`
+            //get most popular category by user with userID from past 5 days
+            const bestCategoryFromLast5days = await this.prismaService.$queryRaw`
+            select "category" from "Course" where id in ( select "courseId" from "Quiz" where id in (
+                select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
+                )) group by "category" order by count(*) desc limit 1`;
+            // get tag with most games played in Category by user with userID from past 5 days
+            const bestTagFromLast5days = await this.prismaService.$queryRaw`
+            select "tag" from "Course" where category::text = ${bestCategoryFromLast5days[0].category} and id in ( select "courseId" from "Quiz" where id in (
+                select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
+                )) group by "tag" order by count(*) desc limit 1`;
+            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category 
+            const mostPopularCourseIdFromLast5days = await this.prismaService.$queryRaw`
+            select id  from "Course" where tag = ${bestTagFromLast5days[0].tag} and id not in ( select "courseId" from "Quiz" where id in (
+                select "quizId" from "UserScores" where "userId" = ${userID}
+                ) )order by (
+                select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
+            ) desc limit 1`;
+
+            const mostPopularCourseFromLast5days = await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    id: mostPopularCourseIdFromLast5days[0].id,
+                    verified: true,
+                }
+            });
+            if ((mostPopularCourseFromLast5days as any[]).length == 0) {
+                // get category with most games played by user with userID of all time
+                const bestCategory = await this.prismaService.$queryRaw`
             select "category" from "Course" where id in ( select "courseId" from "Quiz" where id = (
                 select "quizId" from "UserScores" where "userId" = ${userID} limit 1
                 )) group by "category" order by count(*) desc limit 1`;
-            // get tag with most games played in Category by user with userID 
-            const bestTag = await this.prismaService.$queryRaw`
+                // get tag with most games played in Category by user with userID 
+                const bestTag = await this.prismaService.$queryRaw`
             select "tag" from "Course" where category::text = ${bestCategory[0].category} and id in ( select "courseId" from "Quiz" where id = (
                 select "quizId" from "UserScores" where "userId" = ${userID} limit 1
                 )) group by "tag" order by count(*) desc limit 1`;
-            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category
-            const mostPopularCourseId = await this.prismaService.$queryRaw`
+                // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category of all time
+                const mostPopularCourseId = await this.prismaService.$queryRaw`
             select id  from "Course" where tag = ${bestTag[0].tag} and id not in ( select "courseId" from "Quiz" where id in (
                 select "quizId" from "UserScores" where "userId" = ${userID}
                 ) )order by (
                 select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
             ) desc limit 1`;
-            const mostPopularCourse = await this.prismaService.course.findMany({
-                include: {
-                    text: true,
-                },
-                where: {
-                    id: mostPopularCourseId[0].id,
-                    verified: true,
-                }
-            });
-            if ((mostPopularCourse as any[]).length == 0) {
-                const mostPopularCourseByCategoryId = await this.prismaService.$queryRaw`
+                const mostPopularCourse = await this.prismaService.course.findMany({
+                    include: {
+                        text: true,
+                    },
+                    where: {
+                        id: mostPopularCourseId[0].id,
+                        verified: true,
+                    }
+                });
+                if ((mostPopularCourse as any[]).length == 0) {
+                    const mostPopularCourseByCategoryId = await this.prismaService.$queryRaw`
                 select id from "Course" where category::text = ${bestCategory[0].category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
                     select "quizId" from "UserScores" where "userId" = ${userID}
                     ) )order by (
                     select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
                 ) desc limit 1`;
-                const mostPopularCourseByCategory = await this.prismaService.course.findMany({
-                    include: {
-                        text: true,
-                    },
-                    where: {
-                        id: mostPopularCourseByCategoryId[0].id,
-                    },
-                });
-                if ((mostPopularCourseByCategory as any[]).length == 0) {
-                    return randomCourse[0];
+                    const mostPopularCourseByCategory = await this.prismaService.course.findMany({
+                        include: {
+                            text: true,
+                        },
+                        where: {
+                            id: mostPopularCourseByCategoryId[0].id,
+                        },
+                    });
+                    if ((mostPopularCourseByCategory as any[]).length == 0) {
+                        return randomCourse;
+                    }
+                    return mostPopularCourseByCategory || randomCourse;
                 }
-                return mostPopularCourseByCategory[0] || randomCourse[0];
+                return mostPopularCourse || randomCourse;
             }
-            return mostPopularCourse || randomCourse;
+            else {
+                return mostPopularCourseFromLast5days || randomCourse;
+            }
         }
         catch (e) {
             return randomCourse;
