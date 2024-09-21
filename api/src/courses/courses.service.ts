@@ -522,7 +522,7 @@ export class CoursesService {
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;
     }
-    // have to be tested - maybe in the future this will be more complicated
+
     async getMostFitCourse(userID: string) {
         const randomCourse = await this.prismaService.course.findMany({
             include: {
@@ -534,7 +534,7 @@ export class CoursesService {
             take: 1,
         });
         try {
-            // get category iwth most games played by user with userID
+            // get category with most games played by user with userID
             const bestCategory = await this.prismaService.$queryRaw`
             select "category" from "Course" where id in ( select "courseId" from "Quiz" where id = (
                 select "quizId" from "UserScores" where "userId" = ${userID} limit 1
@@ -551,13 +551,13 @@ export class CoursesService {
                 ) )order by (
                 select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
             ) desc limit 1`;
-            console.log(mostPopularCourseId);
             const mostPopularCourse = await this.prismaService.course.findMany({
                 include: {
                     text: true,
                 },
                 where: {
-                    id: mostPopularCourseId,
+                    id: mostPopularCourseId[0].id,
+                    verified: true,
                 }
             });
             if ((mostPopularCourse as any[]).length == 0) {
@@ -572,12 +572,10 @@ export class CoursesService {
                         text: true,
                     },
                     where: {
-                        id: mostPopularCourseByCategoryId,
+                        id: mostPopularCourseByCategoryId[0].id,
                     },
                 });
-
                 if ((mostPopularCourseByCategory as any[]).length == 0) {
-                    // return random course
                     return randomCourse[0];
                 }
                 return mostPopularCourseByCategory[0] || randomCourse[0];
