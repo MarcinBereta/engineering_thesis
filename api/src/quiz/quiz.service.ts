@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
-import { Prisma } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 import { DashboardQuiz } from './dto/quiz.dashboard';
 import { QuizUpdateDto } from './dto/quiz.update';
 
@@ -784,6 +784,47 @@ export class QuizService {
                 creatorId: userID
             }
         });
+    }
+    async getNumberOfCourses(): Promise<number> {
+        return await this.prismaService.course.count();
+    }
+    async percentOfCoursesByCategory(userID: string, category: string): Promise<Number> {
+        let result = {};
+        const userScores = await this.prismaService.userScores.findMany({
+            where: {
+                userId: userID
+            },
+            select: {
+                score: true,
+                noQuest: true,
+                quizId: true
+            }
+        });
+        const uniqueUserScores = Array.from(new Map(userScores.map(item => [item.quizId, item])).values());
+        for (const score of uniqueUserScores) {
+            const quiz = await this.prismaService.quiz.findUnique({
+                where: {
+                    id: score.quizId
+                },
+                include: {
+                    course: true
+                }
+            });
+            if (quiz) {
+                if (result[quiz.course.category]) {
+                    result[quiz.course.category] += 1;
+                } else {
+                    result[quiz.course.category] = 1;
+                }
+            }
+        }
+        const courses = await this.prismaService.course.findMany({
+            where: {
+                category: category as Category,
+            }
+        });
+        const percatage = (result[category] / courses.length) * 100;
+        return percatage;
     }
     // Achievements
     /*

@@ -154,6 +154,12 @@ type Query {
   getDashboardQuizzes: [Quiz!]!
   getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
   countQuizWithPagination(pagination: PaginationDto!): CountDto!
+  getCreatedCourses: Float!
+  getAllUserGames: Float!
+  getMaxedQuizes: Float!
+  getAllUserFriends: Float!
+  getNumberOfCourses: Float!
+  percentOfCoursesByCategory(category: String!): Float!
 }
 
 input PaginationDto {

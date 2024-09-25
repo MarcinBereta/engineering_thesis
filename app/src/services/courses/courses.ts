@@ -89,12 +89,23 @@ export const getUnverifiedCoursesGQL = graphql(`
             id
             name
             summary
+            category
             text {
                 id
                 type
                 value
             }
         }
+    }
+`);
+
+export const userStatsGQL = graphql(`
+    query getUserStats {
+        getCreatedCourses
+        getAllUserGames
+        getMaxedQuizes
+        getAllUserFriends
+        getNumberOfCourses
     }
 `);
 

@@ -64,6 +64,9 @@ const DashboardScreen = (props: DashboardScreen) => {
                         source={{
                             uri: 'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
+                        onPress={() => {
+                            props.navigation.navigate('UserProfile');
+                        }}
                     />
                     <View
                         style={{

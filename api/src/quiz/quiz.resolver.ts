@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context, Float } from '@nestjs/graphql';
 import { Quiz, RecreateQuizDto } from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
@@ -7,10 +7,11 @@ import { AddScore } from './dto/addScore.dto';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 import { QuizUpdateDto } from '../quiz/dto/quiz.update';
+import { Category } from '@prisma/client';
 @Resolver(() => Quiz)
 @UseGuards(JwtAuthGuard)
 export class QuizResolver {
-    constructor(private quizService: QuizService) {}
+    constructor(private quizService: QuizService) { }
 
     @Query(() => Quiz)
     async getQuizById(@Args('id') id: string): Promise<Quiz> {
@@ -43,6 +44,35 @@ export class QuizResolver {
         @Args('pagination') pagination: PaginationDto
     ) {
         return await this.quizService.getQuizzesCountWithPagination(pagination);
+    }
+
+    @Query(() => Float)
+    async getCreatedCourses(@Context() context): Promise<number> {
+        return this.quizService.getCreatedCourses(context.req.user.id);
+    }
+
+    @Query(() => Number)
+    async getAllUserGames(@Context() context): Promise<number> {
+        return this.quizService.getAllUserGames(context.req.user.id);
+    }
+
+    @Query(() => Number)
+    async getMaxedQuizes(@Context() context): Promise<number> {
+        return this.quizService.getMaxedQuizes(context.req.user.id);
+    }
+
+    @Query(() => Number)
+    async getAllUserFriends(@Context() context): Promise<number> {
+        return this.quizService.getAllUserFriends(context.req.user.id);
+    }
+    @Query(() => Number)
+    async getNumberOfCourses(): Promise<number> {
+        return this.quizService.getNumberOfCourses();
+    }
+
+    @Query(() => Number)
+    async percentOfCoursesByCategory(@Args('category') category: string, @Context() context,): Promise<Number> {
+        return this.quizService.percentOfCoursesByCategory(context.req.user.id, category);
     }
 
     @Mutation(() => Quiz)
