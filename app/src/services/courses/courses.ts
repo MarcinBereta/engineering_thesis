@@ -106,6 +106,17 @@ export const userStatsGQL = graphql(`
         getMaxedQuizes
         getAllUserFriends
         getNumberOfCourses
+        getPercentageOfCategory{
+            MATH
+            HISTORY
+            GEOGRAPHY
+            ENGLISH
+            ART
+            SPORTS
+            SCIENCE
+            MUSIC
+            OTHER
+        }
     }
 `);
 

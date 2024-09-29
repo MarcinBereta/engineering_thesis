@@ -377,6 +377,11 @@ export class CoursesService {
 
             return { count, size: PAGINATION_SIZE };
         }
+        const count = await this.prismaService.course.count({
+            where: {
+                verified: true,
+            },
+        });
 
         const coursesCountCached = await this.cacheManager.get('courses_count');
 
@@ -386,12 +391,6 @@ export class CoursesService {
                 size: PAGINATION_SIZE,
             };
         }
-
-        const count = await this.prismaService.course.count({
-            where: {
-                verified: true,
-            },
-        });
 
         await this.cacheManager.set('courses_count', count);
 
@@ -506,7 +505,7 @@ export class CoursesService {
 
     async getDashboardCourses() {
         const cachedCourses = await this.cacheManager.get('dashboard_courses');
-        if (cachedCourses) {
+        if (cachedCourses && (cachedCourses as any[]).length == 3) {
             return cachedCourses;
         }
         const courses = await this.prismaService.course.findMany({
@@ -517,7 +516,7 @@ export class CoursesService {
             where: {
                 verified: true,
             },
-            take: 5,
+            take: 3,
         });
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;

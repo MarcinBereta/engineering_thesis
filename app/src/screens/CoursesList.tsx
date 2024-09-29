@@ -59,7 +59,6 @@ const CoursesList = (props: CoursesList) => {
     if (isLoading || data == undefined) {
         return <Text>{t('loading')}...</Text>;
     }
-
     return (
         <Layout navigation={props.navigation} icon="course">
             <Text

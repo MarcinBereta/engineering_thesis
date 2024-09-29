@@ -1,6 +1,6 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View, Button, Image, StyleSheet } from 'react-native';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';

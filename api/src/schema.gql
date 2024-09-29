@@ -133,6 +133,18 @@ type UserScore {
   createdAt: DateTime!
 }
 
+type PercentageOfCategoryDTO {
+  MATH: Float!
+  HISTORY: Float!
+  GEOGRAPHY: Float!
+  ENGLISH: Float!
+  ART: Float!
+  SPORTS: Float!
+  SCIENCE: Float!
+  MUSIC: Float!
+  OTHER: Float!
+}
+
 type Query {
   users: [User!]!
   getUsersWithPagination(pagination: PaginationDto!): [User!]!
@@ -160,6 +172,7 @@ type Query {
   getAllUserFriends: Float!
   getNumberOfCourses: Float!
   percentOfCoursesByCategory(category: String!): Float!
+  getPercentageOfCategory: PercentageOfCategoryDTO!
 }
 
 input PaginationDto {

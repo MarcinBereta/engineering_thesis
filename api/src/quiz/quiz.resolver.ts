@@ -8,6 +8,7 @@ import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 import { QuizUpdateDto } from '../quiz/dto/quiz.update';
 import { Category } from '@prisma/client';
+import { PercentageOfCategoryDTO } from './dto/percentage-of-category.dto';
 @Resolver(() => Quiz)
 @UseGuards(JwtAuthGuard)
 export class QuizResolver {
@@ -73,6 +74,12 @@ export class QuizResolver {
     @Query(() => Number)
     async percentOfCoursesByCategory(@Args('category') category: string, @Context() context,): Promise<Number> {
         return this.quizService.percentOfCoursesByCategory(context.req.user.id, category);
+    }
+
+    @Query(() => PercentageOfCategoryDTO)
+    async getPercentageOfCategory(@Context() context): Promise<PercentageOfCategoryDTO> {
+        const data = await this.quizService.getPercentageOfCategory(context.req.user.id);
+        return data as PercentageOfCategoryDTO;
     }
 
     @Mutation(() => Quiz)

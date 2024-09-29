@@ -1,8 +1,9 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
 import { AuthenticatedRootStackParamList } from './Navigator';
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { ResultOf } from 'gql.tada';
@@ -18,6 +19,7 @@ type UserProfile = NativeStackScreenProps<
 export const UserProfile = (props: UserProfile) => {
     const { userInfo } = useContext(AuthContext);
     const { t, i18n } = useTranslation();
+    const [selectedCategory, setSelectedCategory] = useState<string>('MATH');
     const { data, isLoading, refetch, isError, error } = useQuery({
         queryKey: ['stats'],
         queryFn: async () =>
@@ -30,10 +32,10 @@ export const UserProfile = (props: UserProfile) => {
                 }
             ),
     });
-    if (userInfo === null || data === undefined) {
+    if (!userInfo || !data) {
         return null;
     }
-    console.log(data);
+
     return (
         <Layout icon="dashboard" navigation={props.navigation}>
             <ScrollView contentContainerStyle={styleForProfile.container}>
@@ -48,39 +50,86 @@ export const UserProfile = (props: UserProfile) => {
 
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
-                        <Text style={styleForProfile.cardText}>{t('Role')}: {userInfo?.role}</Text>
+                        <Text style={styleForProfile.cardText}>
+                            <Text style={styleForProfile.boldText}>{t('Role')}:</Text> {userInfo?.role}
+                        </Text>
                     </View>
                 </Card>
 
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
-                        <Text style={styleForProfile.cardText}>{t('Maxed Courses')}: {data.getMaxedQuizes}</Text>
+                        <Text style={styleForProfile.cardText}>
+                            <Text style={styleForProfile.boldText}>{t('Maxed Courses')}:</Text> {data.getMaxedQuizes}
+                        </Text>
                     </View>
                 </Card>
 
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
-                        <Text style={styleForProfile.cardText}>{t('All games')}: {data.getAllUserGames}</Text>
+                        <Text style={styleForProfile.cardText}>
+                            <Text style={styleForProfile.boldText}>{t('All games')}:</Text> {data.getAllUserGames}
+                        </Text>
                     </View>
                 </Card>
 
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
-                        <Text style={styleForProfile.cardText}>{t('Friends')}: {data.getAllUserFriends}</Text>
+                        <Text style={styleForProfile.cardText}>
+                            <Text style={styleForProfile.boldText}>{t('Friends')}:</Text> {data.getAllUserFriends}
+                        </Text>
                     </View>
                 </Card>
 
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
-                        <Text style={styleForProfile.cardText}>{t('Created Courses')}: {data.getCreatedCourses}</Text>
+                        <Text style={styleForProfile.cardText}>
+                            <Text style={styleForProfile.boldText}>{t('Created Courses')}:</Text> {data.getCreatedCourses}
+                        </Text>
                     </View>
                 </Card>
 
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
-                        <Text style={styleForProfile.cardText}>{t('Verified')}: {userInfo?.verified ? t('Yes') : t('No')}</Text>
+                        <Text style={styleForProfile.cardText}>
+                            <Text style={styleForProfile.boldText}>{t('Verified')}:</Text> {userInfo?.verified ? t('Yes') : t('No')}
+                        </Text>
                     </View>
                 </Card>
+                <View style={styleForProfile.sectionContainer}>
+                    <Text style={styleForProfile.sectionTitle}>
+                        {t('Percantage of done by category')}
+                    </Text>
+                    <Text style={styleForProfile.smallerTitle}>
+                        {t('Pick category')}:
+                    </Text>
+                    <View style={styleForProfile.pickerContainer}>
+                        <RNPickerSelect
+                            onValueChange={(value) => setSelectedCategory(value)}
+                            items={[
+                                { label: t('Math'), value: 'MATH' },
+                                { label: t('History'), value: 'HISTORY' },
+                                { label: t('Geography'), value: 'GEOGRAPHY' },
+                                { label: t('English'), value: 'ENGLISH' },
+                                { label: t('Art'), value: 'ART' },
+                                { label: t('Sports'), value: 'SPORTS' },
+                                { label: t('Science'), value: 'SCIENCE' },
+                                { label: t('Music'), value: 'MUSIC' },
+                                { label: t('Other'), value: 'OTHER' },
+                            ]}
+                            value={selectedCategory}
+                            style={pickerSelectStyles}
+                            useNativeAndroidPickerStyle={false}
+                            placeholder={{ label: t('Select a category'), value: null }}
+                        />
+                    </View>
+                    <Card containerStyle={styleForProfile.card}>
+                        <View style={styleForProfile.cardContent}>
+                            <Text style={styleForProfile.cardText}>
+                                {t('Percentage')}: {data.getPercentageOfCategory[selectedCategory as keyof typeof data.getPercentageOfCategory]}
+                            </Text>
+                        </View>
+                    </Card>
+                </View>
             </ScrollView>
         </Layout>
     );
@@ -88,12 +137,17 @@ export const UserProfile = (props: UserProfile) => {
 
 const styleForProfile = StyleSheet.create({
     container: {
-        padding: 16,
+        padding: 10,
         alignItems: 'center',
+    },
+    pickerContainer: {
+        marginVertical: 10,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        fontWeight: 'bold',
     },
     header: {
         alignItems: 'center',
-        marginBottom: 24,
     },
     profileImage: {
         width: 100,
@@ -109,17 +163,58 @@ const styleForProfile = StyleSheet.create({
     email: {
         fontSize: 18,
         color: 'gray',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     card: {
         width: '100%',
-        marginBottom: 15,
+    },
+    boldText: {
+        fontWeight: 'bold',
     },
     cardContent: {
-        flexDirection: 'row',
         alignItems: 'center',
     },
     cardText: {
         fontSize: 15,
+    },
+    sectionContainer: {
+        marginVertical: 20,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 10,
+        shadowColor: '#000',
+        borderColor: '#f0f0f0',
+        alignItems: 'center',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    smallerTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        backgroundColor: '#f2f',
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 1,
+        borderRadius: 10,
+        color: 'black',
+    },
+    inputAndroid: {
+        fontSize: 16,
+        backgroundColor: 'rgba(90, 154, 230, 1)',
+        color: 'white',
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderColor: 'transparent',
+        borderWidth: 0,
+        borderRadius: 30,
     },
 });

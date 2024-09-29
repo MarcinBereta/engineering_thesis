@@ -44,7 +44,6 @@ const UserList = (props: UserList) => {
                 }
             ),
     });
-
     if (data == undefined || isLoading) {
         return <Text>Loading...</Text>;
     }
