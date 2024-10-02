@@ -5,7 +5,13 @@ import { NavigationType } from '../Navbar';
 import { ResultOf } from 'gql.tada';
 import { useTranslation } from 'react-i18next';
 import { Touchable } from 'react-native';
-
+import { AuthContext } from '@/contexts/AuthContext';
+import React, { useContext, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import request from 'graphql-request';
+import { graphqlURL } from '@/services/settings';
+import { getMyCoursesGQL } from '@/services/courses/courses';
+import Course from '../courses/course/CourseItem';
 const QuizzesListItem = ({
     navigation,
     item,
@@ -16,6 +22,16 @@ const QuizzesListItem = ({
     >['getQuizzesWithPagination'][0];
 }) => {
     const { t } = useTranslation();
+
+    const { userInfo } = useContext(AuthContext);
+    const isAuthorized = () => {
+        return (
+            userInfo?.role === 'ADMIN' ||
+            userInfo?.role === 'MODERATOR' ||
+            userInfo?.id === item.course?.creatorId
+        );
+    };
+
     return (
         <Card
             containerStyle={{
@@ -51,30 +67,33 @@ const QuizzesListItem = ({
                         <Text> {t(item.course?.category as string)}</Text>
                     </View>
                 </View>
-                <TouchableOpacity
-                    style={{
-                        width: '80%',
-                        padding: 5,
-                        backgroundColor: 'lightblue',
-                        marginLeft: '10%',
-                        borderRadius: 20,
-                        marginTop: 20,
-                    }}
-                    onPress={() => {
-                        navigation.push('QuizEdit', { quiz: item });
-                    }}
-                >
-                    <Text
-                        style={{
-                            textAlign: 'center',
-                            fontWeight: 'bold',
-                            fontSize: 15,
-                            color: 'white',
-                        }}
-                    >
-                        Edit quiz
-                    </Text>
-                </TouchableOpacity>
+                <>
+                    {isAuthorized() && (
+                        <TouchableOpacity
+                            style={{
+                                width: '80%',
+                                padding: 5,
+                                backgroundColor: 'lightblue',
+                                marginLeft: '10%',
+                                borderRadius: 20,
+                                marginTop: 20,
+                            }}
+                            onPress={() => {
+                                navigation.push('QuizEdit', { quiz: item });
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    fontSize: 15,
+                                    color: 'white',
+                                }}
+                            >
+                                Edit quiz
+                            </Text>
+                        </TouchableOpacity>
+                    )}</>
             </TouchableOpacity>
         </Card>
     );

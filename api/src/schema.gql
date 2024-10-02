@@ -75,6 +75,7 @@ type SimpleCourse {
   summary: String
   category: String!
   tag: String
+  creatorId: String
 }
 
 type Course {
@@ -83,6 +84,7 @@ type Course {
   summary: String
   category: String!
   tag: String
+  creatorId: String
   text: [CourseItem!]!
 }
 
@@ -97,6 +99,7 @@ type ExtendedCourse {
   summary: String
   category: String!
   tag: String
+  creatorId: String
   text: [CourseItem!]!
   creator: CourseCreator!
 }

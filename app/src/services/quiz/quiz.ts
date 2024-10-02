@@ -42,6 +42,7 @@ export const getQuizzesWithPaginationGQL = graphql(
                     id
                     name
                     summary
+                    creatorId
                     category
                 }
             }

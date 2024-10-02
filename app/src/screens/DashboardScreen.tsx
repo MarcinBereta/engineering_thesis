@@ -43,7 +43,6 @@ const DashboardScreen = (props: DashboardScreen) => {
     useEffect(() => {
         setNavigationRef(props.navigation);
     }, []);
-    console.log(data);
     if (userInfo === null || data === undefined) {
         return null;
     }

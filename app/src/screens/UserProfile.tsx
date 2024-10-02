@@ -1,12 +1,11 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { ResultOf } from 'gql.tada';
 import { userStatsGQL } from '@/services/courses/courses';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
@@ -47,7 +46,12 @@ export const UserProfile = (props: UserProfile) => {
                     <Text style={styleForProfile.username}>{userInfo?.username}</Text>
                     <Text style={styleForProfile.email}>{userInfo?.email}</Text>
                 </View>
-
+                <View style={styleForProfile.button}>
+                    <Button title={t('My Courses')}
+                        onPress={() => {
+                            props.navigation.navigate('MyCourses');
+                        }} />
+                </View>
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
@@ -194,6 +198,9 @@ const styleForProfile = StyleSheet.create({
     smallerTitle: {
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    button: {
+        marginVertical: 10,
     },
 });
 
