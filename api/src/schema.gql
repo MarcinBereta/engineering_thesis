@@ -181,6 +181,7 @@ type Query {
 input PaginationDto {
   page: Float!
   search: String
+  category: String
 }
 
 type Mutation {

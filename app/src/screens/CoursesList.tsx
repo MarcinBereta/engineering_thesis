@@ -9,7 +9,6 @@ import { graphqlURL } from '@/services/settings';
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '@/components/utils/Pagination';
 import { Layout } from '@/components/Layout';
-import { CustomButton } from '@/components/CustomButton';
 import { SearchBar } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
 import { CourseListItem } from '@/components/courses/list/CourseListItem';
@@ -18,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import Picker from 'react-native-picker-select';
-
 const { height } = Dimensions.get('window');
 export type Course = ResultOf<
     typeof getCoursesWithPaginationGQL
@@ -37,9 +35,9 @@ const CoursesList = (props: CoursesList) => {
     const [page, setPage] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState('');
     const debounceSearch = useDebounce(search);
-
+    const debounceCategory = useDebounce(selectedCategory);
     const { data, isLoading, refetch, isError, error } = useQuery({
-        queryKey: ['courses', page, debounceSearch],
+        queryKey: ['courses', page, debounceSearch, debounceCategory],
         queryFn: async () =>
             request(
                 graphqlURL,
@@ -48,6 +46,7 @@ const CoursesList = (props: CoursesList) => {
                     pagination: {
                         page,
                         search: debounceSearch,
+                        category: debounceCategory,
                     },
                 },
                 {
@@ -88,6 +87,8 @@ const CoursesList = (props: CoursesList) => {
                             borderRadius: 10,
                         },
                     }}
+                    value={selectedCategory}
+                    onValueChange={(value) => setSelectedCategory(value)}
                     items={[
                         { label: 'All', value: '' },
                         { label: 'History', value: 'HISTORY' },
@@ -100,8 +101,6 @@ const CoursesList = (props: CoursesList) => {
                         { label: 'Sports', value: 'SPORTS' },
                         { label: 'Other', value: 'OTHER' },
                     ]}
-                    value={selectedCategory}
-                    onValueChange={(itemValue: SetStateAction<string>) => setSelectedCategory(itemValue)}
                 />
             </View>
             <SearchBar
@@ -113,7 +112,7 @@ const CoursesList = (props: CoursesList) => {
                 }}
             />
             <FlatList
-                data={data.getCoursesWithPagination.filter(item => selectedCategory === '' || item.category === selectedCategory)}
+                data={data.getCoursesWithPagination}
                 contentContainerStyle={{ maxHeight: height * 0.6 }}
                 renderItem={({ item }) => (
                     <CourseListItem

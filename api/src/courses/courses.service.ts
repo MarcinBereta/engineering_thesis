@@ -4,7 +4,7 @@ import { CourseInput, EditCourseInput } from './dto/CourseDTO';
 import { join } from 'path';
 import { QuizService } from 'src/quiz/quiz.service';
 import { simpleUser } from 'src/auth/dto/signup-response';
-import { Moderator, Prisma } from '@prisma/client';
+import { Category, Moderator, Prisma } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
@@ -321,8 +321,8 @@ export class CoursesService {
     }
 
     async getAllCoursesWithPagination(paginationDto: PaginationDto) {
-        const { page, search } = paginationDto;
-
+        const { page, search, category } = paginationDto;
+        console.log(category)
         if (search) {
             const courses = await this.prismaService.course.findMany({
                 include: {
@@ -334,6 +334,20 @@ export class CoursesService {
                         contains: search,
                         mode: 'insensitive',
                     },
+                },
+                skip: (page - 1) * PAGINATION_SIZE,
+                take: PAGINATION_SIZE,
+            });
+            return courses;
+        }
+        if (category) {
+            const courses = await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    verified: true,
+                    category: category as Category,
                 },
                 skip: (page - 1) * PAGINATION_SIZE,
                 take: PAGINATION_SIZE,
@@ -363,7 +377,7 @@ export class CoursesService {
     }
 
     async getCoursesCount(paginationDto: PaginationDto) {
-        const { search } = paginationDto;
+        const { search, category } = paginationDto;
 
         if (search) {
             const count = await this.prismaService.course.count({
@@ -372,6 +386,16 @@ export class CoursesService {
                     name: {
                         contains: search,
                     },
+                },
+            });
+
+            return { count, size: PAGINATION_SIZE };
+        }
+        if (category) {
+            const count = await this.prismaService.course.count({
+                where: {
+                    verified: true,
+                    category: category as Category,
                 },
             });
 
