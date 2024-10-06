@@ -6,6 +6,8 @@ export class PaginationDto {
     page: number;
     @Field({ nullable: true })
     search: string;
+    @Field({ nullable: true })
+    category: string;
 }
 
 @ObjectType()

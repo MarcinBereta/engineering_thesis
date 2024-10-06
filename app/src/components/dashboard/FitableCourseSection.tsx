@@ -1,4 +1,4 @@
-import { dashboardDataGQL, getUserScoreGQL } from '@/services/quiz/quiz';
+import { dashboardDataGQL, getUserScoreGQL, mostFitableCourseGQL } from '@/services/quiz/quiz';
 import { normalizeText } from '@rneui/base';
 import { Card, Icon } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
@@ -7,13 +7,13 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { useTranslation } from 'react-i18next';
 
-export const DashboardCourseSection = ({
+export const DashboardFitableCourseSection = ({
     navigation,
-    courses,
+    course,
     userScore,
 }: {
     navigation: NavigationType;
-    courses: ResultOf<typeof dashboardDataGQL>['dashboardCourses'];
+    course: ResultOf<typeof mostFitableCourseGQL>['getMostFitCourse'];
     userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
     const { t } = useTranslation();
@@ -25,10 +25,7 @@ export const DashboardCourseSection = ({
     };
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.push('CoursesList');
-                }}
+            <View
                 style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -38,12 +35,11 @@ export const DashboardCourseSection = ({
                 }}
             >
                 <Text style={{ fontSize: normalizeText(20), paddingRight: 20 }}>
-                    {t('featured_courses')}
+                    {t('fitable_course')}
                 </Text>
-                <Icon type="font-awesome" name="arrow-right" size={30} />
-            </TouchableOpacity>
+            </View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {courses.map((c) => (
+                {course.map((c: any) => (
                     <TouchableOpacity
                         onPress={() => {
                             navigation.push('course', { course: c });
@@ -61,9 +57,6 @@ export const DashboardCourseSection = ({
                                 )}
                             </Card.Title>
                             <Card.Divider />
-                            <Card.FeaturedSubtitle>
-                                {c.creator.username}
-                            </Card.FeaturedSubtitle>
                         </Card>
                     </TouchableOpacity>
                 ))}

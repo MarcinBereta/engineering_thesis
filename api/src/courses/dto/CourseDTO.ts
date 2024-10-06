@@ -12,6 +12,8 @@ export class SimpleCourse {
     category: Category;
     @Field({ nullable: true })
     tag: string;
+    @Field({ nullable: true })
+    creatorId: string;
 }
 
 @ObjectType()

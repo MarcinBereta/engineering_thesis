@@ -75,6 +75,7 @@ type SimpleCourse {
   summary: String
   category: String!
   tag: String
+  creatorId: String
 }
 
 type Course {
@@ -83,6 +84,7 @@ type Course {
   summary: String
   category: String!
   tag: String
+  creatorId: String
   text: [CourseItem!]!
 }
 
@@ -97,6 +99,7 @@ type ExtendedCourse {
   summary: String
   category: String!
   tag: String
+  creatorId: String
   text: [CourseItem!]!
   creator: CourseCreator!
 }
@@ -133,6 +136,27 @@ type UserScore {
   createdAt: DateTime!
 }
 
+type UserScoreExtended {
+  userId: String!
+  quizId: String!
+  score: Float!
+  noQuest: Float!
+  createdAt: DateTime!
+  quizName: String!
+}
+
+type PercentageOfCategoryDTO {
+  MATH: Float!
+  HISTORY: Float!
+  GEOGRAPHY: Float!
+  ENGLISH: Float!
+  ART: Float!
+  SPORTS: Float!
+  SCIENCE: Float!
+  MUSIC: Float!
+  OTHER: Float!
+}
+
 type Query {
   users: [User!]!
   getUsersWithPagination(pagination: PaginationDto!): [User!]!
@@ -146,6 +170,7 @@ type Query {
   dashboardCourses: [ExtendedCourse!]!
   unVerifiedCourses: [Course!]!
   getCoursesWithPagination(pagination: PaginationDto!): [Course!]!
+  getMostFitCourse: [Course!]!
   countCoursesWithPagination(pagination: PaginationDto!): CountDto!
   MyCourses: [Course!]!
   getQuizById(id: String!): Quiz!
@@ -153,11 +178,20 @@ type Query {
   getDashboardQuizzes: [Quiz!]!
   getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
   countQuizWithPagination(pagination: PaginationDto!): CountDto!
+  getUserScore: [UserScoreExtended!]!
+  getCreatedCourses: Float!
+  getAllUserGamesCount: Float!
+  getMaxedQuizesCount: Float!
+  getFriendsCount: Float!
+  getNumberOfCourses: Float!
+  percentOfCoursesByCategory(category: String!): Float!
+  getPercentageOfCategory: PercentageOfCategoryDTO!
 }
 
 input PaginationDto {
   page: Float!
   search: String
+  category: String
 }
 
 type Mutation {

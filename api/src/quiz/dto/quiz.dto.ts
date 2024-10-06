@@ -46,6 +46,11 @@ export class UserScore {
     @Field()
     createdAt: Date;
 }
+@ObjectType()
+export class UserScoreExtended extends UserScore {
+    @Field()
+    quizName: string;
+}
 
 @InputType()
 export class RecreateQuizDto {

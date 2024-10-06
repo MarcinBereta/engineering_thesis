@@ -42,6 +42,7 @@ export const getQuizzesWithPaginationGQL = graphql(
                     id
                     name
                     summary
+                    creatorId
                     category
                 }
             }
@@ -113,6 +114,18 @@ export const updateQuizGQL = graphql(
     `,
     [quizQuestionFragment]
 );
+export const getUserScoreGQL = graphql(
+    `
+        query getUserScore {
+            getUserScore {
+                quizId
+                score
+                noQuest
+                quizName
+            }
+        }
+    `,
+);
 
 export const addQUizResultGQL = graphql(
     `
@@ -129,6 +142,23 @@ export const addQUizResultGQL = graphql(
     `,
     [quizQuestionFragment]
 );
+
+export const mostFitableCourseGQL = graphql(
+    `
+    query getMostFitCourse {
+        getMostFitCourse{
+            id
+            name
+            summary
+            category
+            text {
+                id
+                type
+                value
+            }
+        }
+    }
+    `);
 
 export const dashboardDataGQL = graphql(
     `

@@ -1,18 +1,28 @@
 import { NavigationType } from '@/components/Navbar';
 import { Course } from '@/screens/CoursesList';
-import { Card, Text } from '@rneui/themed';
+import { getUserScoreGQL } from '@/services/quiz/quiz';
+import { Card, Icon, Text } from '@rneui/themed';
+import { ResultOf } from 'gql.tada';
 import React from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export const CourseListItem = ({
     course,
     navigation,
-    children
+    children,
+    userScore,
 }: {
     course: Course;
     navigation: NavigationType;
-    children?:React.ReactNode | React.ReactNode[]
+    children?: React.ReactNode | React.ReactNode[]
+    userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
+    const hasCompletedQuiz = (courseName: string) => {
+        if (userScore === undefined) {
+            return false;
+        }
+        return userScore.some((score) => score.quizName === courseName) || false;
+    };
     return (
         <TouchableOpacity
             onPress={() => {
@@ -28,9 +38,18 @@ export const CourseListItem = ({
                     borderRadius: 10,
                 }}
             >
-                <Card.Title>{course.name}</Card.Title>
+                <Card.Title>{course.name}
+                    {hasCompletedQuiz(course.name) && (
+                        <Icon
+                            type="font-awesome"
+                            name="check"
+                            size={15}
+                            color="green"
+                        />
+                    )}
+                </Card.Title>
                 <Card.Divider width={2} />
-                <Text style={{marginVertical:10}}>{course.summary}</Text>
+                <Text style={{ marginVertical: 10 }}>{course.summary}</Text>
                 {children}
             </Card>
         </TouchableOpacity>

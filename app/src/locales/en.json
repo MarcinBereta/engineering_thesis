@@ -3,6 +3,7 @@
     "featured_courses": "Featured courses",
     "friends": "Friends",
     "featured_quizzes": "Featured quizzes",
+    "fitable_course": "Best course for you",
     "logout": "Logout",
     "create_course": "Create course",
     "verify_account": "Verify account",
@@ -69,10 +70,10 @@
     "save": "Save",
     "save_profile": "Save profile",
     "English": "English",
-    "Polish": "Polish",
-    "Spanish": "Spanish",
-    "France": "France",
-    "German": "German",
+    "Polish": "Polski",
+    "Spanish": "Español",
+    "France": "Français",
+    "German": "Deutsch",
     "userSettings": "User settings",
     "language": "Language"
 }

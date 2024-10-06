@@ -27,6 +27,7 @@ import { ResultOf } from 'gql.tada';
 import { quizQuestionFragment } from '@/services/quiz/quiz';
 import { UserPage } from './User';
 import { UserSettings } from './UserSettings';
+import { UserProfile } from './UserProfile';
 import QuizEdit from './QuizEdit';
 
 const Stack = createNativeStackNavigator();
@@ -88,9 +89,10 @@ export type AuthenticatedRootStackParamList = {
     VerifyUsers: undefined;
     VerifyAccount: undefined;
     UserSettings: undefined;
+    UserProfile: undefined;
 };
 
-const Navigator = ({}: {}) => {
+const Navigator = ({ }: {}) => {
     const { userInfo, refreshLoading } = useContext(AuthContext);
     const AuthenticatedStack =
         createNativeStackNavigator<AuthenticatedRootStackParamList>();
@@ -174,6 +176,10 @@ const Navigator = ({}: {}) => {
                         <AuthenticatedStack.Screen
                             component={UserSettings}
                             name="UserSettings"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={UserProfile}
+                            name="UserProfile"
                         />
                         <AuthenticatedStack.Screen
                             component={UserList}

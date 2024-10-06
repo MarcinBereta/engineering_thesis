@@ -69,6 +69,7 @@ export const getCoursesWithPaginationGQL = graphql(`
             id
             name
             summary
+            category
             text {
                 id
                 type
@@ -88,11 +89,33 @@ export const getUnverifiedCoursesGQL = graphql(`
             id
             name
             summary
+            category
             text {
                 id
                 type
                 value
             }
+        }
+    }
+`);
+
+export const userStatsGQL = graphql(`
+    query getUserStats {
+        getCreatedCourses
+        getAllUserGamesCount
+        getMaxedQuizesCount
+        getFriendsCount
+        getNumberOfCourses
+        getPercentageOfCategory{
+            MATH
+            HISTORY
+            GEOGRAPHY
+            ENGLISH
+            ART
+            SPORTS
+            SCIENCE
+            MUSIC
+            OTHER
         }
     }
 `);
