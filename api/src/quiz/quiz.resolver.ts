@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Context, Float } from '@nestjs/graphql';
-import { Quiz, RecreateQuizDto } from './dto/quiz.dto';
+import { Quiz, RecreateQuizDto, UserScore, UserScoreExtended } from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
@@ -46,25 +46,28 @@ export class QuizResolver {
     ) {
         return await this.quizService.getQuizzesCountWithPagination(pagination);
     }
-
+    @Query(() => [UserScoreExtended])
+    async getUserScore(@Context() context): Promise<any[]> {
+        return this.quizService.getUserScore(context.req.user.id);
+    }
     @Query(() => Float)
     async getCreatedCourses(@Context() context): Promise<number> {
         return this.quizService.getCreatedCourses(context.req.user.id);
     }
 
     @Query(() => Number)
-    async getAllUserGames(@Context() context): Promise<number> {
-        return this.quizService.getAllUserGames(context.req.user.id);
+    async getAllUserGamesCount(@Context() context): Promise<number> {
+        return this.quizService.getAllUserGamesCount(context.req.user.id);
     }
 
     @Query(() => Number)
-    async getMaxedQuizes(@Context() context): Promise<number> {
-        return this.quizService.getMaxedQuizes(context.req.user.id);
+    async getMaxedQuizesCount(@Context() context): Promise<number> {
+        return this.quizService.getMaxedQuizesCount(context.req.user.id);
     }
 
     @Query(() => Number)
-    async getAllUserFriends(@Context() context): Promise<number> {
-        return this.quizService.getAllUserFriends(context.req.user.id);
+    async getFriendsCount(@Context() context): Promise<number> {
+        return this.quizService.getFriendsCount(context.req.user.id);
     }
     @Query(() => Number)
     async getNumberOfCourses(): Promise<number> {

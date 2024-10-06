@@ -136,6 +136,15 @@ type UserScore {
   createdAt: DateTime!
 }
 
+type UserScoreExtended {
+  userId: String!
+  quizId: String!
+  score: Float!
+  noQuest: Float!
+  createdAt: DateTime!
+  quizName: String!
+}
+
 type PercentageOfCategoryDTO {
   MATH: Float!
   HISTORY: Float!
@@ -169,10 +178,11 @@ type Query {
   getDashboardQuizzes: [Quiz!]!
   getQuizzesWithPagination(pagination: PaginationDto!): [Quiz!]!
   countQuizWithPagination(pagination: PaginationDto!): CountDto!
+  getUserScore: [UserScoreExtended!]!
   getCreatedCourses: Float!
-  getAllUserGames: Float!
-  getMaxedQuizes: Float!
-  getAllUserFriends: Float!
+  getAllUserGamesCount: Float!
+  getMaxedQuizesCount: Float!
+  getFriendsCount: Float!
   getNumberOfCourses: Float!
   percentOfCoursesByCategory(category: String!): Float!
   getPercentageOfCategory: PercentageOfCategoryDTO!

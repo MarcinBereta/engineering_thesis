@@ -1,5 +1,5 @@
 import { ResultOf } from '@/graphql';
-import { dashboardDataGQL } from '@/services/quiz/quiz';
+import { dashboardDataGQL, getUserScoreGQL } from '@/services/quiz/quiz';
 import { normalizeText } from '@rneui/base';
 import { Card, Icon } from '@rneui/themed';
 import { Text, View } from 'react-native';
@@ -10,11 +10,33 @@ import { useTranslation } from 'react-i18next';
 export const DashboardQuizSection = ({
     navigation,
     quizzes,
+    userScore,
 }: {
     navigation: NavigationType;
     quizzes: ResultOf<typeof dashboardDataGQL>['getDashboardQuizzes'];
+    userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
     const { t } = useTranslation();
+    const hasCompletedQuiz = (quizName: string) => {
+        if (userScore === undefined) {
+            return false;
+        }
+        return userScore.some((score) => score.quizName === quizName) || false;
+    };
+    const getResultOfQuiz = (quizName: string) => {
+        if (userScore === undefined) {
+            return '';
+        }
+        const quizResult = userScore.find(score => score.quizName === quizName);
+        if (quizResult === undefined) {
+            return '';
+        }
+
+        const { score, noQuest } = quizResult;
+        return `${score}/${noQuest}`;
+
+    };
+
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
             <TouchableOpacity
@@ -42,7 +64,25 @@ export const DashboardQuizSection = ({
                         }}
                     >
                         <Card>
-                            <Card.Title>{q.name}</Card.Title>
+                            <Card.Title>{q.name}
+                                {hasCompletedQuiz(q.name) && (
+                                    <Icon
+                                        type="font-awesome"
+                                        name="check"
+                                        size={15}
+                                        color="green" />
+                                )}
+                            </Card.Title>
+                            <Card.Divider />
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    fontSize: 14,
+                                    color: 'blue',
+                                }}
+
+                            >{getResultOfQuiz(q.name)}</Text>
                         </Card>
                     </TouchableOpacity>
                 ))}

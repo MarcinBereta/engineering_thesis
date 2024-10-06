@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import Picker from 'react-native-picker-select';
+import { getUserScoreGQL } from '@/services/quiz/quiz';
 const { height } = Dimensions.get('window');
 export type Course = ResultOf<
     typeof getCoursesWithPaginationGQL
@@ -54,6 +55,27 @@ const CoursesList = (props: CoursesList) => {
                 }
             ),
     });
+
+    const { data: scoresData } = useQuery({
+        queryKey: ['UserScore'],
+        queryFn: async () =>
+            request(
+                graphqlURL,
+                getUserScoreGQL,
+                {},
+                {
+                    Authorization: 'Bearer ' + userInfo?.token,
+                }
+            )
+    });
+
+    if (userInfo === null || data === undefined) {
+        return null;
+    }
+    if (scoresData === undefined) {
+        return null;
+    }
+
 
     if (isLoading || data == undefined) {
         return <Text>{t('loading')}...</Text>;
@@ -118,6 +140,7 @@ const CoursesList = (props: CoursesList) => {
                     <CourseListItem
                         course={item}
                         navigation={props.navigation}
+                        userScore={scoresData.getUserScore}
                     />
                 )}
             />

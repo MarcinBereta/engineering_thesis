@@ -5,7 +5,7 @@ import { useContext, useState } from 'react';
 import { QuizQuestion } from '../components/quiz/QuizQuestion';
 import { AuthContext } from '../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { addQUizResultGQL, quizQuestionFragment } from '@/services/quiz/quiz';
 import { ResultOf, VariablesOf, readFragment } from '@/graphql';
@@ -37,7 +37,7 @@ const QuizMain = ({ route, navigation }: quiz) => {
     const { t } = useTranslation();
     const { userInfo, socket } = useContext(AuthContext);
     const [friendSelect, setFriendSelect] = useState(false);
-
+    const queryClient = useQueryClient();
     const { data, isLoading, refetch, error } = useQuery({
         queryKey: ['friendsList'],
         queryFn: async () =>
@@ -56,7 +56,11 @@ const QuizMain = ({ route, navigation }: quiz) => {
             request(graphqlURL, addQUizResultGQL, data, {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
-    });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['MostFitableCourse'] });
+            queryClient.invalidateQueries({ queryKey: ['UserScore'] });
+        }
+    })
 
     const { quiz } = route.params;
     const [questions, setQuestions] = useState<extendedQuestion[]>(() => {
@@ -101,6 +105,8 @@ const QuizMain = ({ route, navigation }: quiz) => {
                 score: correctAnswers.length,
             },
         });
+        queryClient.invalidateQueries({ queryKey: ['courses'] });
+        queryClient.invalidateQueries({ queryKey: ['UserScore'] });
         navigation.navigate('QuizResult', { score: correct, total: all });
     };
 

@@ -102,9 +102,9 @@ export const getUnverifiedCoursesGQL = graphql(`
 export const userStatsGQL = graphql(`
     query getUserStats {
         getCreatedCourses
-        getAllUserGames
-        getMaxedQuizes
-        getAllUserFriends
+        getAllUserGamesCount
+        getMaxedQuizesCount
+        getFriendsCount
         getNumberOfCourses
         getPercentageOfCategory{
             MATH

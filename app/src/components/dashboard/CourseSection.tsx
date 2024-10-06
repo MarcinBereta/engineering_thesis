@@ -1,4 +1,4 @@
-import { dashboardDataGQL } from '@/services/quiz/quiz';
+import { dashboardDataGQL, getUserScoreGQL } from '@/services/quiz/quiz';
 import { normalizeText } from '@rneui/base';
 import { Card, Icon } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
@@ -10,12 +10,19 @@ import { useTranslation } from 'react-i18next';
 export const DashboardCourseSection = ({
     navigation,
     courses,
+    userScore,
 }: {
     navigation: NavigationType;
     courses: ResultOf<typeof dashboardDataGQL>['dashboardCourses'];
+    userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
     const { t } = useTranslation();
-
+    const hasCompletedQuiz = (courseName: string) => {
+        if (userScore === undefined) {
+            return false;
+        }
+        return userScore.some((score) => score.quizName === courseName) || false;
+    };
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
             <TouchableOpacity
@@ -43,7 +50,16 @@ export const DashboardCourseSection = ({
                         }}
                     >
                         <Card>
-                            <Card.Title>{c.name}</Card.Title>
+                            <Card.Title>{c.name}
+                                {hasCompletedQuiz(c.name) && (
+                                    <Icon
+                                        type="font-awesome"
+                                        name="check"
+                                        size={15}
+                                        color="green"
+                                    />
+                                )}
+                            </Card.Title>
                             <Card.Divider />
                             <Card.FeaturedSubtitle>
                                 {c.creator.username}

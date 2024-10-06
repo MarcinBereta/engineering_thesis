@@ -545,146 +545,207 @@ export class CoursesService {
         return courses;
     }
 
-    async getMostFitCourse(userID: string) {
-        let randomCourse: any[];
+
+    async getRandomCourseNotPlayed(userID: string) {
         const randomCourseNotPlayedId = await this.prismaService.$queryRaw`
         select id from "Course" where id not in ( select "courseId" from "Quiz" where id in (
             select "quizId" from "UserScores" where "userId" = ${userID}
             ) )order by (
             select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
         ) desc limit 1`;
-        try {
-            randomCourse = await this.prismaService.course.findMany({
-                include: {
-                    text: true,
-                },
-                where: {
-                    id: randomCourseNotPlayedId[0].id,
-                    verified: true,
-                },
-                take: 1,
-            });
-        } catch (e) {
-            console.log("Failed to find random course")
-            const randomId = await this.prismaService.$queryRaw`select id from "Course" order by random() limit 1`
-            randomCourse = await this.prismaService.course.findMany({
-                include: {
-                    text: true,
-                },
-                where: {
-                    verified: true,
-                    id: randomId[0].id,
-                },
-                take: 1,
-            });
-        }
-        try {
-            //get most popular category by user with userID from past 5 days
-            const bestCategoryFromLast5days = await this.prismaService.$queryRaw`
-            select "category" from "Course" where id in ( select "courseId" from "Quiz" where id in (
-                select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
-                )) group by "category" order by count(*) desc limit 1`;
-            // get tag with most games played in Category by user with userID from past 5 days
-            const bestTagFromLast5days = await this.prismaService.$queryRaw`
-            select "tag" from "Course" where category::text = ${bestCategoryFromLast5days[0].category} and id in ( select "courseId" from "Quiz" where id in (
-                select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
-                )) group by "tag" order by count(*) desc limit 1`;
-            if ((bestTagFromLast5days as any[]).length == 0) {
-                const mostPopularCourseByCategoryIdFromLast5days = await this.prismaService.$queryRaw`
-                select id from "Course" where category::text = ${bestCategoryFromLast5days[0].category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
+
+        const randomCourse = await this.prismaService.course.findMany({
+            include: {
+                text: true,
+            },
+            where: {
+                id: randomCourseNotPlayedId[0].id,
+                verified: true,
+            },
+            take: 1,
+        });
+        return randomCourse;
+    }
+
+    async getRandomCourse(userID: string) {
+        const randomId = await this.prismaService.$queryRaw`select id from "Course" order by random() limit 1`
+        const randomCourse = await this.prismaService.course.findMany({
+            include: {
+                text: true,
+            },
+            where: {
+                verified: true,
+                id: randomId[0].id,
+            },
+            take: 1,
+        });
+        return randomCourse;
+    }
+
+    async getBestCategoryFromLast5days(userID: string) {
+        return await this.prismaService.$queryRaw`
+        select "category" from "Course" where id in ( select "courseId" from "Quiz" where id in (
+            select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
+            )) group by "category" order by count(*) desc limit 1`;
+    }
+
+    async getBestTagFromLast5days(userID: string, category: string) {
+        return await this.prismaService.$queryRaw`
+        select "tag" from "Course" where category::text = ${category} and id in ( select "courseId" from "Quiz" where id in (
+            select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
+            )) group by "tag" order by count(*) desc limit 1`;
+    }
+
+    async mostPopularCourseByCategoryFromLast5days(userID: string, category: string) {
+        const mostPopularCourseByCategoryIdFromLast5days = await this.prismaService.$queryRaw`
+                select id from "Course" where category::text = ${category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
                     select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
                     ) )order by (
                     select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
                 ) desc limit 1`;
-                if ((mostPopularCourseByCategoryIdFromLast5days as any[]).length != 0) {
-                    const mostPopularCourseByCategoryFromLast5days = await this.prismaService.course.findMany({
-                        include: {
-                            text: true,
-                        },
-                        where: {
-                            id: mostPopularCourseByCategoryIdFromLast5days[0].id,
-                        },
-                    });
-                    return mostPopularCourseByCategoryFromLast5days;
-                }
-            }
-            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category 
-            const mostPopularCourseIdFromLast5days = await this.prismaService.$queryRaw`
-            select id  from "Course" where tag = ${bestTagFromLast5days[0].tag} and id not in ( select "courseId" from "Quiz" where id in (
-                select "quizId" from "UserScores" where "userId" = ${userID}
-                ) )order by (
-                select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
-            ) desc limit 1`;
-
-            const mostPopularCourseFromLast5days = await this.prismaService.course.findMany({
+        if ((mostPopularCourseByCategoryIdFromLast5days as any[]).length != 0) {
+            const mostPopularCourseByCategoryFromLast5days = await this.prismaService.course.findMany({
                 include: {
                     text: true,
                 },
                 where: {
-                    id: mostPopularCourseIdFromLast5days[0].id,
+                    id: mostPopularCourseByCategoryIdFromLast5days[0].id,
+                },
+            });
+            return mostPopularCourseByCategoryFromLast5days;
+        }
+        else {
+            return null;
+        }
+    }
+
+    async mostPopularCourseFromLast5days(userId: string, tag: string) {
+        const mostPopularCourseIdFromLast5days = await this.prismaService.$queryRaw`
+            select id  from "Course" where tag = ${tag} and id not in ( select "courseId" from "Quiz" where id in (
+                select "quizId" from "UserScores" where "userId" = ${userId}
+                ) )order by (
+                select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
+            ) desc limit 1`;
+
+        const mostPopularCourseFromLast5days = await this.prismaService.course.findMany({
+            include: {
+                text: true,
+            },
+            where: {
+                id: mostPopularCourseIdFromLast5days[0].id,
+                verified: true,
+            }
+        });
+        return mostPopularCourseFromLast5days;
+    }
+
+    async getBestCategory(userID: string) {
+        return await this.prismaService.$queryRaw`
+        select "category" from "Course" where id in ( select "courseId" from "Quiz" where id = (
+            select "quizId" from "UserScores" where "userId" = ${userID} limit 1
+            )) group by "category" order by count(*) desc limit 1`;
+    }
+
+    async getBestTag(userID: string, category: string) {
+        await this.prismaService.$queryRaw`
+    select "tag" from "Course" where category::text = ${category} and id in ( select "courseId" from "Quiz" where id = (
+        select "quizId" from "UserScores" where "userId" = ${userID} limit 1
+        )) group by "tag" order by count(*) desc limit 1`;
+    }
+
+    async getMostPopularCourseByCategory(userID: string, category: string) {
+        const mostPopularCourseByCategoryId = await this.prismaService.$queryRaw`
+                select id from "Course" where category::text = ${category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
+                    select "quizId" from "UserScores" where "userId" = ${userID}
+                    ) )order by (
+                    select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
+                ) desc limit 1`;
+        if ((mostPopularCourseByCategoryId as any[]).length != 0) {
+            const mostPopularCourseByCategory = await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    id: mostPopularCourseByCategoryId[0].id,
+                },
+            });
+            return mostPopularCourseByCategory;
+        }
+        else {
+            return null;
+        }
+    }
+
+    async getMostPopularCourse(userId: string, tag: string) {
+        const mostPopularCourseId = await this.prismaService.$queryRaw`
+            select id  from "Course" where tag = ${tag} and id not in ( select "courseId" from "Quiz" where id in (
+                select "quizId" from "UserScores" where "userId" = ${userId}
+                ) )order by (
+                select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
+            ) desc limit 1`;
+        if ((mostPopularCourseId as any[]).length != 0) {
+            const mostPopularCourse = await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    id: mostPopularCourseId[0].id,
                     verified: true,
                 }
             });
+            return mostPopularCourse;
+        }
+        else {
+            return null;
+        }
+    }
+    async getMostFitCourse(userID: string) {
+        let randomCourse: any[];
+        try {
+            randomCourse = await this.getRandomCourseNotPlayed(userID);
+        } catch (e) {
+            console.log("Failed to find random course")
+            randomCourse = await this.getRandomCourse(userID);
+        }
+        try {
+            //get most popular category by user with userID from past 5 days
+            const bestCategoryFromLast5days = await this.getBestCategoryFromLast5days(userID);
+            // get tag with most games played in Category by user with userID from past 5 days
+            const bestTagFromLast5days = await this.getBestTagFromLast5days(userID, bestCategoryFromLast5days[0].category);
+            if ((bestTagFromLast5days as any[]).length == 0) {
+                const mostPopularCourseByCategoryFromLast5days = await this.mostPopularCourseByCategoryFromLast5days(userID, bestCategoryFromLast5days[0].category);
+                if (mostPopularCourseByCategoryFromLast5days != null) {
+                    return mostPopularCourseByCategoryFromLast5days;
+                }
+            }
+            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category 
+            const mostPopularCourseFromLast5days = await this.mostPopularCourseFromLast5days(userID, bestCategoryFromLast5days[0].tag)
             return mostPopularCourseFromLast5days;
         } catch (e) {
             console.log("Failed to find most popular course from last 5 days")
         }
         try {
             // get category with most games played by user with userID of all time
-            const bestCategory = await this.prismaService.$queryRaw`
-            select "category" from "Course" where id in ( select "courseId" from "Quiz" where id = (
-                select "quizId" from "UserScores" where "userId" = ${userID} limit 1
-                )) group by "category" order by count(*) desc limit 1`;
-            if ((bestCategory as any[]).length == 0) {
+            const bestCategory = this.getBestCategory(userID);
+            if ((bestCategory as unknown as any[]).length == 0) {
                 return randomCourse;
             }
             console.log(`${bestCategory[0].category}`)
             // get tag with most games played in Category by user with userID 
-            const bestTag = await this.prismaService.$queryRaw`
-            select "tag" from "Course" where category::text = ${bestCategory[0].category} and id in ( select "courseId" from "Quiz" where id = (
-                select "quizId" from "UserScores" where "userId" = ${userID} limit 1
-                )) group by "tag" order by count(*) desc limit 1`;
-            console.log(`${bestTag[0].tag}`)
-            if ((bestTag as any[]).length == 0) {
-                const mostPopularCourseByCategoryId = await this.prismaService.$queryRaw`
-                select id from "Course" where category::text = ${bestCategory[0].category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
-                    select "quizId" from "UserScores" where "userId" = ${userID}
-                    ) )order by (
-                    select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
-                ) desc limit 1`;
-                if ((mostPopularCourseByCategoryId as any[]).length != 0) {
-                    const mostPopularCourseByCategory = await this.prismaService.course.findMany({
-                        include: {
-                            text: true,
-                        },
-                        where: {
-                            id: mostPopularCourseByCategoryId[0].id,
-                        },
-                    });
-                    return mostPopularCourseByCategory;
+            const bestTag = this.getBestTag(userID, bestCategory[0].category);
+            if ((bestTag as unknown as any[]).length == 0) {
+                const mostPopularCourseByCategory = await this.getMostPopularCourseByCategory(userID, bestCategory[0].category);
+                if (mostPopularCourseByCategory == null) {
+                    return randomCourse;
                 }
                 return randomCourse;
             }
             // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category of all time
-            const mostPopularCourseId = await this.prismaService.$queryRaw`
-            select id  from "Course" where tag = ${bestTag[0].tag} and id not in ( select "courseId" from "Quiz" where id in (
-                select "quizId" from "UserScores" where "userId" = ${userID}
-                ) )order by (
-                select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
-            ) desc limit 1`;
-            if ((mostPopularCourseId as any[]).length != 0) {
-                const mostPopularCourse = await this.prismaService.course.findMany({
-                    include: {
-                        text: true,
-                    },
-                    where: {
-                        id: mostPopularCourseId[0].id,
-                        verified: true,
-                    }
-                });
-                return mostPopularCourse;
+            const mostPopularCourse = await this.getMostPopularCourse(userID, bestCategory[0].tag);
+            if (mostPopularCourse == null) {
+                return randomCourse;
             }
-            return randomCourse;
+            return mostPopularCourse;
         }
         catch (e) {
             return randomCourse;

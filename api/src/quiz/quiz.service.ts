@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Quiz } from './dto/quiz.dto';
+import { Quiz, UserScore } from './dto/quiz.dto';
 import { AddScore } from './dto/addScore.dto';
 import OpenAI from 'openai';
 import { Cache } from 'cache-manager';
@@ -17,6 +17,7 @@ enum QuizOptions {
     MULTIPLE_CHOICES,
     TRUE_FALSE,
 }
+const categories = ['MATH', 'HISTORY', 'GEOGRAPHY', 'ENGLISH', 'ART', 'SPORTS', 'SCIENCE', 'MUSIC', 'OTHER'];
 @Injectable()
 export class QuizService {
     private openai = new OpenAI({
@@ -55,7 +56,6 @@ export class QuizService {
         const rawQuery = Prisma.sql`select q.id, q.name, c.category from "Quiz" q inner join "Course" C on q."courseId" = C.id order by (select count(*) as count from "UserScores" u where u."quizId"  = q.id) desc limit 5`;
         const quizzesRaw: DashboardQuiz[] =
             await this.prismaService.$queryRaw(rawQuery);
-
         const quizzes = await this.prismaService.quiz.findMany({
             where: {
                 id: {
@@ -69,6 +69,7 @@ export class QuizService {
             },
             take: 3,
         });
+
         return quizzes;
     }
 
@@ -757,6 +758,42 @@ export class QuizService {
             },
         });
     }
+    async getUserScore(userId: string): Promise<any[]> {
+        const scores = await this.prismaService.userScores.findMany({
+            where: {
+                userId: userId,
+            },
+            orderBy: {
+                score: 'desc',
+            },
+        });
+        const quizIds = scores.map(score => score.quizId);
+        const quizzes = await this.prismaService.quiz.findMany({
+            where: {
+                id: { in: quizIds },
+            },
+        });
+        const quizMap = new Map<string, string>();
+        quizzes.forEach(quiz => {
+            quizMap.set(quiz.id, quiz.name);
+        });
+        const bestScoresMap = new Map<string, any>();
+
+        scores.forEach(score => {
+            if (!bestScoresMap.has(score.quizId)) {
+                bestScoresMap.set(score.quizId, {
+                    userId: score.userId,
+                    quizId: score.quizId,
+                    quizName: quizMap.get(score.quizId) || 'Unknown',
+                    score: score.score,
+                    noQuest: score.noQuest
+                });
+            }
+        });
+        console.log(Array.from(bestScoresMap.values()))
+        return Array.from(bestScoresMap.values());
+    }
+
     // Stats
     /*
     Stats:
@@ -765,21 +802,21 @@ export class QuizService {
     - Number of friends
     - Number of created quizes
     */
-    async getAllUserGames(userID: string): Promise<number> {
+    async getAllUserGamesCount(userID: string): Promise<number> {
         return await this.prismaService.userScores.count({
             where: {
                 userId: userID
             }
         });
     }
-    async getAllUserFriends(userID: string): Promise<number> {
+    async getFriendsCount(userID: string): Promise<number> {
         return await this.prismaService.friends.count({
             where: {
                 userId: userID
             }
         });
     }
-    async getMaxedQuizes(userID: string): Promise<number> {
+    async getMaxedQuizesCount(userID: string): Promise<number> {
         const userScores = await this.prismaService.userScores.findMany({
             where: {
                 userId: userID
@@ -855,8 +892,6 @@ export class QuizService {
             MUSIC: 0,
             OTHER: 0
         };
-        const categories = ['MATH', 'HISTORY', 'GEOGRAPHY', 'ENGLISH', 'ART', 'SPORTS', 'SCIENCE', 'MUSIC', 'OTHER'];
-
         for (const category of categories) {
             result[category] = await this.percentOfCoursesByCategory(userId, category) as number || 0;
         }
@@ -888,8 +923,8 @@ export class QuizService {
         return user.verified;
     }
     async checkAchivements(userID: string): Promise<string[]> {
-        const userGames = await this.getAllUserGames(userID);
-        const userFriends = await this.getAllUserFriends(userID);
+        const userGames = await this.getAllUserGamesCount(userID);
+        const userFriends = await this.getFriendsCount(userID);
         const userCourses = await this.getCreatedCourses(userID);
         const userAchivements = [];
         if (userGames >= 1 && userGames <= 1000) {

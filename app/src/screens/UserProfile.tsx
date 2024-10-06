@@ -63,7 +63,7 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Maxed Courses')}:</Text> {data.getMaxedQuizes}
+                            <Text style={styleForProfile.boldText}>{t('Maxed Courses')}:</Text> {data.getMaxedQuizesCount}
                         </Text>
                     </View>
                 </Card>
@@ -71,7 +71,7 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('All games')}:</Text> {data.getAllUserGames}
+                            <Text style={styleForProfile.boldText}>{t('All games')}:</Text> {data.getAllUserGamesCount}
                         </Text>
                     </View>
                 </Card>
@@ -79,7 +79,7 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Friends')}:</Text> {data.getAllUserFriends}
+                            <Text style={styleForProfile.boldText}>{t('Friends')}:</Text> {data.getFriendsCount}
                         </Text>
                     </View>
                 </Card>

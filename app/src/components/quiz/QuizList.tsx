@@ -5,7 +5,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
-import { getQuizzesWithPaginationGQL } from '@/services/quiz/quiz';
+import { getQuizzesWithPaginationGQL, getUserScoreGQL } from '@/services/quiz/quiz';
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '../utils/Pagination';
 import { Card, SearchBar } from '@rneui/themed';
@@ -46,6 +46,27 @@ const QuizzesList = (props: QuizzesList) => {
                 }
             ),
     });
+    const { data: scoresData } = useQuery({
+        queryKey: ['UserScore'],
+        queryFn: async () =>
+            request(
+                graphqlURL,
+                getUserScoreGQL,
+                {},
+                {
+                    Authorization: 'Bearer ' + userInfo?.token,
+                }
+            )
+    });
+
+    if (userInfo === null || data === undefined) {
+        return null;
+    }
+    if (scoresData === undefined) {
+        return null;
+    }
+
+
     if (data == undefined || isLoading) {
         return <Text>{t('loading')}...</Text>;
     }
@@ -110,6 +131,7 @@ const QuizzesList = (props: QuizzesList) => {
                         key={item.id}
                         item={item}
                         navigation={props.navigation}
+                        userScore ={scoresData.getUserScore}
                     />
                 )}
             />
