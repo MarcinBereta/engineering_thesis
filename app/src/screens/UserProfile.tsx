@@ -1,6 +1,14 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button, Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+    Button,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import React, { useContext, useEffect, useState } from 'react';
@@ -11,6 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
 import { Card, Icon } from '@rneui/base';
+import { widthPixel } from '@/utils/Normalize';
+import { CustomButton } from '@/components/CustomButton';
 type UserProfile = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
     'UserProfile'
@@ -41,21 +51,32 @@ export const UserProfile = (props: UserProfile) => {
                 <View style={styleForProfile.header}>
                     <Image
                         style={styleForProfile.profileImage}
-                        source={{ uri: userInfo?.image ?? "https://randomuser.me/api/portraits/men/36.jpg" }}
+                        source={{
+                            uri:
+                                userInfo?.image ??
+                                'https://randomuser.me/api/portraits/men/36.jpg',
+                        }}
                     />
-                    <Text style={styleForProfile.username}>{userInfo?.username}</Text>
+                    <Text style={styleForProfile.username}>
+                        {userInfo?.username}
+                    </Text>
                     <Text style={styleForProfile.email}>{userInfo?.email}</Text>
                 </View>
                 <View style={styleForProfile.button}>
-                    <Button title={t('My Courses')}
+                    <CustomButton
+                        title={t('My Courses')}
                         onPress={() => {
                             props.navigation.navigate('MyCourses');
-                        }} />
+                        }}
+                    />
                 </View>
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Role')}:</Text> {userInfo?.role}
+                            <Text style={styleForProfile.boldText}>
+                                {t('Role')}:
+                            </Text>{' '}
+                            {userInfo?.role}
                         </Text>
                     </View>
                 </Card>
@@ -63,7 +84,10 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Maxed Courses')}:</Text> {data.getMaxedQuizesCount}
+                            <Text style={styleForProfile.boldText}>
+                                {t('Maxed Courses')}:
+                            </Text>{' '}
+                            {data.getMaxedQuizesCount}
                         </Text>
                     </View>
                 </Card>
@@ -71,7 +95,10 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('All games')}:</Text> {data.getAllUserGamesCount}
+                            <Text style={styleForProfile.boldText}>
+                                {t('All games')}:
+                            </Text>{' '}
+                            {data.getAllUserGamesCount}
                         </Text>
                     </View>
                 </Card>
@@ -79,7 +106,10 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Friends')}:</Text> {data.getFriendsCount}
+                            <Text style={styleForProfile.boldText}>
+                                {t('Friends')}:
+                            </Text>{' '}
+                            {data.getFriendsCount}
                         </Text>
                     </View>
                 </Card>
@@ -87,7 +117,10 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Created Courses')}:</Text> {data.getCreatedCourses}
+                            <Text style={styleForProfile.boldText}>
+                                {t('Created Courses')}:
+                            </Text>{' '}
+                            {data.getCreatedCourses}
                         </Text>
                     </View>
                 </Card>
@@ -95,7 +128,10 @@ export const UserProfile = (props: UserProfile) => {
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
-                            <Text style={styleForProfile.boldText}>{t('Verified')}:</Text> {userInfo?.verified ? t('Yes') : t('No')}
+                            <Text style={styleForProfile.boldText}>
+                                {t('Verified')}:
+                            </Text>{' '}
+                            {userInfo?.verified ? t('Yes') : t('No')}
                         </Text>
                     </View>
                 </Card>
@@ -108,7 +144,9 @@ export const UserProfile = (props: UserProfile) => {
                     </Text>
                     <View style={styleForProfile.pickerContainer}>
                         <RNPickerSelect
-                            onValueChange={(value) => setSelectedCategory(value)}
+                            onValueChange={(value) =>
+                                setSelectedCategory(value)
+                            }
                             items={[
                                 { label: t('Math'), value: 'MATH' },
                                 { label: t('History'), value: 'HISTORY' },
@@ -123,13 +161,21 @@ export const UserProfile = (props: UserProfile) => {
                             value={selectedCategory}
                             style={pickerSelectStyles}
                             useNativeAndroidPickerStyle={false}
-                            placeholder={{ label: t('Select a category'), value: null }}
+                            placeholder={{
+                                label: t('Select a category'),
+                                value: null,
+                            }}
                         />
                     </View>
                     <Card containerStyle={styleForProfile.card}>
                         <View style={styleForProfile.cardContent}>
                             <Text style={styleForProfile.cardText}>
-                                {t('Percentage')}: {data.getPercentageOfCategory[selectedCategory as keyof typeof data.getPercentageOfCategory]}
+                                {t('Percentage')}:{' '}
+                                {
+                                    data.getPercentageOfCategory[
+                                        selectedCategory as keyof typeof data.getPercentageOfCategory
+                                    ]
+                                }
                             </Text>
                         </View>
                     </Card>
@@ -215,7 +261,7 @@ const pickerSelectStyles = StyleSheet.create({
         color: 'black',
     },
     inputAndroid: {
-        fontSize: 16,
+        fontSize: 20,
         backgroundColor: 'rgba(90, 154, 230, 1)',
         color: 'white',
         paddingHorizontal: 10,
@@ -223,5 +269,7 @@ const pickerSelectStyles = StyleSheet.create({
         borderColor: 'transparent',
         borderWidth: 0,
         borderRadius: 30,
+        minWidth: widthPixel(150),
+        textAlign: 'center',
     },
 });

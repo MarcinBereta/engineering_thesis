@@ -1,7 +1,8 @@
+import { heightPixel, widthPixel } from '@/utils/Normalize';
 import { Button, ButtonProps } from '@rneui/themed';
 import React from 'react';
 
-export const CustomButton = (props:ButtonProps) => {
+export const CustomButton = (props: ButtonProps) => {
     return (
         <Button
             {...props}
@@ -12,6 +13,8 @@ export const CustomButton = (props:ButtonProps) => {
                 borderColor: 'transparent',
                 borderWidth: 0,
                 borderRadius: 30,
+                paddingHorizontal: widthPixel(20),
+                paddingVertical: heightPixel(10),
             }}
         />
     );
