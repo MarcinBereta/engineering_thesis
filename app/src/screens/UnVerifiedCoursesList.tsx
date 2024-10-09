@@ -129,8 +129,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                     renderItem={({ item }) => (
                         <CourseListItem
                             course={item}
-                            navigation={props.navigation}
-                        >
+                            navigation={props.navigation} userScore={[]}                        >
                             <CustomButton
                                 onPress={(e) => {
                                     e.preventDefault();

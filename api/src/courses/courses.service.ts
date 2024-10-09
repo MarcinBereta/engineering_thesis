@@ -371,6 +371,7 @@ export class CoursesService {
             skip: (page - 1) * PAGINATION_SIZE,
             take: PAGINATION_SIZE,
         });
+
         await this.cacheManager.set('all_courses/' + page, courses);
         return courses;
     }
@@ -408,7 +409,7 @@ export class CoursesService {
 
         const coursesCountCached = await this.cacheManager.get('courses_count');
 
-        if (coursesCountCached) {
+        if (coursesCountCached && (coursesCountCached as number) === count) {
             return {
                 count: coursesCountCached,
                 size: PAGINATION_SIZE,
