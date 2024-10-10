@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Quiz, UserScore } from './dto/quiz.dto';
+import { Quiz } from './dto/quiz.dto';
 import { AddScore } from './dto/addScore.dto';
 import OpenAI from 'openai';
 import { Cache } from 'cache-manager';
@@ -17,7 +17,17 @@ enum QuizOptions {
     MULTIPLE_CHOICES,
     TRUE_FALSE,
 }
-const categories = ['MATH', 'HISTORY', 'GEOGRAPHY', 'ENGLISH', 'ART', 'SPORTS', 'SCIENCE', 'MUSIC', 'OTHER'];
+const categories = [
+    'MATH',
+    'HISTORY',
+    'GEOGRAPHY',
+    'ENGLISH',
+    'ART',
+    'SPORTS',
+    'SCIENCE',
+    'MUSIC',
+    'OTHER',
+];
 @Injectable()
 export class QuizService {
     private openai = new OpenAI({
@@ -27,7 +37,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) { }
+    ) {}
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -50,6 +60,18 @@ export class QuizService {
         }
 
         return quiz;
+    }
+
+    async getQuizzesByCourseId(courseId: string) {
+        return await this.prismaService.quiz.findMany({
+            where: {
+                courseId: courseId,
+            },
+            include: {
+                questions: true,
+                course: true,
+            },
+        });
     }
 
     async getDashboardQuizzes(): Promise<Quiz[]> {
@@ -137,7 +159,6 @@ export class QuizService {
         if (cachedCount && cachedCount === count) {
             return { count: cachedCount, size: PAGINATION_SIZE };
         }
-
 
         if (count) {
             await this.cacheManager.set('quizzes_count', count);
@@ -306,8 +327,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' questions in the quiz.'
+                        numberOfQuestions +
+                        ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -380,26 +401,26 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                        4 * numberOfQuestions +
-                        'options in total.'
+                            4 * numberOfQuestions +
+                            'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                        4 * numberOfQuestions +
-                        ' options in total.'
+                            4 * numberOfQuestions +
+                            ' options in total.'
                     );
                 }
 
             if (totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' correct answers.'
+                        numberOfQuestions +
+                        ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' correct answers.'
+                        numberOfQuestions +
+                        ' correct answers.'
                 );
             }
 
@@ -736,7 +757,7 @@ export class QuizService {
             where: {
                 quizId: addScore.quizId,
             },
-        })
+        });
         console.log('Number of questions: ', numberOfQuestions);
         console.log('Score: ', addScore.score);
         return this.prismaService.quiz.update({
@@ -767,30 +788,30 @@ export class QuizService {
                 score: 'desc',
             },
         });
-        const quizIds = scores.map(score => score.quizId);
+        const quizIds = scores.map((score) => score.quizId);
         const quizzes = await this.prismaService.quiz.findMany({
             where: {
                 id: { in: quizIds },
             },
         });
         const quizMap = new Map<string, string>();
-        quizzes.forEach(quiz => {
+        quizzes.forEach((quiz) => {
             quizMap.set(quiz.id, quiz.name);
         });
         const bestScoresMap = new Map<string, any>();
 
-        scores.forEach(score => {
+        scores.forEach((score) => {
             if (!bestScoresMap.has(score.quizId)) {
                 bestScoresMap.set(score.quizId, {
                     userId: score.userId,
                     quizId: score.quizId,
                     quizName: quizMap.get(score.quizId) || 'Unknown',
                     score: score.score,
-                    noQuest: score.noQuest
+                    noQuest: score.noQuest,
                 });
             }
         });
-        console.log(Array.from(bestScoresMap.values()))
+        console.log(Array.from(bestScoresMap.values()));
         return Array.from(bestScoresMap.values());
     }
 
@@ -805,63 +826,70 @@ export class QuizService {
     async getAllUserGamesCount(userID: string): Promise<number> {
         return await this.prismaService.userScores.count({
             where: {
-                userId: userID
-            }
+                userId: userID,
+            },
         });
     }
     async getFriendsCount(userID: string): Promise<number> {
         return await this.prismaService.friends.count({
             where: {
-                userId: userID
-            }
+                userId: userID,
+            },
         });
     }
     async getMaxedQuizesCount(userID: string): Promise<number> {
         const userScores = await this.prismaService.userScores.findMany({
             where: {
-                userId: userID
+                userId: userID,
             },
             select: {
                 score: true,
-                noQuest: true
-            }
+                noQuest: true,
+            },
         });
 
-        const maxedQuizes = userScores.filter(scoreRecord => scoreRecord.score === scoreRecord.noQuest);
+        const maxedQuizes = userScores.filter(
+            (scoreRecord) => scoreRecord.score === scoreRecord.noQuest
+        );
         return maxedQuizes.length;
     }
 
     async getCreatedCourses(userID: string): Promise<number> {
         return await this.prismaService.course.count({
             where: {
-                creatorId: userID
-            }
+                creatorId: userID,
+            },
         });
     }
     async getNumberOfCourses(): Promise<number> {
         return await this.prismaService.course.count();
     }
-    async percentOfCoursesByCategory(userID: string, category: string): Promise<Number> {
-        let result: number[] = [];
+    async percentOfCoursesByCategory(
+        userID: string,
+        category: string
+    ): Promise<number> {
+        const result: number[] = [];
         const userScores = await this.prismaService.userScores.findMany({
             where: {
-                userId: userID
+                userId: userID,
             },
             select: {
                 score: true,
                 noQuest: true,
-                quizId: true
-            }
+                quizId: true,
+            },
         });
-        const uniqueUserScores = Array.from(new Map(userScores.map(item => [item.quizId, item])).values());
+        const uniqueUserScores = Array.from(
+            new Map(userScores.map((item) => [item.quizId, item])).values()
+        );
         for (const score of uniqueUserScores) {
             const quiz = await this.prismaService.quiz.findUnique({
                 where: {
-                    id: score.quizId
+                    id: score.quizId,
                 },
                 include: {
-                    course: true
-                }
+                    course: true,
+                },
             });
             if (quiz) {
                 if (result[quiz.course.category]) {
@@ -874,14 +902,16 @@ export class QuizService {
         const courses = await this.prismaService.course.findMany({
             where: {
                 category: category as Category,
-            }
+            },
         });
         const percatage = (result[category] / courses.length) * 100;
         return percatage;
     }
 
-    async getPercentageOfCategory(userId: string): Promise<PercentageOfCategoryDTO> {
-        let result: PercentageOfCategoryDTO = {
+    async getPercentageOfCategory(
+        userId: string
+    ): Promise<PercentageOfCategoryDTO> {
+        const result: PercentageOfCategoryDTO = {
             MATH: 0,
             HISTORY: 0,
             GEOGRAPHY: 0,
@@ -890,15 +920,18 @@ export class QuizService {
             SPORTS: 0,
             SCIENCE: 0,
             MUSIC: 0,
-            OTHER: 0
+            OTHER: 0,
         };
         for (const category of categories) {
-            result[category] = await this.percentOfCoursesByCategory(userId, category) as number || 0;
+            result[category] =
+                ((await this.percentOfCoursesByCategory(
+                    userId,
+                    category
+                )) as number) || 0;
         }
         console.log(result);
         return result;
     }
-
 
     // Achievements
     /*
@@ -918,7 +951,7 @@ export class QuizService {
         const user = await this.prismaService.user.findUnique({
             where: {
                 id: userID,
-            }
+            },
         });
         return user.verified;
     }
@@ -969,6 +1002,6 @@ export class QuizService {
     //                         set: (await userAchivements).map(achievement => ({ id: achievement }))
     //                     }
     //                 }
-    //             });            
+    //             });
     // }
 }

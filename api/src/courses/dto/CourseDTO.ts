@@ -20,6 +20,8 @@ export class SimpleCourse {
 export class Course extends SimpleCourse {
     @Field(() => [CourseItem])
     text: CourseItem[];
+    @Field({nullable:true})
+    courseId?: string;
 }
 
 @ObjectType()

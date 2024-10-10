@@ -75,6 +75,7 @@ export const getCoursesWithPaginationGQL = graphql(`
                 type
                 value
             }
+            courseId
         }
         countCoursesWithPagination(pagination: $pagination) {
             count

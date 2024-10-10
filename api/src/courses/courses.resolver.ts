@@ -15,21 +15,17 @@ import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 @Resolver(() => Course)
 @UseGuards(JwtAuthGuard)
 export class CoursesResolver {
-    constructor(private courseService: CoursesService) { }
+    constructor(private courseService: CoursesService) {}
 
     @UseInterceptors(CacheInterceptor)
     @CacheKey('all_courses')
     @Query(() => [Course])
     async course() {
-        console.log('all_courses');
         return await this.courseService.getAllCourses();
     }
 
-    // @UseInterceptors(CacheInterceptor)
-    // @CacheKey('dashboard_courses')
     @Query(() => [ExtendedCourse])
     async dashboardCourses() {
-        console.log('dashboard_courses');
         return await this.courseService.getDashboardCourses();
     }
 
@@ -57,7 +53,6 @@ export class CoursesResolver {
         const course = await this.courseService.getMostFitCourse(userId);
         return course;
     }
-
 
     @Query(() => CountDto)
     async countCoursesWithPagination(

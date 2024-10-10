@@ -28,8 +28,7 @@ type DashboardScreen = NativeStackScreenProps<
 const DashboardScreen = (props: DashboardScreen) => {
     const { t } = useTranslation();
     const { logout, userInfo, socket } = useContext(AuthContext);
-    const queryClient = useQueryClient();
-    const { data: data, isLoading, refetch, isError, error } = useQuery({
+    const { data: data} = useQuery({
         queryKey: ['courses'],
         queryFn: async () =>
             request(

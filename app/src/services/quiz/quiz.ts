@@ -55,6 +55,29 @@ export const getQuizzesWithPaginationGQL = graphql(
     [quizQuestionFragment]
 );
 
+export const GetCoursesWithPaginationGQL = graphql(
+    `
+        query GetCoursesWithPagination($courseId: String!) {
+            getQuizzesByCourseId(courseId: $courseId) {
+                id
+                courseId
+                name
+                questions {
+                    ...quizQuestionFragment
+                }
+                course {
+                    id
+                    name
+                    summary
+                    creatorId
+                    category
+                }
+            }
+        }
+    `,
+    [quizQuestionFragment]
+);
+
 export const getQuizByIdGQL = graphql(
     `
         query getQuiz($id: String!) {

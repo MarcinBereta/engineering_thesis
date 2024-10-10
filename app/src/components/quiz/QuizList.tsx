@@ -5,14 +5,16 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
-import { getQuizzesWithPaginationGQL, getUserScoreGQL } from '@/services/quiz/quiz';
+import {
+    getQuizzesWithPaginationGQL,
+    getUserScoreGQL,
+} from '@/services/quiz/quiz';
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '../utils/Pagination';
-import { Card, SearchBar } from '@rneui/themed';
+import { SearchBar } from '@rneui/themed';
 import { normalizeText } from '@rneui/base';
 import { QuizzesListItem } from './QuizListItem';
 import { Layout } from '../Layout';
-import { t } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -56,7 +58,7 @@ const QuizzesList = (props: QuizzesList) => {
                 {
                     Authorization: 'Bearer ' + userInfo?.token,
                 }
-            )
+            ),
     });
 
     if (userInfo === null || data === undefined) {
@@ -65,7 +67,6 @@ const QuizzesList = (props: QuizzesList) => {
     if (scoresData === undefined) {
         return null;
     }
-
 
     if (data == undefined || isLoading) {
         return <Text>{t('loading')}...</Text>;
@@ -89,7 +90,9 @@ const QuizzesList = (props: QuizzesList) => {
                         fontWeight: 'bold',
                         fontSize: normalizeText(15),
                     }}
-                >Select Category:</Text>
+                >
+                    Select Category:
+                </Text>
                 <Picker
                     style={{
                         inputAndroid: {
@@ -113,7 +116,9 @@ const QuizzesList = (props: QuizzesList) => {
                         { label: 'Other', value: 'OTHER' },
                     ]}
                     value={selectedCategory}
-                    onValueChange={(itemValue: SetStateAction<string>) => setSelectedCategory(itemValue)}
+                    onValueChange={(itemValue: SetStateAction<string>) =>
+                        setSelectedCategory(itemValue)
+                    }
                 />
             </View>
             <SearchBar
@@ -125,13 +130,18 @@ const QuizzesList = (props: QuizzesList) => {
                 }}
             />
             <FlatList
-                data={data.getQuizzesWithPagination.filter(item => selectedCategory === '' || (item.course && item.course.category === selectedCategory))}
+                data={data.getQuizzesWithPagination.filter(
+                    (item) =>
+                        selectedCategory === '' ||
+                        (item.course &&
+                            item.course.category === selectedCategory)
+                )}
                 renderItem={({ item }) => (
                     <QuizzesListItem
                         key={item.id}
                         item={item}
                         navigation={props.navigation}
-                        userScore ={scoresData.getUserScore}
+                        userScore={scoresData.getUserScore}
                     />
                 )}
             />

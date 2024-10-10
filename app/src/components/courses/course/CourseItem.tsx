@@ -5,11 +5,14 @@ import { fontPixel } from '../../../utils/Normalize';
 import { Layout } from '@/components/Layout';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CustomButton } from '@/components/CustomButton';
+import { useTranslation } from 'react-i18next';
 
 type course = NativeStackScreenProps<AuthenticatedRootStackParamList, 'course'>;
 
 const Course = ({ route, navigation }: course) => {
     const { course } = route.params;
+    const {t} = useTranslation()
     return (
         <Layout navigation={navigation} icon="course">
             <Text style={{ fontSize: fontPixel(40), textAlign: 'center' }}>
@@ -19,6 +22,12 @@ const Course = ({ route, navigation }: course) => {
                 data={course.text}
                 renderItem={({ item }) => <CourseListItem course={item} />}
                 keyExtractor={(item) => item.id}
+            />
+            <CustomButton
+                title={t('course_quizzes_list')}
+                onPress={()=>{
+                    navigation.navigate('CourseQuizzesList', {courseId: course.id})
+                }}
             />
         </Layout>
     );

@@ -2,10 +2,11 @@ import { dashboardDataGQL, getUserScoreGQL } from '@/services/quiz/quiz';
 import { normalizeText } from '@rneui/base';
 import { Card, Icon } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
-import { Text, View } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { useTranslation } from 'react-i18next';
+const { width } = Dimensions.get('window');
 
 export const DashboardCourseSection = ({
     navigation,
@@ -49,7 +50,11 @@ export const DashboardCourseSection = ({
                             navigation.push('course', { course: c });
                         }}
                     >
-                        <Card>
+                        <Card
+                            containerStyle={{
+                                width: width * 0.45,
+                            }}
+                        >
                             <Card.Title>{c.name}
                                 {hasCompletedQuiz(c.name) && (
                                     <Icon

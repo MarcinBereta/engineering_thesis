@@ -29,6 +29,7 @@ import { UserPage } from './User';
 import { UserSettings } from './UserSettings';
 import { UserProfile } from './UserProfile';
 import QuizEdit from './QuizEdit';
+import { CourseQuizzesList } from '@/components/quiz/CourseQuizList';
 
 const Stack = createNativeStackNavigator();
 
@@ -90,9 +91,12 @@ export type AuthenticatedRootStackParamList = {
     VerifyAccount: undefined;
     UserSettings: undefined;
     UserProfile: undefined;
+    CourseQuizzesList: {
+        courseId: string;
+    };
 };
 
-const Navigator = ({ }: {}) => {
+const Navigator = ({}: {}) => {
     const { userInfo, refreshLoading } = useContext(AuthContext);
     const AuthenticatedStack =
         createNativeStackNavigator<AuthenticatedRootStackParamList>();
@@ -168,7 +172,10 @@ const Navigator = ({ }: {}) => {
                             component={Friends}
                             name="Friends"
                         />
-
+                        <AuthenticatedStack.Screen
+                            component={CourseQuizzesList}
+                            name="CourseQuizzesList"
+                        />
                         <AuthenticatedStack.Screen
                             component={UserPage}
                             name="User"

@@ -19,6 +19,7 @@ import { AuthenticatedRootStackParamList } from './Navigator';
 import Picker from 'react-native-picker-select';
 import { getUserScoreGQL } from '@/services/quiz/quiz';
 const { height } = Dimensions.get('window');
+
 export type Course = ResultOf<
     typeof getCoursesWithPaginationGQL
 >['getCoursesWithPagination'][0];

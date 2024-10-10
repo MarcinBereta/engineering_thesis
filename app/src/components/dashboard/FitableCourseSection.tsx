@@ -1,12 +1,16 @@
-import { dashboardDataGQL, getUserScoreGQL, mostFitableCourseGQL } from '@/services/quiz/quiz';
+import {
+    dashboardDataGQL,
+    getUserScoreGQL,
+    mostFitableCourseGQL,
+} from '@/services/quiz/quiz';
 import { normalizeText } from '@rneui/base';
 import { Card, Icon } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
-import { Text, View } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { useTranslation } from 'react-i18next';
-
+const { width } = Dimensions.get('window');
 export const DashboardFitableCourseSection = ({
     navigation,
     course,
@@ -21,7 +25,9 @@ export const DashboardFitableCourseSection = ({
         if (userScore === undefined) {
             return false;
         }
-        return userScore.some((score) => score.quizName === courseName) || false;
+        return (
+            userScore.some((score) => score.quizName === courseName) || false
+        );
     };
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -38,15 +44,27 @@ export const DashboardFitableCourseSection = ({
                     {t('fitable_course')}
                 </Text>
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+            <View
+                style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
                 {course.map((c: any) => (
                     <TouchableOpacity
                         onPress={() => {
                             navigation.push('course', { course: c });
                         }}
                     >
-                        <Card>
-                            <Card.Title>{c.name}
+                        <Card
+                            containerStyle={{
+                                width: width * 0.8,
+                            }}
+                        >
+                            <Card.Title>
+                                {c.name}
                                 {hasCompletedQuiz(c.name) && (
                                     <Icon
                                         type="font-awesome"

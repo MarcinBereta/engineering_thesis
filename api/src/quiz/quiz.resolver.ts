@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Context, Float } from '@nestjs/graphql';
-import { Quiz, RecreateQuizDto, UserScore, UserScoreExtended } from './dto/quiz.dto';
+import { Quiz, RecreateQuizDto,  UserScoreExtended } from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
@@ -7,7 +7,6 @@ import { AddScore } from './dto/addScore.dto';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 import { QuizUpdateDto } from '../quiz/dto/quiz.update';
-import { Category } from '@prisma/client';
 import { PercentageOfCategoryDTO } from './dto/percentage-of-category.dto';
 @Resolver(() => Quiz)
 @UseGuards(JwtAuthGuard)
@@ -38,6 +37,11 @@ export class QuizResolver {
         @Args('pagination') pagination: PaginationDto
     ): Promise<Quiz[]> {
         return this.quizService.getQuizzesWithPagination(pagination);
+    }
+
+    @Query(() => [Quiz])
+    async getQuizzesByCourseId(@Args('courseId') courseId: string) {
+        return await this.quizService.getQuizzesByCourseId(courseId);
     }
 
     @Query(() => CountDto)
@@ -75,7 +79,7 @@ export class QuizResolver {
     }
 
     @Query(() => Number)
-    async percentOfCoursesByCategory(@Args('category') category: string, @Context() context,): Promise<Number> {
+    async percentOfCoursesByCategory(@Args('category') category: string, @Context() context,): Promise<number> {
         return this.quizService.percentOfCoursesByCategory(context.req.user.id, category);
     }
 

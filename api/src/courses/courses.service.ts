@@ -20,7 +20,7 @@ export class CoursesService {
         private prismaService: PrismaService,
         private quizService: QuizService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) { }
+    ) {}
 
     async processCourse(course: EditCourseInput | CourseInput, id: string) {
         const courseItemsToAdd = [];
@@ -36,9 +36,10 @@ export class CoursesService {
                 } else {
                     const fileName = join(
                         `public/${id}`,
-                        `image-${i}.${course.text[i].value == 'jpg'
-                            ? 'jpeg'
-                            : course.text[i].value
+                        `image-${i}.${
+                            course.text[i].value == 'jpg'
+                                ? 'jpeg'
+                                : course.text[i].value
                         }`
                     );
 
@@ -106,7 +107,7 @@ export class CoursesService {
         if (!user.verified) {
             throw new Error('User is not verified');
         }
-        if (course.category == null || course.category as string == '') {
+        if (course.category == null || (course.category as string) == '') {
             throw new Error('Category is required');
         }
         const moderators = await this.prismaService.moderator.findMany({
@@ -149,33 +150,45 @@ export class CoursesService {
         });
     }
 
-    private async getAndCheckOptions(category: string, getOrCheck: boolean, tag: string) {
+    private async getAndCheckOptions(
+        category: string,
+        getOrCheck: boolean,
+        tag: string
+    ) {
         // true for get, false for check
-        let specificOptions = ''
+        let specificOptions = '';
         switch (category) {
             case 'MATH':
-                specificOptions = 'Algebra, Analytics, Statistics, Probability, Trigonometric, Other';
+                specificOptions =
+                    'Algebra, Analytics, Statistics, Probability, Trigonometric, Other';
                 break;
             case 'HISTORY':
-                specificOptions = 'Prehistory, Antiquity, Middle Ages, Modern period, Contemporary period, Wars and conflicts, Historical Figures, Other';
+                specificOptions =
+                    'Prehistory, Antiquity, Middle Ages, Modern period, Contemporary period, Wars and conflicts, Historical Figures, Other';
                 break;
             case 'GEOGRAPHY':
-                specificOptions = 'Social, Economic, Political, Cartography, Climatology, Other';
+                specificOptions =
+                    'Social, Economic, Political, Cartography, Climatology, Other';
                 break;
             case 'ENGLISH':
-                specificOptions = 'Grammar, Vocabluary, Culture, Writing, Reading, Conversations, Other';
+                specificOptions =
+                    'Grammar, Vocabluary, Culture, Writing, Reading, Conversations, Other';
                 break;
             case 'ART':
-                specificOptions = 'Painting, Sculpture, Architecture, Literature, Music, Theatre, Other';
+                specificOptions =
+                    'Painting, Sculpture, Architecture, Literature, Music, Theatre, Other';
                 break;
             case 'SPORTS':
-                specificOptions = 'Individual, Team, Water, Winter, Motor, Extreme, Other';
+                specificOptions =
+                    'Individual, Team, Water, Winter, Motor, Extreme, Other';
                 break;
             case 'SCIENCE':
-                specificOptions = 'Physics, Chemisrty, Biology, Astronomy, Earth, Environment, Other';
+                specificOptions =
+                    'Physics, Chemisrty, Biology, Astronomy, Earth, Environment, Other';
                 break;
             case 'MUSIC':
-                specificOptions = 'Rock, Pop, Classical, Dance, Country, Jazz, Rap, HipHop, Other';
+                specificOptions =
+                    'Rock, Pop, Classical, Dance, Country, Jazz, Rap, HipHop, Other';
                 break;
             case 'OTHER':
                 specificOptions = 'Other';
@@ -186,18 +199,15 @@ export class CoursesService {
         }
         if (getOrCheck) {
             return specificOptions;
-        }
-        else {
+        } else {
             // check if tag is in specific options
             if (specificOptions.includes(tag)) {
                 return tag;
-            }
-            else {
-                return "Other";
+            } else {
+                return 'Other';
             }
         }
     }
-
 
     private async createSummaryAndTag(courseId: string) {
         const course = await this.prismaService.course.findUnique({
@@ -210,9 +220,12 @@ export class CoursesService {
         });
 
         const category = course.category;
-        const choices = await this.getAndCheckOptions(category, true, "");
+        const choices = await this.getAndCheckOptions(category, true, '');
 
-        const text = course.text.filter((t => t.type == "text")).map((item) => item.value).join(' ');
+        const text = course.text
+            .filter((t) => t.type == 'text')
+            .map((item) => item.value)
+            .join(' ');
         const response = await this.openai.chat.completions.create({
             messages: [
                 {
@@ -231,7 +244,7 @@ export class CoursesService {
             response_format: { type: 'text' },
         });
 
-        let summary = ''
+        let summary = '';
         summary += response.choices[0].message.content;
 
         const response_tag = await this.openai.chat.completions.create({
@@ -245,26 +258,27 @@ export class CoursesService {
                 {
                     role: 'assistant',
                     content:
-                        'Choose tag for this text from the following options: ' + choices + " . (Write only tag)",
+                        'Choose tag for this text from the following options: ' +
+                        choices +
+                        ' . (Write only tag)',
                 },
             ],
             model: 'gpt-4o-mini',
             response_format: { type: 'text' },
         });
 
-        let tag = ''
+        let tag = '';
         tag += response_tag.choices[0].message.content;
-        const check_tag = await this.getAndCheckOptions(category, false, tag)
+        const check_tag = await this.getAndCheckOptions(category, false, tag);
         await this.prismaService.course.update({
             where: {
-                id: courseId
+                id: courseId,
             },
             data: {
                 summary: summary,
-                tag: check_tag
-            }
-        })
-
+                tag: check_tag,
+            },
+        });
     }
 
     async editCourse(course: EditCourseInput, user: simpleUser) {
@@ -460,7 +474,7 @@ export class CoursesService {
     }
 
     async getUnVerifiedCourses(userId: string) {
-        await this.cacheManager.del('unverified_courses/' + userId); //temporary 
+        await this.cacheManager.del('unverified_courses/' + userId); //temporary
         const cachedCourses = await this.cacheManager.get(
             'unverified_courses/' + userId
         );
@@ -508,8 +522,8 @@ export class CoursesService {
 
         const moderator = await this.prismaService.moderator.findUnique({
             where: {
-                id: course.moderatorId
-            }
+                id: course.moderatorId,
+            },
         });
 
         await this.cacheManager.del('my_courses/' + course.creatorId);
@@ -546,7 +560,6 @@ export class CoursesService {
         return courses;
     }
 
-
     async getRandomCourseNotPlayed(userID: string) {
         const randomCourseNotPlayedId = await this.prismaService.$queryRaw`
         select id from "Course" where id not in ( select "courseId" from "Quiz" where id in (
@@ -568,8 +581,9 @@ export class CoursesService {
         return randomCourse;
     }
 
-    async getRandomCourse(userID: string) {
-        const randomId = await this.prismaService.$queryRaw`select id from "Course" order by random() limit 1`
+    async getRandomCourse() {
+        const randomId = await this.prismaService
+            .$queryRaw`select id from "Course" order by random() limit 1`;
         const randomCourse = await this.prismaService.course.findMany({
             include: {
                 text: true,
@@ -597,46 +611,52 @@ export class CoursesService {
             )) group by "tag" order by count(*) desc limit 1`;
     }
 
-    async mostPopularCourseByCategoryFromLast5days(userID: string, category: string) {
-        const mostPopularCourseByCategoryIdFromLast5days = await this.prismaService.$queryRaw`
+    async mostPopularCourseByCategoryFromLast5days(
+        userID: string,
+        category: string
+    ) {
+        const mostPopularCourseByCategoryIdFromLast5days = await this
+            .prismaService.$queryRaw`
                 select id from "Course" where category::text = ${category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
                     select "quizId" from "UserScores" where "userId" = ${userID} and "createdAt" > now() - interval '5 days'
                     ) )order by (
                     select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
                 ) desc limit 1`;
         if ((mostPopularCourseByCategoryIdFromLast5days as any[]).length != 0) {
-            const mostPopularCourseByCategoryFromLast5days = await this.prismaService.course.findMany({
-                include: {
-                    text: true,
-                },
-                where: {
-                    id: mostPopularCourseByCategoryIdFromLast5days[0].id,
-                },
-            });
+            const mostPopularCourseByCategoryFromLast5days =
+                await this.prismaService.course.findMany({
+                    include: {
+                        text: true,
+                    },
+                    where: {
+                        id: mostPopularCourseByCategoryIdFromLast5days[0].id,
+                    },
+                });
             return mostPopularCourseByCategoryFromLast5days;
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     async mostPopularCourseFromLast5days(userId: string, tag: string) {
-        const mostPopularCourseIdFromLast5days = await this.prismaService.$queryRaw`
+        const mostPopularCourseIdFromLast5days = await this.prismaService
+            .$queryRaw`
             select id  from "Course" where tag = ${tag} and id not in ( select "courseId" from "Quiz" where id in (
                 select "quizId" from "UserScores" where "userId" = ${userId}
                 ) )order by (
                 select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
             ) desc limit 1`;
 
-        const mostPopularCourseFromLast5days = await this.prismaService.course.findMany({
-            include: {
-                text: true,
-            },
-            where: {
-                id: mostPopularCourseIdFromLast5days[0].id,
-                verified: true,
-            }
-        });
+        const mostPopularCourseFromLast5days =
+            await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    id: mostPopularCourseIdFromLast5days[0].id,
+                    verified: true,
+                },
+            });
         return mostPopularCourseFromLast5days;
     }
 
@@ -655,24 +675,25 @@ export class CoursesService {
     }
 
     async getMostPopularCourseByCategory(userID: string, category: string) {
-        const mostPopularCourseByCategoryId = await this.prismaService.$queryRaw`
+        const mostPopularCourseByCategoryId = await this.prismaService
+            .$queryRaw`
                 select id from "Course" where category::text = ${category} and verified = true and id not in ( select "courseId" from "Quiz" where id in (
                     select "quizId" from "UserScores" where "userId" = ${userID}
                     ) )order by (
                     select count(*) from "UserScores" where "quizId" = (select id from "Quiz" where "courseId" = "Course"."id")
                 ) desc limit 1`;
         if ((mostPopularCourseByCategoryId as any[]).length != 0) {
-            const mostPopularCourseByCategory = await this.prismaService.course.findMany({
-                include: {
-                    text: true,
-                },
-                where: {
-                    id: mostPopularCourseByCategoryId[0].id,
-                },
-            });
+            const mostPopularCourseByCategory =
+                await this.prismaService.course.findMany({
+                    include: {
+                        text: true,
+                    },
+                    where: {
+                        id: mostPopularCourseByCategoryId[0].id,
+                    },
+                });
             return mostPopularCourseByCategory;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -692,11 +713,10 @@ export class CoursesService {
                 where: {
                     id: mostPopularCourseId[0].id,
                     verified: true,
-                }
+                },
             });
             return mostPopularCourse;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -705,25 +725,37 @@ export class CoursesService {
         try {
             randomCourse = await this.getRandomCourseNotPlayed(userID);
         } catch (e) {
-            console.log("Failed to find random course")
-            randomCourse = await this.getRandomCourse(userID);
+            console.log('Failed to find random course');
+            randomCourse = await this.getRandomCourse();
         }
         try {
             //get most popular category by user with userID from past 5 days
-            const bestCategoryFromLast5days = await this.getBestCategoryFromLast5days(userID);
+            const bestCategoryFromLast5days =
+                await this.getBestCategoryFromLast5days(userID);
             // get tag with most games played in Category by user with userID from past 5 days
-            const bestTagFromLast5days = await this.getBestTagFromLast5days(userID, bestCategoryFromLast5days[0].category);
+            const bestTagFromLast5days = await this.getBestTagFromLast5days(
+                userID,
+                bestCategoryFromLast5days[0].category
+            );
             if ((bestTagFromLast5days as any[]).length == 0) {
-                const mostPopularCourseByCategoryFromLast5days = await this.mostPopularCourseByCategoryFromLast5days(userID, bestCategoryFromLast5days[0].category);
+                const mostPopularCourseByCategoryFromLast5days =
+                    await this.mostPopularCourseByCategoryFromLast5days(
+                        userID,
+                        bestCategoryFromLast5days[0].category
+                    );
                 if (mostPopularCourseByCategoryFromLast5days != null) {
                     return mostPopularCourseByCategoryFromLast5days;
                 }
             }
-            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category 
-            const mostPopularCourseFromLast5days = await this.mostPopularCourseFromLast5days(userID, bestCategoryFromLast5days[0].tag)
+            // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category
+            const mostPopularCourseFromLast5days =
+                await this.mostPopularCourseFromLast5days(
+                    userID,
+                    bestCategoryFromLast5days[0].tag
+                );
             return mostPopularCourseFromLast5days;
         } catch (e) {
-            console.log("Failed to find most popular course from last 5 days")
+            console.log('Failed to find most popular course from last 5 days');
         }
         try {
             // get category with most games played by user with userID of all time
@@ -731,24 +763,30 @@ export class CoursesService {
             if ((bestCategory as unknown as any[]).length == 0) {
                 return randomCourse;
             }
-            console.log(`${bestCategory[0].category}`)
-            // get tag with most games played in Category by user with userID 
+            console.log(`${bestCategory[0].category}`);
+            // get tag with most games played in Category by user with userID
             const bestTag = this.getBestTag(userID, bestCategory[0].category);
             if ((bestTag as unknown as any[]).length == 0) {
-                const mostPopularCourseByCategory = await this.getMostPopularCourseByCategory(userID, bestCategory[0].category);
+                const mostPopularCourseByCategory =
+                    await this.getMostPopularCourseByCategory(
+                        userID,
+                        bestCategory[0].category
+                    );
                 if (mostPopularCourseByCategory == null) {
                     return randomCourse;
                 }
                 return randomCourse;
             }
             // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category of all time
-            const mostPopularCourse = await this.getMostPopularCourse(userID, bestCategory[0].tag);
+            const mostPopularCourse = await this.getMostPopularCourse(
+                userID,
+                bestCategory[0].tag
+            );
             if (mostPopularCourse == null) {
                 return randomCourse;
             }
             return mostPopularCourse;
-        }
-        catch (e) {
+        } catch (e) {
             return randomCourse;
         }
     }
