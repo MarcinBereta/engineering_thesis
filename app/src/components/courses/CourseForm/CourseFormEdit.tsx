@@ -170,6 +170,8 @@ export const CourseEditForm = ({ route, navigation }: EditCourse) => {
         });
     };
 
+    console.log(dragData.length);
+
     return (
         <ScrollView style={{ flex: 1, flexDirection: 'column' }}>
             <Text
@@ -226,7 +228,7 @@ export const CourseEditForm = ({ route, navigation }: EditCourse) => {
                 keyExtractor={(item, index) => `item-${item.type} - ${index}`}
                 onDragEnd={({ data }) => setData(data)}
                 scrollEnabled={true}
-                style={{ flex: 1, flexDirection: 'column' }}
+                style={{ flexDirection: 'column', maxHeight: height * 0.6 }}
                 renderItem={(params: {
                     item: any;
                     getIndex: () => number | undefined;
@@ -322,7 +324,8 @@ export const CourseEditForm = ({ route, navigation }: EditCourse) => {
                     title={t('add')}
                 />
             </Dialog>
-            <Button
+            <View style={{ height: 10 }} />
+            <CustomButton
                 onPress={() => {
                     uploadCourse();
                 }}

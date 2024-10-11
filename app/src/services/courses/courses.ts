@@ -76,6 +76,7 @@ export const getCoursesWithPaginationGQL = graphql(`
                 value
             }
             courseId
+            language
         }
         countCoursesWithPagination(pagination: $pagination) {
             count
@@ -107,7 +108,7 @@ export const userStatsGQL = graphql(`
         getMaxedQuizesCount
         getFriendsCount
         getNumberOfCourses
-        getPercentageOfCategory{
+        getPercentageOfCategory {
             MATH
             HISTORY
             GEOGRAPHY
@@ -126,12 +127,15 @@ export const getMyCoursesGQL = graphql(`
         MyCourses {
             id
             name
+            summary
             category
             text {
                 id
                 type
                 value
             }
+            courseId
+            language
         }
     }
 `);

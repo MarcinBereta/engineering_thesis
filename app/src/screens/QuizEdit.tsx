@@ -163,7 +163,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                 >
                     <TextInput
                         style={{
-                            fontSize: 20,
+                            fontSize: fontPixel(20),
                             textAlign: 'center',
                         }}
                         multiline
@@ -196,7 +196,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                     flexDirection: 'row',
                                     justifyContent: 'space-between',
                                     padding: 10,
-                                    width: '80%',
+                                    width: '90%',
                                     borderWidth: 2,
                                     borderColor:
                                         ans === quiz.questions[index].correct[0]
@@ -210,7 +210,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                     value={ans}
                                     multiline
                                     style={{
-                                        width: '70%',
+                                        width: '50%',
                                     }}
                                     onChangeText={(text) => {
                                         setQuiz((q) => {
@@ -343,17 +343,27 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                 {quiz.name}
             </Text>
 
-            <View>
-                <Text>Recreate quiz</Text>
+            <View
+                style={{
+                    justifyContent: 'center',
+                    width: '100%',
+                }}
+            >
+                <Text style={{ textAlign: 'center', fontSize: fontPixel(40) }}>
+                    Recreate quiz
+                </Text>
                 <TextInput
                     placeholder="Question count"
                     keyboardType="numeric"
                     onChangeText={(text) => setQuestionCount(parseInt(text))}
+                    style={{ width: '100%', textAlign:'center',fontSize:fontPixel(20) }}
                 />
                 <TextInput
                     placeholder="Answer count"
                     keyboardType="numeric"
                     onChangeText={(text) => setAnswerCount(parseInt(text))}
+                    style={{ width: '100%', textAlign:'center', fontSize:fontPixel(20) }}
+
                 />
                 <View style={{ padding: 5 }}>
                     <Text
@@ -458,6 +468,8 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                         </View>
                     </Modal>
                 </View>
+                <View style={{ height: 10 }} />
+
                 <CustomButton
                     onPress={() => {
                         regenerateQuiz.mutate({
@@ -471,7 +483,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                     }}
                     title={t('recreate_quiz')}
                 />
-
+                <View style={{ height: 10 }} />
                 <CustomButton
                     onPress={() => {
                         setEditActive(!editActive);

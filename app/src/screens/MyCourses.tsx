@@ -1,6 +1,6 @@
-import { View, Text, Button, TouchableOpacity } from 'react-native';
+import { View, Text, Button } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 import { getMyCoursesGQL } from '@/services/courses/courses';
 import { graphqlURL } from '@/services/settings';
@@ -9,6 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
+import { Layout } from '@/components/Layout';
+import { CustomButton } from '@/components/CustomButton';
+import { Card } from '@rneui/themed';
 
 type MyCourses = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
@@ -37,59 +40,55 @@ const MyCourses = (props: MyCourses) => {
     }
 
     return (
-        <View style={{ flexDirection: 'column', flex: 1 }}>
-            <Text>{t('courses_list')}: </Text>
-            <FlatList
-                data={data.MyCourses}
-                renderItem={({ item }) => (
-                    <View
-                        style={{
-                            padding: 5,
-                            borderColor: 'black',
-                            borderWidth: 1,
-                            margin: 5,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <Text style={{ flex: 6 }}>{item.name}</Text>
-                        <View
-                            style={{
-                                flex: 6,
-                                justifyContent: 'space-around',
-                                flexDirection: 'row',
-                            }}
-                        >
-                            <Button
-                                onPress={() => {
-                                    props.navigation.push('course', {
-                                        course: item,
-                                    });
+        <Layout navigation={props.navigation} icon="course">
+            <View style={{ flexDirection: 'column', flex: 1 }}>
+                <Text>{t('courses_list')}: </Text>
+                <FlatList
+                    data={data.MyCourses}
+                    renderItem={({ item }) => (
+                        <Card>
+                            <Text style={{ flex: 6, textAlign: 'center' }}>
+                                {item.name}
+                            </Text>
+                            <Card.Divider />
+                            <View
+                                style={{
+                                    flex: 6,
+                                    justifyContent: 'space-around',
+                                    flexDirection: 'row',
                                 }}
-                                title="View"
-                            />
-                            <Button
-                                onPress={() => {
-                                    props.navigation.push('EditCourse', {
-                                        course: item,
-                                    });
-                                }}
-                                title="Edit"
-                            />
-                        </View>
-                    </View>
-                )}
-            />
-
-            {userInfo?.verified ? (
-                <Button
-                    title={t('create_course')}
-                    onPress={() => {
-                        props.navigation.push('createCourse');
-                    }}
+                            >
+                                <CustomButton
+                                    onPress={() => {
+                                        props.navigation.push('course', {
+                                            course: item,
+                                        });
+                                    }}
+                                    title="View"
+                                />
+                                <CustomButton
+                                    onPress={() => {
+                                        props.navigation.push('EditCourse', {
+                                            course: item,
+                                        });
+                                    }}
+                                    title="Edit"
+                                />
+                            </View>
+                        </Card>
+                    )}
                 />
-            ) : null}
-        </View>
+
+                {userInfo?.verified ? (
+                    <Button
+                        title={t('create_course')}
+                        onPress={() => {
+                            props.navigation.push('createCourse');
+                        }}
+                    />
+                ) : null}
+            </View>
+        </Layout>
     );
 };
 

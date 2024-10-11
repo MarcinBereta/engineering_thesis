@@ -37,8 +37,8 @@ export type Course = {
     id: string;
     name: string;
     category: string;
-    language: string;
-    summary?: string;
+    summary: string | null;
+    language: string | null;
     text: {
         id: string;
         type: string;

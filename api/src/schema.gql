@@ -76,6 +76,7 @@ type SimpleCourse {
   category: String!
   tag: String
   creatorId: String
+  language: String
 }
 
 type Course {
@@ -85,6 +86,7 @@ type Course {
   category: String!
   tag: String
   creatorId: String
+  language: String
   text: [CourseItem!]!
   courseId: String
 }
@@ -101,6 +103,7 @@ type ExtendedCourse {
   category: String!
   tag: String
   creatorId: String
+  language: String
   text: [CourseItem!]!
   courseId: String
   creator: CourseCreator!
@@ -267,7 +270,7 @@ input EditCourseInput {
   category: String!
   text: [CourseItemInput!]!
   id: String!
-  language: String!
+  language: String
 }
 
 input VerifyCourseDto {

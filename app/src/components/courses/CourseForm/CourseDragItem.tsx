@@ -27,7 +27,7 @@ export const DragItem = ({
 }: RenderItemType) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [textForm, setTextForm] = useState(item.value);
-
+    console.log(item.type)
     return (
         <ScaleDecorator>
             <TouchableOpacity

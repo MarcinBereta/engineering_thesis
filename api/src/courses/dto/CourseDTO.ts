@@ -14,6 +14,8 @@ export class SimpleCourse {
     tag: string;
     @Field({ nullable: true })
     creatorId: string;
+    @Field({nullable:true})
+    language: string;
 }
 
 @ObjectType()
@@ -69,7 +71,7 @@ export class EditCourseInput {
     text: CourseItemInput[];
     @Field()
     id: string;
-    @Field()
+    @Field({nullable:true})
     language: string;
 }
 
