@@ -21,7 +21,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
 
     const { userInfo } = useContext(AuthContext);
     const user = route.params.user;
-
+    console.log(user)
     const [tempCategories, setTempCategories] = useState<
         { value: string; label: string; checked: boolean }[]
     >(() => {
@@ -38,7 +38,9 @@ const UserPage = ({ route, navigation }: UserPage) => {
         ];
         const cats = [];
         if (user.role == 'USER') return [];
-        const userCategories: string[] = user.Moderator[0].categories;
+        console.log()
+        const userCategories: string[] = user.Moderator != null ? user.Moderator.categories : [];
+        // const userCategories:string[] = []
         for (let dbCat of dbCategories) {
             if (userCategories.includes(dbCat))
                 cats.push({
@@ -66,7 +68,11 @@ const UserPage = ({ route, navigation }: UserPage) => {
         ];
         const cats = [];
         if (user.role == 'USER') return [];
-        const userCategories: string[] = user.Moderator[0].categories;
+        const userCategories: string[] = user.Moderator != null ? user.Moderator.categories : [];
+        console.log(user.Moderator != null)
+        console.log(user.Moderator)
+        // const userCategories:string[] = []
+
         for (let dbCat of dbCategories) {
             cats.push({
                 label: dbCat,

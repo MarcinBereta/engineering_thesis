@@ -1,12 +1,10 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
-    Button,
     Image,
     ScrollView,
     StyleSheet,
     Text,
-    TextInput,
     View,
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
@@ -21,6 +19,7 @@ import { graphqlURL } from '@/services/settings';
 import { Card, Icon } from '@rneui/base';
 import { widthPixel } from '@/utils/Normalize';
 import { CustomButton } from '@/components/CustomButton';
+import constants from '../../constants';
 type UserProfile = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
     'UserProfile'
@@ -53,8 +52,8 @@ export const UserProfile = (props: UserProfile) => {
                         style={styleForProfile.profileImage}
                         source={{
                             uri:
-                                userInfo?.image ??
-                                'https://randomuser.me/api/portraits/men/36.jpg',
+                               userInfo.image != null  ?constants.url + '/files/avatars/' + userInfo.image :
+                        'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                     />
                     <Text style={styleForProfile.username}>

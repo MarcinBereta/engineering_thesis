@@ -1,4 +1,4 @@
-import { Image, Text, View } from 'react-native';
+import { Dimensions, Image, Text, View } from 'react-native';
 import constants from '../../../../constants';
 import { Card } from '@rneui/themed';
 import { fontPixel } from '@/utils/Normalize';
@@ -7,7 +7,11 @@ export type courseItem = {
     type: string;
     value: string;
 };
+const { width, } = Dimensions.get('window');
 export const CourseListItem = ({ course: item }: { course: courseItem }) => {
+    if (item.type != 'text') {
+        console.log(constants.url + '/' + item.value);
+    }
     return (
         <Card
             containerStyle={{
@@ -22,8 +26,8 @@ export const CourseListItem = ({ course: item }: { course: courseItem }) => {
                 <Text>{item.value}</Text>
             ) : (
                 <Image
-                    style={{ width: '100%', height: 300 }}
-                    resizeMethod="resize"
+                    style={{ width: width * 0.9, height: 300 }}
+                    resizeMode='stretch'
                     source={{ uri: constants.url + '/' + item.value }}
                 />
             )}

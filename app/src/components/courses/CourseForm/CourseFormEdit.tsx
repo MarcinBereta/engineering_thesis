@@ -228,7 +228,7 @@ export const CourseEditForm = ({ route, navigation }: EditCourse) => {
                 keyExtractor={(item, index) => `item-${item.type} - ${index}`}
                 onDragEnd={({ data }) => setData(data)}
                 scrollEnabled={true}
-                style={{ flexDirection: 'column', maxHeight: height * 0.6 }}
+                style={{ flexDirection: 'column', maxHeight: height * 0.5 }}
                 renderItem={(params: {
                     item: any;
                     getIndex: () => number | undefined;

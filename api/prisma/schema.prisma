@@ -29,7 +29,7 @@ model User {
   Friends                 Friends[]          @relation(name: "friends_users")
   Friends_request         Friends[]          @relation(name: "friends_friends")
   VerificationForm        VerificationForm[]
-  Moderator               Moderator[]
+  Moderator               Moderator?        
   FriendsRequests         FriendsRequests[]  @relation(name: "friends_requests_user")
   FriendsRequests_friends FriendsRequests[]  @relation(name: "friends_requests_friend")
 }
@@ -124,11 +124,11 @@ model VerificationForm {
 
 model Moderator {
   id         String     @id @default(uuid())
-  userId     String
+  userId     String @unique
   createdAt  DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime   @updatedAt @db.Timestamptz(3)
   categories Category[]
-  User       User       @relation(fields: [userId], references: [id])
+  User       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   Course     Course[]
 }
 

@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native-gesture-handler';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
-import { getUsersGQL } from '@/services/admin/admin';
+import constants from '../../constants';
 const { height, width } = Dimensions.get('window');
 
 type DashboardScreen = NativeStackScreenProps<
@@ -88,7 +88,8 @@ const DashboardScreen = (props: DashboardScreen) => {
                         size={width * 0.1}
                         rounded
                         source={{
-                            uri: 'https://randomuser.me/api/portraits/men/36.jpg',
+                            uri:  userInfo.image != null  ?constants.url + '/files/avatars/' + userInfo.image :
+                        'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                         onPress={() => {
                             props.navigation.navigate('UserProfile');

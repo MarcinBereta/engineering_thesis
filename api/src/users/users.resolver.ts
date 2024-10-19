@@ -1,137 +1,135 @@
 import { Resolver, Query, Args, Context, Mutation } from '@nestjs/graphql';
-import { UsersService } from './users.service';
 import { User } from './dto/user.entity';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { CurrentUser } from 'src/auth/get-current-user.decorator';
-import { UserEdit } from './dto/edit-user-input';
-import {
-    VerificationForm,
-    VerificationFormData,
-    VerifyUser,
-} from './verification-form';
+import { ChangeData, VerificationForm, VerificationFormData, VerifyUser } from './verification-form';
 import { NullResponse } from './dto/none-reponse';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
+import { UserEdit } from './dto/edit-user-input';
+import { UsersService } from './users.service';
 
-@Resolver((of) => User)
+@Resolver(() => User)
 @UseGuards(JwtAuthGuard)
 
 // @UseGuards(JwtAuthGuard)
 export class UsersResolver {
-    constructor(private UsersService: UsersService) {}
+    constructor(private userService: UsersService) {}
 
-    @Query((returns) => [User])
+    @Query(() => [User])
     @UseInterceptors(CacheInterceptor)
     @CacheKey('all_users')
-    users(@CurrentUser() user: User): Promise<User[]> {
-        return this.UsersService.findAll();
+    users(): Promise<User[]> {
+        return this.userService.findAll();
     }
 
-    @Query((returns) => [User])
+    @Query(() => [User])
     getUsersWithPagination(@Args('pagination') pagination: PaginationDto) {
-        return this.UsersService.getUsersWithPagination(pagination);
+        return this.userService.getUsersWithPagination(pagination);
     }
 
-    @Query((returns) => CountDto)
+    @Query(() => CountDto)
     countUsersWithPagination(
         @Args('pagination') pagination: PaginationDto
     ): Promise<CountDto> {
-        return this.UsersService.getUsersCount(pagination);
+        return this.userService.getUsersCount(pagination);
     }
 
-    @Query((returns) => [User])
+    @Query(() => [User])
     getUserFriends(@Context() context) {
-        return this.UsersService.getUserFriends(context.req.user.id);
+        return this.userService.getUserFriends(context.req.user.id);
     }
 
-    @Query((returns) => [User])
+    @Query(() => [User])
     getUserFriendRequests(@Context() context) {
-        return this.UsersService.getFriendsRequests(context.req.user.id);
+        return this.userService.getFriendsRequests(context.req.user.id);
     }
 
-    @Query((returns) => [User])
+    @Query(() => [User])
     getAllUsers(): Promise<User[]> {
-        return this.UsersService.findAll();
+        return this.userService.findAll();
     }
 
-    @Mutation((returns) => User)
-    async updateUser(@Args('UserEdit') UserEdit: UserEdit): Promise<User> {
-        return this.UsersService.updateUser(UserEdit);
+    @Mutation(() => User)
+    async updateUser(@Args('UserEdit') UserEditInput: UserEdit): Promise<User> {
+        return this.userService.updateUser(UserEditInput);
     }
 
-    @Query((returns) => User)
+    @Query(() => User)
     async refreshUserData(@Context() context): Promise<User> {
-        return this.UsersService.getUserById(context.req.user.id);
+        return this.userService.getUserById(context.req.user.id);
     }
 
-    @Mutation((returns) => User)
+    @Mutation(() => User)
     async addVerificationForm(
-        @Args('VerificationForm') VerificationForm: VerificationForm,
+        @Args('VerificationForm') VerificationFormInput: VerificationForm,
         @Context() context
     ): Promise<User> {
-        return this.UsersService.addVerificationForm(
-            VerificationForm.text,
+        return this.userService.addVerificationForm(
+            VerificationFormInput.text,
             context.req.user.id
         );
     }
 
-    @Mutation((returns) => User)
+    @Mutation(() => User)
     async verifyUser(
-        @Args('VerifyUser') VerifyUser: VerifyUser,
+        @Args('VerifyUser') VerifyUserInput: VerifyUser,
         @Context() context
     ): Promise<User> {
         const user = context.req.user;
         if (user.role != 'ADMIN' && user.role != 'MODERATOR') {
             throw new Error('You are not allowed to verify users');
         }
-        return this.UsersService.verifyUser(VerifyUser.requestId);
+        return this.userService.verifyUser(VerifyUserInput.requestId);
     }
 
-    @Query((returns) => [VerificationFormData])
+    @Query(() => [VerificationFormData])
     @UseInterceptors(CacheInterceptor)
     @CacheKey('verification_requests')
-    async getVerifyRequests(
-        @Context() context
-    ): Promise<VerificationFormData[]> {
-        return this.UsersService.getVerificationForms();
+    async getVerifyRequests(): Promise<VerificationFormData[]> {
+        return this.userService.getVerificationForms();
     }
 
-    @Mutation((returns) => NullResponse)
+    @Mutation(() => NullResponse)
     async addFriendRequest(
         @Args('friendName') friendName: string,
         @Context() context
     ) {
-        return this.UsersService.sendFriendRequest(
+        return this.userService.sendFriendRequest(
             friendName,
             context.req.user.id
         );
     }
 
-    @Mutation((returns) => NullResponse)
+    @Mutation(() => NullResponse)
     async acceptFriendRequest(
         @Args('friendId') requestId: string,
         @Context() context
     ) {
-        return this.UsersService.acceptFriendRequest(
+        return this.userService.acceptFriendRequest(
             requestId,
             context.req.user.id
         );
     }
 
-    @Mutation((returns) => NullResponse)
+    @Mutation(() => NullResponse)
     async declineFriendRequest(
         @Args('friendId') requestId: string,
         @Context() context
     ) {
-        return this.UsersService.declineFriendRequest(
+        return this.userService.declineFriendRequest(
             requestId,
             context.req.user.id
         );
     }
 
-    @Mutation((returns) => NullResponse)
+    @Mutation(() => NullResponse)
     async removeFriend(@Args('friendId') friendId: string, @Context() context) {
-        return this.UsersService.removeFriend(friendId, context.req.user.id);
+        return this.userService.removeFriend(friendId, context.req.user.id);
+    }
+
+    @Mutation(()=>NullResponse)
+    async changeData(@Args('changeData') changeData: ChangeData, @Context() context) {
+        return this.userService.changeData(changeData, context.req.user.id);
     }
 }

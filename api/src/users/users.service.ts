@@ -5,7 +5,7 @@ import { CreateUserInput } from './dto/create-user-input';
 import { UserEdit } from './dto/edit-user-input';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { VerificationFormData } from './verification-form';
+import { ChangeData, VerificationFormData } from './verification-form';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
 @Injectable()
@@ -52,6 +52,9 @@ export class UsersService {
                         },
                     ],
                 },
+                include: {
+                    Moderator: true,
+                },
                 skip: (page - 1) * PAGINATION_SIZE,
                 take: PAGINATION_SIZE,
             });
@@ -60,6 +63,8 @@ export class UsersService {
         const cachedUsers = await this.cacheManager.get<User[]>(
             'all_users/' + page
         );
+
+        console.log(cachedUsers)
         if (cachedUsers) {
             return cachedUsers;
         }
@@ -67,6 +72,9 @@ export class UsersService {
         const users = await this.prismaService.user.findMany({
             skip: (page - 1) * PAGINATION_SIZE,
             take: PAGINATION_SIZE,
+            include: {
+                Moderator: true,
+            },
         });
 
         await this.cacheManager.set('all_users/' + page, users);
@@ -196,7 +204,7 @@ export class UsersService {
     async deleteUserCache() {
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
-        for (let key of keys) {
+        for (const key of keys) {
             if (key.includes('all_users')) {
                 cachesToDelete.push(this.cacheManager.del(key));
             }
@@ -471,6 +479,18 @@ export class UsersService {
                     { userId: userId, friendId: friendId },
                     { userId: friendId, friendId: userId },
                 ],
+            },
+        });
+    }
+
+    async changeData(changeData: ChangeData, userId: string) {
+        await this.prismaService.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                username: changeData.userName,
+                email: changeData.email,
             },
         });
     }

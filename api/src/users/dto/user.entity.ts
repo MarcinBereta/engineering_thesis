@@ -1,9 +1,22 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
+@ObjectType()
+export class SimpleModerator {
+    @Field()
+    id: string;
+    @Field()
+    userId: string;
+    @Field()
+    createdAt: Date;
+    @Field()
+    updatedAt: Date;
+    @Field(() => [String])
+    categories: string[];
+}
 
 @ObjectType()
 export class User {
-    @Field((type) => String)
+    @Field(() => String)
     id: string;
     @Field()
     username: string;
@@ -11,9 +24,9 @@ export class User {
     email: string;
     @Field()
     password: string;
-    @Field((type) => Date)
+    @Field(() => Date, { nullable: true })
     createdAt: Date;
-    @Field()
+    @Field({ nullable: true })
     updatedAt: Date;
     @Field()
     role: Role;
@@ -21,20 +34,6 @@ export class User {
     verified: boolean;
     @Field({ nullable: true })
     image: string | null;
-    @Field((type) => [SimpleModerator])
-    Moderator?: SimpleModerator[];
-}
-
-@ObjectType()
-export class SimpleModerator {
-    @Field()
-    id: String;
-    @Field()
-    userId: String;
-    @Field()
-    createdAt: Date;
-    @Field()
-    updatedAt: Date;
-    @Field((type) => [String])
-    categories: String[];
+    @Field(() => SimpleModerator, { nullable: true })
+    Moderator?: SimpleModerator;
 }

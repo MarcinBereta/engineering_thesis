@@ -26,6 +26,14 @@ export const addCourseGQL = graphql(
     [courseFragment]
 );
 
+export const changeDataGQL = graphql(`
+    mutation ChangeData($changeData: ChangeData!) {
+        changeData(changeData: $changeData) {
+            message
+        }
+    }
+`);
+
 export const verifyCourseGQL = graphql(`
     mutation verifyCourse($verifyCourse: VerifyCourseDto!) {
         verifyCourse(verifyCourse: $verifyCourse) {
@@ -75,7 +83,6 @@ export const getCoursesWithPaginationGQL = graphql(`
                 type
                 value
             }
-            courseId
             language
         }
         countCoursesWithPagination(pagination: $pagination) {
@@ -97,6 +104,7 @@ export const getUnverifiedCoursesGQL = graphql(`
                 type
                 value
             }
+            language
         }
     }
 `);
@@ -148,6 +156,21 @@ export const addPhotos = async (photos: File[], id: string) => {
     return await axios({
         method: 'POST',
         url: constants.url + `/files/${id}`,
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+        data: formData,
+    });
+};
+
+export const addAvatar = async (photo: File, id: string) => {
+    const formData = new FormData();
+
+    formData.append('file', photo);
+    console.log(photo);
+    return await axios({
+        method: 'POST',
+        url: constants.url + `/files/avatar/${id}/${photo.name}`,
         headers: {
             'Content-Type': 'multipart/form-data',
         },

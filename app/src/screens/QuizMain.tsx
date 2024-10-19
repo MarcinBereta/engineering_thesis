@@ -59,8 +59,8 @@ const QuizMain = ({ route, navigation }: quiz) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['MostFitableCourse'] });
             queryClient.invalidateQueries({ queryKey: ['UserScore'] });
-        }
-    })
+        },
+    });
 
     const { quiz } = route.params;
     const [questions, setQuestions] = useState<extendedQuestion[]>(() => {
@@ -170,6 +170,14 @@ const QuizMain = ({ route, navigation }: quiz) => {
                         margin: 10,
                     }}
                 >
+                    {currentQuestion != 0 && (
+                        <CustomButton
+                            onPress={() => {
+                                setCurrentQuestion(currentQuestion - 1);
+                            }}
+                            title={t('previous_question')}
+                        />
+                    )}
                     <CustomButton
                         onPress={() => {
                             if (currentQuestion === questions.length - 1) {
@@ -180,19 +188,12 @@ const QuizMain = ({ route, navigation }: quiz) => {
                                 setCurrentQuestion(currentQuestion + 1);
                             }
                         }}
-                        title={`${currentQuestion == questions.length - 1
-                            ? t('end_quiz')
-                            : t('next_question')
-                            }`}
+                        title={`${
+                            currentQuestion == questions.length - 1
+                                ? t('end_quiz')
+                                : t('next_question')
+                        }`}
                     />
-                    {currentQuestion != 0 && (
-                        <CustomButton
-                            onPress={() => {
-                                setCurrentQuestion(currentQuestion - 1);
-                            }}
-                            title={t('previous_question')}
-                        />
-                    )}
                 </View>
             </Layout>
         );
