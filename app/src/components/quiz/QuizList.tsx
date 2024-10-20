@@ -116,9 +116,10 @@ const QuizzesList = (props: QuizzesList) => {
                         { label: 'Other', value: 'OTHER' },
                     ]}
                     value={selectedCategory}
-                    onValueChange={(itemValue: SetStateAction<string>) =>
-                        setSelectedCategory(itemValue)
-                    }
+                    onValueChange={(itemValue: SetStateAction<string>) => {
+                        setSelectedCategory(itemValue);
+                        setPage(1);
+                    }}
                 />
             </View>
             <SearchBar
@@ -127,6 +128,7 @@ const QuizzesList = (props: QuizzesList) => {
                 value={search}
                 onChangeText={(text) => {
                     setSearch(text);
+                    setPage(1);
                 }}
             />
             <FlatList

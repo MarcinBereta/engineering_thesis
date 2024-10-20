@@ -60,13 +60,13 @@ export type User = {
     image: string | null;
     role: string;
     verified: boolean;
-    Moderator: {
+    Moderator?: {
         id: string;
         userId: string;
         createdAt: Date;
         updatedAt: Date;
         categories: string[];
-    }[];
+    } | null;
 };
 
 export type AuthenticatedRootStackParamList = {

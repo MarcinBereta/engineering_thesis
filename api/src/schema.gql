@@ -2,17 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type SimpleModerator {
   id: String!
-  username: String!
-  email: String!
-  password: String!
+  userId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  role: String!
-  verified: Boolean!
-  image: String
-  Moderator: [SimpleModerator!]!
+  categories: [String!]!
 }
 
 """
@@ -20,12 +15,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type SimpleModerator {
+type User {
   id: String!
-  userId: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  categories: [String!]!
+  username: String!
+  email: String!
+  password: String!
+  createdAt: DateTime
+  updatedAt: DateTime
+  role: String!
+  verified: Boolean!
+  image: String
+  Moderator: SimpleModerator
 }
 
 type simpleUser {
@@ -212,6 +212,7 @@ type Mutation {
   acceptFriendRequest(friendId: String!): NullResponse!
   declineFriendRequest(friendId: String!): NullResponse!
   removeFriend(friendId: String!): NullResponse!
+  changeData(changeData: ChangeData!): NullResponse!
   addCourse(newCourse: CourseInput!): Course!
   editCourse(editCourse: EditCourseInput!): Course!
   verifyCourse(verifyCourse: VerifyCourseDto!): Course!
@@ -250,6 +251,11 @@ input VerificationForm {
 
 input VerifyUser {
   requestId: String!
+}
+
+input ChangeData {
+  userName: String!
+  email: String!
 }
 
 input CourseInput {

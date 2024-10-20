@@ -236,7 +236,7 @@ export const CourseForm = (props: CourseForm) => {
                     }
                     onDragEnd={({ data }) => setData(data)}
                     scrollEnabled={true}
-                    style={{ flexDirection: 'column', maxHeight: height * 0.6 }}
+                    style={{ flexDirection: 'column', maxHeight: height * 0.5 }}
                     renderItem={(params: {
                         item: any;
                         getIndex: () => number | undefined;

@@ -67,7 +67,7 @@ const CoursesList = (props: CoursesList) => {
                 {
                     Authorization: 'Bearer ' + userInfo?.token,
                 }
-            )
+            ),
     });
 
     if (userInfo === null || data === undefined) {
@@ -76,7 +76,6 @@ const CoursesList = (props: CoursesList) => {
     if (scoresData === undefined) {
         return null;
     }
-
 
     if (isLoading || data == undefined) {
         return <Text>{t('loading')}...</Text>;
@@ -99,7 +98,9 @@ const CoursesList = (props: CoursesList) => {
                         fontWeight: 'bold',
                         fontSize: normalizeText(15),
                     }}
-                >Select Category:</Text>
+                >
+                    Select Category:
+                </Text>
                 <Picker
                     style={{
                         inputAndroid: {
@@ -111,7 +112,10 @@ const CoursesList = (props: CoursesList) => {
                         },
                     }}
                     value={selectedCategory}
-                    onValueChange={(value) => setSelectedCategory(value)}
+                    onValueChange={(value) => {
+                        setSelectedCategory(value);
+                        setPage(1);
+                    }}
                     items={[
                         { label: 'All', value: '' },
                         { label: 'History', value: 'HISTORY' },
@@ -132,6 +136,7 @@ const CoursesList = (props: CoursesList) => {
                 value={search}
                 onChangeText={(text) => {
                     setSearch(text);
+                    setPage(1);
                 }}
             />
             <FlatList

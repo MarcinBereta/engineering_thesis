@@ -13,6 +13,13 @@ export class VerifyUser {
     requestId: string;
 }
 
+@InputType()
+export class ChangeData {
+    @Field()
+    userName: string;
+    @Field()
+    email: string;
+}
 @ObjectType()
 export class VerificationFormData {
     @Field()

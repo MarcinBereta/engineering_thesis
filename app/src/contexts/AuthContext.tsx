@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import {
     registerGQL,
     loginGQL,
@@ -33,6 +33,8 @@ interface AuthContext {
         password: string
     ) => Promise<void>;
     logout: () => Promise<void>;
+    updateUserImage: (image: string) => void;
+    updateUserData: (userName: string, email: string) => void;
 }
 
 export const AuthContext = React.createContext<AuthContext>({} as any);
@@ -86,7 +88,7 @@ export const AuthProvider = ({
             );
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const loginMutation = useMutation({
@@ -115,7 +117,7 @@ export const AuthProvider = ({
             );
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const refreshTokenMutation = useMutation({
@@ -183,7 +185,7 @@ export const AuthProvider = ({
             });
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const refreshLoading = refreshMutation.isPending;
@@ -213,7 +215,7 @@ export const AuthProvider = ({
             );
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const register = async (
@@ -274,13 +276,13 @@ export const AuthProvider = ({
                             username:
                                 userInfo.user.name ||
                                 userInfo.user.familyName +
-                                    ' ' +
-                                    userInfo.user.givenName ||
+                                ' ' +
+                                userInfo.user.givenName ||
                                 '',
                             image: userInfo.user.photo as string,
                         },
                     });
-                } catch (err) {}
+                } catch (err) { }
                 break;
         }
     };
@@ -326,6 +328,40 @@ export const AuthProvider = ({
         }
     };
 
+    const updateUserImage = async (image: string | null) => {
+        if (userInfo != null) {
+            setUserInfo({
+                ...userInfo,
+                image: image,
+            });
+            await AsyncStorage.setItem(
+                'userInfo',
+                JSON.stringify({
+                    ...userInfo,
+                    image: image,
+                })
+            );
+        }
+    };
+
+    const updateUserData = async (email: string, userName: string) => {
+        if (userInfo != null) {
+            setUserInfo({
+                ...userInfo,
+                email,
+                username: userName,
+            });
+            await AsyncStorage.setItem(
+                'userInfo',
+                JSON.stringify({
+                    ...userInfo,
+                    email,
+                    username: userName,
+                })
+            );
+        }
+    };
+
     React.useEffect(() => {
         isLoggedIn();
 
@@ -352,6 +388,8 @@ export const AuthProvider = ({
                 register,
                 login,
                 logout,
+                updateUserImage,
+                updateUserData,
             }}
         >
             {children}
@@ -361,4 +399,3 @@ export const AuthProvider = ({
 function getConfig(arg0: string, arg1: string) {
     throw new Error('Function not implemented.');
 }
-
