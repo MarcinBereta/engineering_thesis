@@ -88,7 +88,7 @@ export const AuthProvider = ({
             );
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const loginMutation = useMutation({
@@ -117,7 +117,7 @@ export const AuthProvider = ({
             );
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const refreshTokenMutation = useMutation({
@@ -185,7 +185,7 @@ export const AuthProvider = ({
             });
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const refreshLoading = refreshMutation.isPending;
@@ -215,7 +215,7 @@ export const AuthProvider = ({
             );
             setSocket(socket);
         },
-        onError: async (data, variables, context) => {},
+        onError: async (data, variables, context) => { },
     });
 
     const register = async (
@@ -276,13 +276,13 @@ export const AuthProvider = ({
                             username:
                                 userInfo.user.name ||
                                 userInfo.user.familyName +
-                                    ' ' +
-                                    userInfo.user.givenName ||
+                                ' ' +
+                                userInfo.user.givenName ||
                                 '',
                             image: userInfo.user.photo as string,
                         },
                     });
-                } catch (err) {}
+                } catch (err) { }
                 break;
         }
     };

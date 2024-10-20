@@ -13,7 +13,7 @@ export class UsersService {
     constructor(
         private prismaService: PrismaService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async findAll(): Promise<User[]> {
         const cachedUsers = await this.cacheManager.get<User[]>('all_users');
@@ -59,7 +59,6 @@ export class UsersService {
                 take: PAGINATION_SIZE,
             });
         }
-
         const cachedUsers = await this.cacheManager.get<User[]>(
             'all_users/' + page
         );
@@ -484,7 +483,8 @@ export class UsersService {
     }
 
     async changeData(changeData: ChangeData, userId: string) {
-        await this.prismaService.user.update({
+        console.log(changeData);
+        const user = await this.prismaService.user.update({
             where: {
                 id: userId,
             },
@@ -493,5 +493,7 @@ export class UsersService {
                 email: changeData.email,
             },
         });
+        await this.deleteUserCache();
+        return user;
     }
 }

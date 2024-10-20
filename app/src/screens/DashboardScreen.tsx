@@ -28,7 +28,7 @@ type DashboardScreen = NativeStackScreenProps<
 const DashboardScreen = (props: DashboardScreen) => {
     const { t } = useTranslation();
     const { logout, userInfo, socket } = useContext(AuthContext);
-    const { data: data} = useQuery({
+    const { data: data } = useQuery({
         queryKey: ['courses'],
         queryFn: async () =>
             request(
@@ -88,8 +88,8 @@ const DashboardScreen = (props: DashboardScreen) => {
                         size={width * 0.1}
                         rounded
                         source={{
-                            uri:  userInfo.image != null  ?constants.url + '/files/avatars/' + userInfo.image :
-                        'https://randomuser.me/api/portraits/men/36.jpg',
+                            uri: userInfo.image != null ? constants.url + '/files/avatars/' + userInfo.image :
+                                'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                         onPress={() => {
                             props.navigation.navigate('UserProfile');

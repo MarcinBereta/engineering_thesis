@@ -36,16 +36,27 @@ export const UserSettings = (props: UserSettings) => {
     const [email, setEmail] = useState(userInfo?.email);
     const [language, setLanguage] = useState<string>('');
 
-    const addCourseMutation = useMutation({
-        mutationFn: async (data: changeDataDto) =>
-            request(graphqlURL, changeDataGQL, data, {
-                Authorization: 'Bearer ' + userInfo?.token,
-            }),
+    const addUserMutation = useMutation({
+        mutationFn: async (data: changeDataDto) => {
+            console.log('Sending request with data:', data);
+            try {
+                const response = await request(graphqlURL, changeDataGQL, data, {
+                    Authorization: 'Bearer ' + userInfo?.token,
+                });
+                console.log('Response:', response);
+                return response;
+            } catch (error) {
+                console.error('Error in request:', error);
+                throw error;
+            }
+        },
         onSuccess: () => {
+            console.log(email, userName)
             updateUserData(email || '', userName || '');
+            clearCache();
+            console.log('Updated')
         },
     });
-
     useEffect(() => {
         getLanguage().then((lang) => setLanguage(lang));
     }, []);
@@ -75,18 +86,26 @@ export const UserSettings = (props: UserSettings) => {
         await addAvatar(res[0], userInfo?.id || '');
         setImage(file.name);
         updateUserImage(file.name)
+        await clearCache();
     };
 
-    const updateData = () => {
+    const updateData = async () => {
         if (userName == null || email == null) return;
         if (userName.length < 3 || email.length == 3) return;
-
-        addCourseMutation.mutate({
+        addUserMutation.mutate({
             changeData: {
                 userName: userName || '',
                 email: email || '',
             },
         });
+    };
+    const clearCache = async () => {
+        try {
+            await AsyncStorage.removeItem('userInfo');
+            console.log('Specific item removed from cache');
+        } catch (error) {
+            console.error('Error clearing cache:', error);
+        }
     };
 
     return (
@@ -113,7 +132,7 @@ export const UserSettings = (props: UserSettings) => {
             />
             <Text>{t('Email')}:</Text>
             <TextInput
-                value={userInfo?.email}
+                value={email}
                 onChangeText={(text) => setEmail(text)}
             />
             <CustomButton title={t('Change photo')} onPress={uploadFile} />

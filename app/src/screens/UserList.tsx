@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import { makeShareableCloneOnUIRecursive } from 'react-native-reanimated/lib/typescript/reanimated2/shareables';
+import constants from '../../constants';
 import { Layout } from '@/components/Layout';
 type UserList = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
@@ -105,8 +106,8 @@ const UserList = (props: UserList) => {
                                         containerStyle={{ margin: 10 }}
                                         source={{
                                             uri:
-                                                item.image ||
-                                                'https://cdn-icons-png.flaticon.com/512/6596/6596121.png',
+                                                item.image != null ? constants.url + '/files/avatars/' + item.image :
+                                                    'https://randomuser.me/api/portraits/men/36.jpg',
                                         }}
                                     />
                                     <View style={{ flexDirection: 'column' }}>
