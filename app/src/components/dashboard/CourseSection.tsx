@@ -24,6 +24,14 @@ export const DashboardCourseSection = ({
         }
         return userScore.some((score) => score.quizName === courseName) || false;
     };
+
+    function shortenCourseName(courseName: string) {
+        if (courseName.length > 20) {
+            return courseName.substring(0, 20) + '...';
+        }
+        return courseName;
+    }
+
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
             <TouchableOpacity
@@ -52,10 +60,10 @@ export const DashboardCourseSection = ({
                     >
                         <Card
                             containerStyle={{
-                                width: width * 0.45,
+                                width: width * 0.4,
                             }}
                         >
-                            <Card.Title>{c.name}
+                            <Card.Title>{shortenCourseName(c.name)}
                                 {hasCompletedQuiz(c.name) && (
                                     <Icon
                                         type="font-awesome"
@@ -66,13 +74,16 @@ export const DashboardCourseSection = ({
                                 )}
                             </Card.Title>
                             <Card.Divider />
-                            <Card.FeaturedSubtitle>
-                                {c.creator.username}
-                            </Card.FeaturedSubtitle>
+                            <Card.FeaturedSubtitle style={{
+                                color: 'purple',
+                                textAlign: 'center',
+                            }}>{t('creator')}: {c.creator.username}</Card.FeaturedSubtitle>
+                            {/* {c.name} */}
+                            {/* </Card.FeaturedSubtitle> */}
                         </Card>
                     </TouchableOpacity>
                 ))}
             </View>
-        </View>
+        </View >
     );
 };

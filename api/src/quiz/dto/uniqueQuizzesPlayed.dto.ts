@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class PercentageOfCategoryDTO {
+export class UniqueQuizzesPlayedDTO {
     @Field(() => Number)
     MATH: number;
 

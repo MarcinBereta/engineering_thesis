@@ -312,11 +312,10 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                 });
                             }
                         }}
-                        title={`${
-                            currentIndex == quiz.questions.length - 1
-                                ? t('end_quiz')
-                                : t('next_question')
-                        }`}
+                        title={`${currentIndex == quiz.questions.length - 1
+                            ? t('end_quiz')
+                            : t('next_question')
+                            }`}
                     />
                     {currentIndex != 0 && (
                         <CustomButton
@@ -350,19 +349,19 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                 }}
             >
                 <Text style={{ textAlign: 'center', fontSize: fontPixel(40) }}>
-                    Recreate quiz
+                    {t('recreate_quiz')}
                 </Text>
                 <TextInput
-                    placeholder="Question count"
+                    placeholder={t("question_count")}
                     keyboardType="numeric"
                     onChangeText={(text) => setQuestionCount(parseInt(text))}
-                    style={{ width: '100%', textAlign:'center',fontSize:fontPixel(20) }}
+                    style={{ width: '100%', textAlign: 'center', fontSize: fontPixel(20) }}
                 />
                 <TextInput
-                    placeholder="Answer count"
+                    placeholder={t("answer_count")}
                     keyboardType="numeric"
                     onChangeText={(text) => setAnswerCount(parseInt(text))}
-                    style={{ width: '100%', textAlign:'center', fontSize:fontPixel(20) }}
+                    style={{ width: '100%', textAlign: 'center', fontSize: fontPixel(20) }}
 
                 />
                 <View style={{ padding: 5 }}>
@@ -379,7 +378,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                     </Text>
                     {types.map((c) => {
                         return (
-                            <TouchableOpacity key={c} onPress={() => {}}>
+                            <TouchableOpacity key={c} onPress={() => { }}>
                                 <Text>{c}</Text>
                             </TouchableOpacity>
                         );
@@ -453,7 +452,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                                     });
                                                 }}
                                             >
-                                                <Text>{c}</Text>
+                                                <Text>{t(c)}</Text>
                                             </TouchableOpacity>
                                         );
                                     })}
@@ -488,7 +487,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                     onPress={() => {
                         setEditActive(!editActive);
                     }}
-                    title={t('edit_quiz')}
+                    title={t('edit')}
                 />
             </View>
         </Layout>

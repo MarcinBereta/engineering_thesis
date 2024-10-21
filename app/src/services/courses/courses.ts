@@ -38,12 +38,6 @@ export const verifyCourseGQL = graphql(`
     mutation verifyCourse($verifyCourse: VerifyCourseDto!) {
         verifyCourse(verifyCourse: $verifyCourse) {
             id
-            name
-            text {
-                id
-                type
-                value
-            }
         }
     }
 `);
@@ -116,7 +110,7 @@ export const userStatsGQL = graphql(`
         getMaxedQuizesCount
         getFriendsCount
         getNumberOfCourses
-        getPercentageOfCategory {
+        numberOfUniqueQuizzesPlayedByCategory {
             MATH
             HISTORY
             GEOGRAPHY

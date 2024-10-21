@@ -211,7 +211,7 @@ export const CourseForm = (props: CourseForm) => {
                         { label: t('MUSIC'), value: 'MUSIC' },
                         { label: t('SPORTS'), value: 'SPORTS' },
                         { label: t('OTHER'), value: 'OTHER' },
-                        { label: t('Choose category'), value: '' },
+                        { label: t('choose_category'), value: '' },
                     ]}
                     value={category}
                 />
@@ -350,7 +350,7 @@ export const CourseForm = (props: CourseForm) => {
                                 uploadCourse();
                             }
                         }}
-                        title="Create"
+                        title={t('create')}
                         disabled={isCreateButtonDisabled}
                     />
                 </View>

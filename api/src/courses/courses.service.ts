@@ -20,7 +20,7 @@ export class CoursesService {
         private prismaService: PrismaService,
         private quizService: QuizService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async processCourse(course: EditCourseInput | CourseInput, id: string) {
         const courseItemsToAdd = [];
@@ -36,10 +36,9 @@ export class CoursesService {
                 } else {
                     const fileName = join(
                         `public/${id}`,
-                        `image-${i}.${
-                            course.text[i].value == 'jpg'
-                                ? 'jpeg'
-                                : course.text[i].value
+                        `image-${i}.${course.text[i].value == 'jpg'
+                            ? 'jpeg'
+                            : course.text[i].value
                         }`
                     );
 
@@ -543,7 +542,7 @@ export class CoursesService {
 
     async getDashboardCourses() {
         const cachedCourses = await this.cacheManager.get('dashboard_courses');
-        if (cachedCourses && (cachedCourses as any[]).length == 3) {
+        if (cachedCourses && (cachedCourses as any[]).length == 4) {
             return cachedCourses;
         }
         const courses = await this.prismaService.course.findMany({
@@ -554,7 +553,7 @@ export class CoursesService {
             where: {
                 verified: true,
             },
-            take: 3,
+            take: 4,
         });
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;

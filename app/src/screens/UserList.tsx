@@ -113,7 +113,7 @@ const UserList = (props: UserList) => {
                                     <View style={{ flexDirection: 'column' }}>
                                         <Text>{item.username}</Text>
                                         <Text style={{ fontWeight: '300' }}>
-                                            {item.role}
+                                            {t(item.role.toLowerCase())}
                                         </Text>
                                     </View>
                                 </View>

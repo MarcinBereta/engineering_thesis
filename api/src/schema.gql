@@ -150,7 +150,7 @@ type UserScoreExtended {
   quizName: String!
 }
 
-type PercentageOfCategoryDTO {
+type UniqueQuizzesPlayedDTO {
   MATH: Float!
   HISTORY: Float!
   GEOGRAPHY: Float!
@@ -191,7 +191,7 @@ type Query {
   getFriendsCount: Float!
   getNumberOfCourses: Float!
   percentOfCoursesByCategory(category: String!): Float!
-  getPercentageOfCategory: PercentageOfCategoryDTO!
+  numberOfUniqueQuizzesPlayedByCategory: UniqueQuizzesPlayedDTO!
 }
 
 input PaginationDto {

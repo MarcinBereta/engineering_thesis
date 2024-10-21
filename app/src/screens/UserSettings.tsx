@@ -110,50 +110,64 @@ export const UserSettings = (props: UserSettings) => {
 
     return (
         <Layout icon="dashboard" navigation={props.navigation}>
-            <Image
-                style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius: 60,
-                    marginBottom: 10,
-                }}
-                source={{
-                    uri:
-                        image != null
-                            ? constants.url + '/files/avatars/' + image
-                            : 'https://randomuser.me/api/portraits/men/36.jpg',
-                }}
-            />
-            <Text>{t('userSettings')}</Text>
-            <Text>{t('Username')}:</Text>
-            <TextInput
-                value={userName}
-                onChangeText={(text) => setUserName(text)}
-            />
-            <Text>{t('Email')}:</Text>
-            <TextInput
-                value={email}
-                onChangeText={(text) => setEmail(text)}
-            />
-            <CustomButton title={t('Change photo')} onPress={uploadFile} />
-            <CustomButton title={t('update_data')} onPress={updateData} />
-
-            <RNPickerSelect
-                onValueChange={(value) => {
-                    changeLanguage(value);
-                }}
-                items={[
-                    { label: t('English'), value: 'en' },
-                    { label: t('Polish'), value: 'pl' },
-                    { label: t('Spanish'), value: 'es' },
-                    { label: t('France'), value: 'fr' },
-                    { label: t('German'), value: 'de' },
-                ]}
-                value={language}
-            />
+            <View style={styles.container}>
+                <Text style={styles.header}>{t('userSettings')}</Text>
+                <Text style={styles.titleLabel}>{t('update_photo')}</Text>
+                <View style={styles.imageContainer}>
+                    <Image
+                        style={{
+                            width: 150,
+                            height: 150,
+                            borderRadius: 60,
+                            marginBottom: 10,
+                        }}
+                        source={{
+                            uri:
+                                image != null
+                                    ? constants.url + '/files/avatars/' + image
+                                    : 'https://randomuser.me/api/portraits/men/36.jpg',
+                        }}
+                    />
+                </View>
+                <CustomButton title={t('update_photo')} onPress={uploadFile} />
+                <Text style={styles.titleLabel}>{t('update_data')}</Text>
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>{t('Username')}:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={userName}
+                        onChangeText={(text) => setUserName(text)}
+                    />
+                </View>
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>{t('Email')}:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={email}
+                        onChangeText={(text) => setEmail(text)}
+                    />
+                </View>
+                <CustomButton title={t('update_data')} onPress={updateData} />
+                <View style={styles.pickerContainer}>
+                    <Text style={styles.titleLabel}>{t('language')}</Text>
+                    <RNPickerSelect
+                        onValueChange={changeLanguage}
+                        items={[
+                            { label: t('English'), value: 'en' },
+                            { label: t('Polish'), value: 'pl' },
+                            { label: t('Spanish'), value: 'es' },
+                            { label: t('France'), value: 'fr' },
+                            { label: t('German'), value: 'de' },
+                        ]}
+                        value={language}
+                        style={pickerSelectStyles}
+                    />
+                </View>
+            </View>
         </Layout>
     );
 };
+
 function generateRandomId() {
     const size = 16;
     let result = '';
@@ -169,3 +183,68 @@ function generateRandomId() {
     }
     return result;
 }
+
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    imageContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20,
+    },
+    header: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    inputGroup: {
+        marginBottom: 20,
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 5,
+    },
+    titleLabel: {
+        fontSize: 20,
+        marginBottom: 10,
+        fontWeight: 'bold',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        fontSize: 16,
+    },
+    pickerContainer: {
+        marginTop: 20,
+    },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        color: 'black',
+        paddingRight: 30, // to ensure the text is never behind the icon
+    },
+    inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        color: 'black',
+        paddingRight: 30, // to ensure the text is never behind the icon
+    },
+});

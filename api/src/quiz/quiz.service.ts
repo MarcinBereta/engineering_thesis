@@ -10,7 +10,7 @@ import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
 import { Category, Prisma } from '@prisma/client';
 import { DashboardQuiz } from './dto/quiz.dashboard';
 import { QuizUpdateDto } from './dto/quiz.update';
-import { PercentageOfCategoryDTO } from './dto/percentage-of-category.dto';
+import { UniqueQuizzesPlayedDTO } from './dto/uniqueQuizzesPlayed.dto';
 
 enum QuizOptions {
     EXCLUDE_DATES,
@@ -37,7 +37,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -89,14 +89,14 @@ export class QuizService {
                 UserScores: true,
                 course: true,
             },
-            take: 3,
+            take: 4,
         });
 
         return quizzes;
     }
 
     async getQuizzesWithPagination(pagination: PaginationDto) {
-        const { search, page } = pagination;
+        const { search, page, category } = pagination;
 
         if (search) {
             return await this.prismaService.quiz.findMany({
@@ -110,11 +110,26 @@ export class QuizService {
                     UserScores: true,
                     course: true,
                 },
-                skip: page,
+                skip: (page - 1) * PAGINATION_SIZE,
                 take: PAGINATION_SIZE,
             });
         }
-
+        if (category) {
+            return await this.prismaService.quiz.findMany({
+                where: {
+                    course: {
+                        category: category as Category,
+                    },
+                },
+                include: {
+                    questions: true,
+                    UserScores: true,
+                    course: true,
+                },
+                skip: (page - 1) * PAGINATION_SIZE,
+                take: PAGINATION_SIZE,
+            });
+        }
         const cachedQuizzes = await this.cacheManager.get<Quiz[]>(
             'all_quizzes/' + page
         );
@@ -140,7 +155,7 @@ export class QuizService {
     }
 
     async getQuizzesCountWithPagination(pagination: PaginationDto) {
-        const { search } = pagination;
+        const { search, category } = pagination;
 
         if (search) {
             const count = await this.prismaService.quiz.count({
@@ -152,6 +167,18 @@ export class QuizService {
             });
 
             return { count, size: PAGINATION_SIZE };
+        }
+        if (category) {
+            const count = await this.prismaService.quiz.count({
+                where: {
+                    course: {
+                        category: category as Category,
+                    },
+                },
+            });
+            console.log('Count: ', count);
+            return { count, size: PAGINATION_SIZE };
+
         }
         const count = await this.prismaService.quiz.count();
         const cachedCount =
@@ -327,8 +354,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' questions in the quiz.'
+                    numberOfQuestions +
+                    ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -401,26 +428,26 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            'options in total.'
+                        4 * numberOfQuestions +
+                        'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            ' options in total.'
+                        4 * numberOfQuestions +
+                        ' options in total.'
                     );
                 }
 
             if (totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
             }
 
@@ -864,7 +891,7 @@ export class QuizService {
     async getNumberOfCourses(): Promise<number> {
         return await this.prismaService.course.count();
     }
-    async percentOfCoursesByCategory(
+    async numberOfUniqueQuizzesPlayed(
         userID: string,
         category: string
     ): Promise<number> {
@@ -904,14 +931,14 @@ export class QuizService {
                 category: category as Category,
             },
         });
-        const percatage = (result[category] / courses.length) * 100;
+        const percatage = result[category];
         return percatage;
     }
 
-    async getPercentageOfCategory(
+    async numberOfUniqueQuizzesPlayedByCategory(
         userId: string
-    ): Promise<PercentageOfCategoryDTO> {
-        const result: PercentageOfCategoryDTO = {
+    ): Promise<UniqueQuizzesPlayedDTO> {
+        const result: UniqueQuizzesPlayedDTO = {
             MATH: 0,
             HISTORY: 0,
             GEOGRAPHY: 0,
@@ -924,7 +951,7 @@ export class QuizService {
         };
         for (const category of categories) {
             result[category] =
-                ((await this.percentOfCoursesByCategory(
+                ((await this.numberOfUniqueQuizzesPlayed(
                     userId,
                     category
                 )) as number) || 0;
