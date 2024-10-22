@@ -116,6 +116,28 @@ export const recreateQuizGQL = graphql(
     [quizQuestionFragment]
 );
 
+export const generateMoreQestionsforAddictionalQuizGQL = graphql(
+    `
+        mutation generateMoreQuizzes($generateMoreQuestions: MoreQuizzesDTO!) {
+            generateMoreQuizzes(generateMoreQuizzes: $generateMoreQuestions) {
+                id
+                courseId
+                name
+                questions {
+                    ...quizQuestionFragment
+                }
+                course {
+                    id
+                    name
+                    summary
+                    category
+                }
+            }
+        }
+    `,
+    [quizQuestionFragment]
+);
+
 export const updateQuizGQL = graphql(
     `
         mutation UpdateQuiz($updateQuiz: QuizUpdateDto!) {

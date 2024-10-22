@@ -782,6 +782,7 @@ export class QuizService {
 
     async generateMoreQestionsforAddictionalQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
         const mergedText: string = await this.mergeTexts(courseId);
+        console.log(courseId, typeOfQuiz);
         const courseLength = mergedText.length;
         const numberOfQuestions = await this.getNumberOfQuestions(courseLength);
         const courseBasic = await this.prismaService.course.findUnique({
@@ -790,13 +791,17 @@ export class QuizService {
             },
         });
         const category = courseBasic.category;
-        // get old questions
-        const oldQuestions = await this.prismaService.question.findMany({
-            where: {
-                quizId: courseId,
-            },
-        });
-
+        let oldQuestions = [];
+        try {
+            oldQuestions = await this.prismaService.question.findMany({
+                where: {
+                    quizId: courseId,
+                },
+            });
+        }
+        catch (error) {
+            console.log('No questions found');
+        }
         const oldQuestionsTexts = oldQuestions.map((question) => question.question);
 
         let typeOfQuizDescription = '';
@@ -804,15 +809,22 @@ export class QuizService {
         switch (typeOfQuiz) {
             case 'general':
                 typeOfQuizDescription = "Please generate only questions with general questions (don't focus on details, just on generalities).";
+                break;
             case 'specific':
                 typeOfQuizDescription = "Please generate only questions with specific questions (focus on details, be specific).";
+                break;
             case 'multiple':
                 typeOfQuizDescription = " Please generate only questions with multiple choice questions.";
+                break;
             case 'truefalse':
-                typeOfQuizDescription = " Please generate only questions with true/false questions.";
+                typeOfQuizDescription = " Please generate only questions with true/false questions. (so only anwsers questions will be true/false";
+                break;
             default:
                 typeOfQuizDescription = "Generate questions.";
+                break;
         };
+
+        console.log(typeOfQuizDescription);
 
         let specificParameters = '';
 
@@ -874,7 +886,7 @@ export class QuizService {
                 {
                     role: 'assistant',
                     content:
-                        'Create a quiz based on the text above (4 answers) exactly ' +
+                        'Create a quiz based on the text above exactly ' +
                         numberOfQuestions +
                         ' questions and save it in a JSON file.(json with question, options and correct_answer) in the ' +
                         courseBasic.language +
@@ -895,37 +907,37 @@ export class QuizService {
             },
         });
         const language = courseBasic.language;
-
+        console.log(typeOfQuiz)
         const translations = {
             en: {
-                general: 'general',
-                specific: 'specific',
-                multiple: 'multiple choice',
-                truefalse: 'true/false',
+                general: ' general',
+                specific: ' specific',
+                multiple: ' multiple choice',
+                truefalse: ' true/false',
             },
             pl: {
-                general: 'ogólne',
-                specific: 'szczegółowe',
-                multiple: 'wybór wielokrotny',
-                truefalse: 'prawda/fałsz',
+                general: ' ogólne',
+                specific: ' szczegółowe',
+                multiple: ' wybór wielokrotny',
+                truefalse: ' prawda/fałsz',
             },
             de: {
-                general: 'allgemein',
-                specific: 'spezifisch',
-                multiple: 'mehrfachauswahl',
-                truefalse: 'wahr/falsch',
+                general: ' allgemein',
+                specific: ' spezifisch',
+                multiple: ' mehrfachauswahl',
+                truefalse: ' wahr/falsch',
             },
             fr: {
-                general: 'général',
-                specific: 'spécifique',
-                multiple: 'choix multiple',
-                truefalse: 'vrai/faux',
+                general: ' général',
+                specific: ' spécifique',
+                multiple: ' choix multiple',
+                truefalse: ' vrai/faux',
             },
             es: {
-                general: 'general',
-                specific: 'específico',
-                multiple: 'opción múltiple',
-                truefalse: 'verdadero/falso',
+                general: ' general',
+                specific: ' específico',
+                multiple: ' opción múltiple',
+                truefalse: ' verdadero/falso',
             },
         };
 
@@ -936,12 +948,14 @@ export class QuizService {
         if (!this.checkCourseExistence(courseId)) {
             throw new Error('The course does not exist.');
         }
+        console.log(typeOfQuizzes);
         let quizList = [];
         const mergedText: string = await this.mergeTexts(courseId);
         const courseLength = mergedText.length;
         let numberOfQuestions = 0;
         numberOfQuestions = await this.getNumberOfQuestions(courseLength);
-        for (const typeOfQuiz in typeOfQuizzes) {
+        for (const typeOfQuiz of typeOfQuizzes) {
+            console.log(typeOfQuiz)
             const courseName = await this.getCourseName(courseId);
             const typeOfQuizTranslated = await this.translateTypeOfQuiz(courseId, typeOfQuiz);
             //check if quiz with this type already exists
@@ -958,16 +972,26 @@ export class QuizService {
 
             const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
             const questionsJson = JSON.parse(questions);
-            let verified = await this.verifyQuiz(questionsJson, numberOfQuestions);
+
+            let verified = await this.verifyQuiz(questionsJson, numberOfQuestions, typeOfQuiz === 'truefalse');
             let tries = 2;
             while (!verified) {
                 if (tries > 0) {
-                    const questions = await this.generateQuestions(courseId);
+                    const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
                     const questionsJson = JSON.parse(questions);
-                    verified = await this.verifyQuiz(
-                        questionsJson,
-                        numberOfQuestions
-                    );
+                    if (typeOfQuiz === 'truefalse') {
+                        verified = await this.verifyQuiz(
+                            questionsJson,
+                            numberOfQuestions,
+                            true
+                        );
+                    }
+                    else {
+                        verified = await this.verifyQuiz(
+                            questionsJson,
+                            numberOfQuestions
+                        );
+                    }
                     tries--;
                 } else {
                     throw new Error('Invalid data format.');
@@ -998,7 +1022,7 @@ export class QuizService {
                         UserScores: true,
                     },
                 });
-                console.log('QUIZ READY');
+                console.log('QUIZ READY Auuuu');
 
                 quizList.push(quiz);
             } else {

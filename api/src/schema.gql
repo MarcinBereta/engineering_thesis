@@ -219,6 +219,7 @@ type Mutation {
   addUserScore(addScore: AddScore!): Quiz!
   RecreateQuiz(recreateQuiz: RecreateQuizDto!): Quiz!
   updateQuiz(updateQuiz: QuizUpdateDto!): Quiz!
+  generateMoreQuizzes(generateMoreQuizzes: MoreQuizzesDTO!): [Quiz!]!
 }
 
 input SingUpUserInput {
@@ -308,4 +309,9 @@ input QuestionUpdateDto {
   answers: [String!]!
   correct: [String!]!
   type: String!
+}
+
+input MoreQuizzesDTO {
+  courseId: String!
+  quizOptions: [String!]!
 }

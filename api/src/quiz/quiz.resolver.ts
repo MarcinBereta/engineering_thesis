@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Context, Float } from '@nestjs/graphql';
-import { Quiz, RecreateQuizDto, UserScoreExtended } from './dto/quiz.dto';
+import { Quiz, RecreateQuizDto, UserScoreExtended, MoreQuizzesDTO } from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
@@ -110,5 +110,12 @@ export class QuizResolver {
     @Mutation(() => Quiz)
     async updateQuiz(@Args('updateQuiz') quizUpdate: QuizUpdateDto) {
         return this.quizService.updateQuizQuestions(quizUpdate);
+    }
+
+    @Mutation(() => [Quiz])
+    async generateMoreQuizzes(@Args('generateMoreQuizzes') MoreQuizzesDTO: MoreQuizzesDTO) {
+        return this.quizService.generateMoreQuizzes(
+            MoreQuizzesDTO.courseId,
+            MoreQuizzesDTO.quizOptions);
     }
 }
