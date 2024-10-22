@@ -485,6 +485,7 @@ export class QuizService {
         }
 
         const courseName = await this.getCourseName(courseId);
+
         if (
             questionsJson &&
             questionsJson.quiz &&
@@ -778,6 +779,245 @@ export class QuizService {
             });
         }
     }
+
+    async generateMoreQestionsforAddictionalQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
+        const mergedText: string = await this.mergeTexts(courseId);
+        const courseLength = mergedText.length;
+        const numberOfQuestions = await this.getNumberOfQuestions(courseLength);
+        const courseBasic = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+        const category = courseBasic.category;
+        // get old questions
+        const oldQuestions = await this.prismaService.question.findMany({
+            where: {
+                quizId: courseId,
+            },
+        });
+
+        const oldQuestionsTexts = oldQuestions.map((question) => question.question);
+
+        let typeOfQuizDescription = '';
+
+        switch (typeOfQuiz) {
+            case 'general':
+                typeOfQuizDescription = "Please generate only questions with general questions (don't focus on details, just on generalities).";
+            case 'specific':
+                typeOfQuizDescription = "Please generate only questions with specific questions (focus on details, be specific).";
+            case 'multiple':
+                typeOfQuizDescription = " Please generate only questions with multiple choice questions.";
+            case 'truefalse':
+                typeOfQuizDescription = " Please generate only questions with true/false questions.";
+            default:
+                typeOfQuizDescription = "Generate questions.";
+        };
+
+        let specificParameters = '';
+
+        switch (category) {
+            case 'MATH':
+                specificParameters =
+                    'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                break;
+            case 'HISTORY':
+                specificParameters =
+                    'Please do not add to many questions with dates. Be more specific about events and people.';
+                break;
+            case 'GEOGRAPHY':
+                specificParameters =
+                    'Be concise and specific about locations and events depending on the course.';
+                break;
+            case 'ENGLISH':
+                specificParameters =
+                    'Please add questions about grammar, vocabulary, literature, etc. based on the text above.';
+                break;
+            case 'ART':
+                specificParameters =
+                    'Please add questions about art history, techniques, artists, etc. based on the text above.';
+                break;
+            case 'SPORTS':
+                specificParameters =
+                    'Please add questions about sports history, rules, players, etc. based on the text above.';
+                break;
+            case 'SCIENCE':
+                specificParameters =
+                    'Please add questions about science history, theories, scientists, etc. based on the text above.';
+                break;
+            case 'MUSIC':
+                specificParameters =
+                    'Please add questions about music history, genres, artists, etc. based on the text above.';
+                break;
+            case 'OTHER' as string:
+                specificParameters =
+                    'Make sure that questions are based on the text above.';
+                break;
+            default:
+                specificParameters = 'Use only text above.';
+                break;
+        }
+
+        const completion = await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'You are a helpful assistant designed to output JSON.',
+                },
+                { role: 'user', content: mergedText },
+                {
+                    role: 'user', content:
+                        'Please do not generate questions that are already in the quiz: ' +
+                        oldQuestionsTexts.join(' ')
+                },
+                {
+                    role: 'assistant',
+                    content:
+                        'Create a quiz based on the text above (4 answers) exactly ' +
+                        numberOfQuestions +
+                        ' questions and save it in a JSON file.(json with question, options and correct_answer) in the ' +
+                        courseBasic.language +
+                        'language. ' +
+                        specificParameters + typeOfQuizDescription,
+                },
+            ],
+            model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
+            response_format: { type: 'json_object' },
+        });
+        return completion.choices[0].message.content;
+    }
+
+    async translateTypeOfQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
+        const courseBasic = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+        const language = courseBasic.language;
+
+        const translations = {
+            en: {
+                general: 'general',
+                specific: 'specific',
+                multiple: 'multiple choice',
+                truefalse: 'true/false',
+            },
+            pl: {
+                general: 'ogólne',
+                specific: 'szczegółowe',
+                multiple: 'wybór wielokrotny',
+                truefalse: 'prawda/fałsz',
+            },
+            de: {
+                general: 'allgemein',
+                specific: 'spezifisch',
+                multiple: 'mehrfachauswahl',
+                truefalse: 'wahr/falsch',
+            },
+            fr: {
+                general: 'général',
+                specific: 'spécifique',
+                multiple: 'choix multiple',
+                truefalse: 'vrai/faux',
+            },
+            es: {
+                general: 'general',
+                specific: 'específico',
+                multiple: 'opción múltiple',
+                truefalse: 'verdadero/falso',
+            },
+        };
+
+        return translations[language]?.[typeOfQuiz] || translations[language]?.general || 'general';
+    }
+
+    async generateMoreQuizzes(courseId: string, typeOfQuizzes: string[]): Promise<Quiz[]> {
+        if (!this.checkCourseExistence(courseId)) {
+            throw new Error('The course does not exist.');
+        }
+        let quizList = [];
+        const mergedText: string = await this.mergeTexts(courseId);
+        const courseLength = mergedText.length;
+        let numberOfQuestions = 0;
+        numberOfQuestions = await this.getNumberOfQuestions(courseLength);
+        for (const typeOfQuiz in typeOfQuizzes) {
+            const courseName = await this.getCourseName(courseId);
+            const typeOfQuizTranslated = await this.translateTypeOfQuiz(courseId, typeOfQuiz);
+            //check if quiz with this type already exists
+            const quiz = await this.prismaService.quiz.findFirst({
+                where: {
+                    courseId: courseId,
+                    name: courseName + typeOfQuizTranslated,
+                },
+            });
+
+            if (quiz) {
+                continue;
+            }
+
+            const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
+            const questionsJson = JSON.parse(questions);
+            let verified = await this.verifyQuiz(questionsJson, numberOfQuestions);
+            let tries = 2;
+            while (!verified) {
+                if (tries > 0) {
+                    const questions = await this.generateQuestions(courseId);
+                    const questionsJson = JSON.parse(questions);
+                    verified = await this.verifyQuiz(
+                        questionsJson,
+                        numberOfQuestions
+                    );
+                    tries--;
+                } else {
+                    throw new Error('Invalid data format.');
+                }
+            }
+
+            if (
+                questionsJson &&
+                questionsJson.quiz &&
+                Array.isArray(questionsJson.quiz)
+            ) {
+                const quiz = await this.prismaService.quiz.create({
+                    data: {
+                        courseId: courseId,
+                        name: courseName + typeOfQuizTranslated,
+                        questions: {
+                            create: questionsJson.quiz.map((questionData) => ({
+                                question: questionData.question,
+                                answers: {
+                                    set: questionData.options,
+                                },
+                                correct: [questionData.correct_answer],
+                            })),
+                        },
+                    },
+                    include: {
+                        questions: true,
+                        UserScores: true,
+                    },
+                });
+                console.log('QUIZ READY');
+
+                quizList.push(quiz);
+            } else {
+                throw new Error('Invalid data format.');
+            }
+        }
+        const keys = await this.cacheManager.store.keys();
+        const cachesToDelete = [];
+        for (const key of keys) {
+            if (key.includes('all_quizzes')) {
+                cachesToDelete.push(this.cacheManager.del(key));
+            }
+        }
+        await Promise.all(cachesToDelete);
+
+
+        return quizList;
+    }
+
 
     async addUserScore(addScore: AddScore, userId: string): Promise<Quiz> {
         const numberOfQuestions = await this.prismaService.question.count({
