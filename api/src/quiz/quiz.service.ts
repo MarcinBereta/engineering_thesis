@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
-import { Category, Prisma } from '@prisma/client';
+import { Category, Prisma, QuestionType } from '@prisma/client';
 import { DashboardQuiz } from './dto/quiz.dashboard';
 import { QuizUpdateDto } from './dto/quiz.update';
 import { UniqueQuizzesPlayedDTO } from './dto/uniqueQuizzesPlayed.dto';
@@ -815,7 +815,6 @@ export class QuizService {
             throw error;
         }
 
-        console.log(oldQuestions);
         const oldQuestionsTexts = oldQuestions.map((question) => question.question);
         console.log(oldQuestionsTexts)
         let typeOfQuizDescription = '';
@@ -1017,28 +1016,55 @@ export class QuizService {
                 questionsJson.quiz &&
                 Array.isArray(questionsJson.quiz)
             ) {
-                const quiz = await this.prismaService.quiz.create({
-                    data: {
-                        courseId: courseId,
-                        name: courseName + typeOfQuizTranslated,
-                        questions: {
-                            create: questionsJson.quiz.map((questionData) => ({
-                                question: questionData.question,
-                                answers: {
-                                    set: questionData.options,
-                                },
-                                correct: questionData.correct_answer,
-                            })),
+                if (typeOfQuiz === 'multiple') {
+                    const quiz = await this.prismaService.quiz.create({
+                        data: {
+                            courseId: courseId,
+                            name: courseName + typeOfQuizTranslated,
+                            questions: {
+                                create: questionsJson.quiz.map((questionData) => ({
+                                    question: questionData.question,
+                                    answers: {
+                                        set: questionData.options,
+                                    },
+                                    type: 'MULTIPLE_ANSWER',
+                                    correct: questionData.correct_answer,
+                                })),
+                            },
                         },
-                    },
-                    include: {
-                        questions: true,
-                        UserScores: true,
-                    },
-                });
-                console.log('QUIZ READY Auuuu');
+                        include: {
+                            questions: true,
+                            UserScores: true,
+                        },
+                    });
+                    console.log('MULTIPLE QUIZ READY');
 
-                quizList.push(quiz);
+                    quizList.push(quiz);
+                }
+                else {
+                    const quiz = await this.prismaService.quiz.create({
+                        data: {
+                            courseId: courseId,
+                            name: courseName + typeOfQuizTranslated,
+                            questions: {
+                                create: questionsJson.quiz.map((questionData) => ({
+                                    question: questionData.question,
+                                    answers: {
+                                        set: questionData.options,
+                                    },
+                                    correct: [questionData.correct_answer],
+                                })),
+                            },
+                        },
+                        include: {
+                            questions: true,
+                            UserScores: true,
+                        },
+                    });
+                    console.log('QUIZ READY');
+
+                    quizList.push(quiz);
+                }
             } else {
                 throw new Error('Invalid data format.');
             }

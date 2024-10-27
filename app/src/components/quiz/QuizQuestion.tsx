@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { ResultOf } from '@/graphql';
 import { Card } from '@rneui/themed';
 const { width, height } = Dimensions.get('window');
+
 export const QuizQuestion = ({
     question,
     index,
@@ -21,7 +22,22 @@ export const QuizQuestion = ({
     index: number;
     setAnswer: (answer: string, index: number) => void;
 }) => {
-    const [answer, addAnswer] = useState('' as string);
+    const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+
+    const handleAnswerPress = (answer: string) => {
+        if (question.type === 'MULTIPLE_ANSWER') {
+            if (selectedAnswers.includes(answer)) {
+                setSelectedAnswers(selectedAnswers.filter((ans) => ans !== answer));
+            } else {
+                setSelectedAnswers([...selectedAnswers, answer]);
+            }
+            setAnswer(answer, index);
+        } else {
+            setSelectedAnswers([answer]);
+            setAnswer(answer, index);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.question}>{question.question}</Text>
@@ -32,15 +48,12 @@ export const QuizQuestion = ({
                     <Card
                         containerStyle={{
                             backgroundColor:
-                                answer == item ? 'lightblue' : 'white',
+                                selectedAnswers.includes(item) ? 'lightblue' : 'white',
                             width: width * 0.6,
                         }}
                     >
                         <TouchableOpacity
-                            onPress={() => {
-                                addAnswer(item);
-                                setAnswer(item, index);
-                            }}
+                            onPress={() => handleAnswerPress(item)}
                         >
                             <Text style={[styles.answer]}>{item}</Text>
                         </TouchableOpacity>

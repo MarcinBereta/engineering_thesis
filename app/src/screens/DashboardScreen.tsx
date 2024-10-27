@@ -132,7 +132,12 @@ const DashboardScreen = (props: DashboardScreen) => {
                             color: 'black',
                         }}
                     >
-                        {t('hello')} {userInfo.username}
+                        {t('hello')}
+                        <Text style={{
+                            color: '#4A90E2',
+                            fontWeight: 'bold',
+                        }}> {userInfo.username}</Text>
+                        !
                     </Text>
                 </View>
 
@@ -193,7 +198,7 @@ const DashboardScreen = (props: DashboardScreen) => {
                     />
                 </View>
             </View>
-        </Layout>
+        </Layout >
     );
 };
 

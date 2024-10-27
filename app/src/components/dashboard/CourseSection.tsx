@@ -18,12 +18,17 @@ export const DashboardCourseSection = ({
     userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
     const { t } = useTranslation();
-    const hasCompletedQuiz = (courseName: string) => {
-        if (userScore === undefined) {
-            return false;
-        }
-        return userScore.some((score) => score.quizName === courseName) || false;
-    };
+    // const hasCompletedQuiz = (courseName: string) => {
+    //     if (userScore === undefined) {
+    //         return false;
+    //     }
+    //     const uniqueQuizzes = new Set(
+    //         userScore.map((score) => score.quizName).filter((quizName) => quizName.includes(courseName))
+    //     );
+    //     const completedQuizzes = userScore.filter((score) => uniqueQuizzes.has(score.quizName));
+    //     console.log(completedQuizzes, uniqueQuizzes);
+    //     return (completedQuizzes.length === uniqueQuizzes.size && uniqueQuizzes.size !== 0);
+    // };
 
     function shortenCourseName(courseName: string) {
         if (courseName.length > 20) {
@@ -64,14 +69,14 @@ export const DashboardCourseSection = ({
                             }}
                         >
                             <Card.Title>{shortenCourseName(c.name)}
-                                {hasCompletedQuiz(c.name) && (
+                                {/* {hasCompletedQuiz(c.name) && (
                                     <Icon
                                         type="font-awesome"
                                         name="check"
                                         size={15}
                                         color="green"
                                     />
-                                )}
+                                )} */}
                             </Card.Title>
                             <Card.Divider />
                             <Card.FeaturedSubtitle style={{

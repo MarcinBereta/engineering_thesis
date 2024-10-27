@@ -6,11 +6,13 @@ import {
 import { normalizeText } from '@rneui/base';
 import { Card, Icon } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
-import { Dimensions, Text, View } from 'react-native';
+import { Dimensions, Text, View, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { useTranslation } from 'react-i18next';
+
 const { width } = Dimensions.get('window');
+
 export const DashboardFitableCourseSection = ({
     navigation,
     course,
@@ -21,58 +23,48 @@ export const DashboardFitableCourseSection = ({
     userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
     const { t } = useTranslation();
-    const hasCompletedQuiz = (courseName: string) => {
-        if (userScore === undefined) {
-            return false;
-        }
-        return (
-            userScore.some((score) => score.quizName === courseName) || false
-        );
-    };
+    // const hasCompletedQuiz = (courseName: string) => {
+    //     if (userScore === undefined) {
+    //         return false;
+    //     }
+    //     const uniqueQuizzes = new Set(
+    //         userScore.map((score) => score.quizName).filter((quizName) => quizName.includes(courseName))
+    //     );
+    //     const completedQuizzes = userScore.filter((score) => uniqueQuizzes.has(score.quizName));
+    //     return (completedQuizzes.length === uniqueQuizzes.size && uniqueQuizzes.size !== 0);
+    // };
+
     return (
-        <View style={{ display: 'flex', flexDirection: 'column' }}>
-            <View
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    padding: 10,
-                    borderBottomWidth: 1,
-                    borderBottomColor: 'black',
-                }}
-            >
-                <Text style={{ fontSize: normalizeText(20), paddingRight: 20 }}>
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <Text style={styles.headerText}>
                     {t('fitable_course')}
                 </Text>
             </View>
-            <View
-                style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                {course.map((c: any) => (
+            <View style={styles.courseContainer}>
+                {course.map((c: any, index: number) => (
                     <TouchableOpacity
+                        key={index}
                         onPress={() => {
                             navigation.push('course', { course: c });
                         }}
                     >
                         <Card
-                            containerStyle={{
-                                width: width * 0.8,
-                            }}
+                            containerStyle={[
+                                styles.card,
+                                index === 0 && styles.highlightedCard,
+                            ]}
                         >
-                            <Card.Title>
+                            <Card.Title style={index === 0 && styles.highlightedCardTitle}>
                                 {c.name}
-                                {hasCompletedQuiz(c.name) && (
+                                {/* {hasCompletedQuiz(c.name) && (
                                     <Icon
                                         type="font-awesome"
                                         name="check"
                                         size={15}
                                         color="green"
                                     />
-                                )}
+                                )} */}
                             </Card.Title>
                             <Card.Divider />
                         </Card>
@@ -82,3 +74,43 @@ export const DashboardFitableCourseSection = ({
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    header: {
+        display: 'flex',
+        flexDirection: 'row',
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'black',
+    },
+    headerText: {
+        fontSize: normalizeText(20),
+        paddingRight: 20,
+    },
+    courseContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    card: {
+        width: width * 0.8,
+    },
+    highlightedCard: {
+        // backgroundColor: '#f0f8ff',
+        borderColor: '#4A90E2',
+        borderWidth: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+    },
+    highlightedCardTitle: {
+        color: '#4A90E2',
+    },
+});

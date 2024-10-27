@@ -74,6 +74,14 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
         });
     };
 
+    const isAuthorized = () => {
+        return (
+            userInfo?.role === 'ADMIN' ||
+            userInfo?.role === 'MODERATOR' ||
+            userInfo?.id === data?.getQuizzesByCourseId[0]?.course?.creatorId
+        );
+    };
+
     const generateMoreQuizzes = useMutation({
         mutationFn: async (data: MoreQuizzesDto) =>
             request(graphqlURL, generateMoreQestionsforAddictionalQuizGQL, data, {
@@ -115,12 +123,14 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                     />
                 )}
             />
-            <TouchableOpacity
-                style={styles.generateButton}
-                onPress={() => setModalVisible(true)}
-            >
-                <Text style={styles.generateButtonText}>{t('generate_more_quizzes')}</Text>
-            </TouchableOpacity>
+            {isAuthorized() && (
+                <TouchableOpacity
+                    style={styles.generateButton}
+                    onPress={() => setModalVisible(true)}
+                >
+                    <Text style={styles.generateButtonText}>{t('generate_more_quizzes')}</Text>
+                </TouchableOpacity>
+            )}
             <Modal
                 animationType="slide"
                 transparent={true}
