@@ -63,6 +63,12 @@ export const UserProfile = (props: UserProfile) => {
                 </View>
                 <View style={styleForProfile.button}>
                     <CustomButton
+                        title={t('my_achievements')}
+                        onPress={() => {
+                            props.navigation.navigate('UserAchievements');
+                        }}
+                    />
+                    <CustomButton
                         title={t('my_courses')}
                         onPress={() => {
                             props.navigation.navigate('MyCourses');

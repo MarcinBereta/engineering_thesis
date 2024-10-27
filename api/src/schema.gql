@@ -162,6 +162,12 @@ type UniqueQuizzesPlayedDTO {
   OTHER: Float!
 }
 
+type UserAchievement {
+  userId: String!
+  name: String!
+  icon: String!
+}
+
 type Query {
   users: [User!]!
   getUsersWithPagination(pagination: PaginationDto!): [User!]!
@@ -192,6 +198,7 @@ type Query {
   getNumberOfCourses: Float!
   percentOfCoursesByCategory(category: String!): Float!
   numberOfUniqueQuizzesPlayedByCategory: UniqueQuizzesPlayedDTO!
+  getUserAchievements: [UserAchievement!]!
 }
 
 input PaginationDto {

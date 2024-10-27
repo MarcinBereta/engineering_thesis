@@ -31,6 +31,7 @@ import { UserProfile } from './UserProfile';
 import QuizEdit from './QuizEdit';
 import { CourseQuizzesList } from '@/components/quiz/CourseQuizList';
 import { CategorySelection } from '@/screens/CategorySelection'
+import { UserAchievements } from './UserAchiements';
 
 const Stack = createNativeStackNavigator();
 
@@ -93,6 +94,7 @@ export type AuthenticatedRootStackParamList = {
     UserSettings: undefined;
     UserProfile: undefined;
     CategorySelection: undefined;
+    UserAchievements: undefined;
     CourseQuizzesList: {
         courseId: string;
     };
@@ -210,6 +212,10 @@ const Navigator = ({ }: {}) => {
                         <AuthenticatedStack.Screen
                             component={CategorySelection}
                             name="CategorySelection"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={UserAchievements}
+                            name="UserAchievements"
                         />
                     </>
                 ) : (

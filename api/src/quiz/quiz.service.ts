@@ -438,7 +438,7 @@ export class QuizService {
                     );
                 }
 
-            if (totalCorrectAnswers !== numberOfQuestions) {
+            if (!ignoreCount && totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
                     numberOfQuestions +
@@ -450,7 +450,7 @@ export class QuizService {
                     ' correct answers.'
                 );
             }
-
+            console.log("ELO BENC");
             return true;
         } catch (error) {
             console.error('Error while verifying quiz:', error);
@@ -706,7 +706,6 @@ export class QuizService {
             },
         });
 
-        // this.cacheManager.del('all_quizzes/');
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
         for (const key of keys) {
@@ -793,17 +792,32 @@ export class QuizService {
         const category = courseBasic.category;
         let oldQuestions = [];
         try {
-            oldQuestions = await this.prismaService.question.findMany({
+            const quizzes = await this.prismaService.quiz.findMany({
                 where: {
-                    quizId: courseId,
+                    courseId: courseId,
+                },
+                select: {
+                    id: true,
                 },
             });
-        }
-        catch (error) {
-            console.log('No questions found');
-        }
-        const oldQuestionsTexts = oldQuestions.map((question) => question.question);
 
+            const quizIds = quizzes.map(quiz => quiz.id);
+
+            oldQuestions = await this.prismaService.question.findMany({
+                where: {
+                    quizId: {
+                        in: quizIds,
+                    },
+                },
+            });
+        } catch (error) {
+            console.error('Error fetching questions:', error);
+            throw error;
+        }
+
+        console.log(oldQuestions);
+        const oldQuestionsTexts = oldQuestions.map((question) => question.question);
+        console.log(oldQuestionsTexts)
         let typeOfQuizDescription = '';
 
         switch (typeOfQuiz) {
@@ -814,7 +828,7 @@ export class QuizService {
                 typeOfQuizDescription = "Please generate only questions with specific questions (focus on details, be specific).";
                 break;
             case 'multiple':
-                typeOfQuizDescription = " Please generate only questions with multiple choice questions.";
+                typeOfQuizDescription = " Please generate only questions with multiple choice questions (more than 1 anwser), correct answer should be array in this case';";
                 break;
             case 'truefalse':
                 typeOfQuizDescription = " Please generate only questions with true/false questions. (so only anwsers questions will be true/false";
@@ -979,7 +993,7 @@ export class QuizService {
                 if (tries > 0) {
                     const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
                     const questionsJson = JSON.parse(questions);
-                    if (typeOfQuiz === 'truefalse') {
+                    if (typeOfQuiz === 'truefalse' || typeOfQuiz === 'multiple') {
                         verified = await this.verifyQuiz(
                             questionsJson,
                             numberOfQuestions,
@@ -1013,7 +1027,7 @@ export class QuizService {
                                 answers: {
                                     set: questionData.options,
                                 },
-                                correct: [questionData.correct_answer],
+                                correct: questionData.correct_answer,
                             })),
                         },
                     },
@@ -1224,75 +1238,4 @@ export class QuizService {
         return result;
     }
 
-    // Achievements
-    /*
-    Achivements:
-    - Number of games 1 - 1000
-    - Number of games 2 - 10000
-    - Number of friends 1 - 10
-    - Number of friends 2 - 100
-    - NUmber of created courses 1 - 10
-    - Number of created courses 2 - 100
-    - Get verification 
-    - Get 100% in quiz 1 - 10
-    - Get 100% in quiz 2 - 100
-    - Get first friend
-    */
-    async isVerified(userID: string): Promise<boolean> {
-        const user = await this.prismaService.user.findUnique({
-            where: {
-                id: userID,
-            },
-        });
-        return user.verified;
-    }
-    async checkAchivements(userID: string): Promise<string[]> {
-        const userGames = await this.getAllUserGamesCount(userID);
-        const userFriends = await this.getFriendsCount(userID);
-        const userCourses = await this.getCreatedCourses(userID);
-        const userAchivements = [];
-        if (userGames >= 1 && userGames <= 1000) {
-            userAchivements.push('numberOfGames1000');
-        }
-        if (userGames >= 2 && userGames <= 10000) {
-            userAchivements.push('numberOfGames10000');
-        }
-        if (userCourses >= 1 && userCourses <= 10) {
-            userAchivements.push('numberOfCreatedCourses10');
-        }
-        if (userCourses >= 2 && userCourses <= 100) {
-            userAchivements.push('numberOfCreatedCourses10');
-        }
-        if (userFriends >= 1) {
-            userAchivements.push('getFirstFriend');
-        }
-        if (userFriends >= 10) {
-            userAchivements.push('numberOfFriends10');
-        }
-        if (userFriends >= 100) {
-            userAchivements.push('numberOfFriends100');
-        }
-        if (this.isVerified(userID)) {
-            userAchivements.push('getVerification');
-        }
-        return userAchivements;
-    }
-    //        async addAchivementToDataBaseAndShow(userID: string): Promise<void> {
-    //             const user = await this.prismaService.user.findUnique({
-    //                 where: {
-    //                     id: userID,
-    //                 },
-    //             });
-    //             const userAchivements = this.checkAchivements(userID);
-    //             await this.prismaService.user.update({
-    //                 where: {
-    //                     id: userID,
-    //                 },
-    //                 data: {
-    //                     Achievement: {
-    //                         set: (await userAchivements).map(achievement => ({ id: achievement }))
-    //                     }
-    //                 }
-    //             });
-    // }
 }

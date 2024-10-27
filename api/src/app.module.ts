@@ -20,6 +20,7 @@ import { SocketModule } from './socket/socket.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
     imports: [
@@ -67,6 +68,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         FilesModule,
         QuizModule,
         SocketModule,
+        AchievementsModule,
     ],
     controllers: [AppController],
     providers: [
@@ -80,4 +82,4 @@ import { ThrottlerModule } from '@nestjs/throttler';
         // },
     ],
 })
-export class AppModule {}
+export class AppModule { }
