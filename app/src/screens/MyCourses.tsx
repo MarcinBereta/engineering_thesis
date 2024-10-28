@@ -80,7 +80,7 @@ const MyCourses = (props: MyCourses) => {
                 />
 
                 {userInfo?.verified ? (
-                    <Button
+                    <CustomButton
                         title={t('create_course')}
                         onPress={() => {
                             props.navigation.push('createCourse');

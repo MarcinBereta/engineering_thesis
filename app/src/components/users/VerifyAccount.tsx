@@ -8,6 +8,7 @@ import request from 'graphql-request';
 import { VariablesOf } from 'gql.tada';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CustomButton } from '../CustomButton';
 export type addVerificationRequestDto = VariablesOf<
     typeof addVerificationRequestGQL
 >;
@@ -60,7 +61,7 @@ const VerifyAccount = ({ route, navigation }: any) => {
                 placeholder="Enter why you should be verified"
                 onChange={(e) => setText(e.nativeEvent.text)}
             />
-            <Button title="Submit" onPress={handleSave} />
+            <CustomButton title="Submit" onPress={handleSave} />
         </View>
     );
 };

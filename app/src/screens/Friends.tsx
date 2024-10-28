@@ -188,7 +188,7 @@ const Friends = (props: Friends) => {
                             height: '100%',
                         }}
                     >
-                        <Button
+                        <CustomButton
                             title={t('add_friend')}
                             onPress={() => {
                                 setIsModalOpen(true);

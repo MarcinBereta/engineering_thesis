@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
 import { View, Button, Text, TouchableOpacity } from 'react-native';
 import * as RootNavigation from '@/utils/NavigationRef';
+import { CustomButton } from '@/components/CustomButton';
 
 export const SocketHandler = () => {
     const { socket, userInfo } = useContext(AuthContext);
@@ -35,7 +36,7 @@ export const SocketHandler = () => {
                 {gameRequest.userName} wants to play with you in{' '}
                 {gameRequest.quiz.name}
             </Text>
-            <Button
+            <CustomButton
                 title="Accept"
                 onPress={() => {
                     RootNavigation.navigate('QuizWithFriends', {
@@ -47,7 +48,7 @@ export const SocketHandler = () => {
                     setGameRequest(null);
                 }}
             />
-            <Button
+            <CustomButton
                 title="Decline"
                 onPress={() => {
                     socket.emit('declineGameRequest', {

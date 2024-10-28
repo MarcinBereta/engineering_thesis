@@ -12,6 +12,7 @@ import request from 'graphql-request';
 import { VariablesOf } from 'gql.tada';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CustomButton } from '../CustomButton';
 export type verifyUserDataDto = VariablesOf<typeof verifyUserDataGQL>;
 type VerifyUsers = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
@@ -100,7 +101,7 @@ const VerifyUsers = (props: VerifyUsers) => {
                                 flexDirection: 'row',
                             }}
                         >
-                            <Button
+                            <CustomButton
                                 onPress={() => {
                                     handleClick(item.id);
                                 }}

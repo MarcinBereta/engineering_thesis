@@ -8,6 +8,7 @@ import { ResultOf } from '@/graphql';
 import { quizQuestionFragment } from '@/services/quiz/quiz';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CustomButton } from '../CustomButton';
 
 type Room = {
     id: string;
@@ -152,7 +153,7 @@ const QuizFriends = ({ route, navigation }: QuizWithFriends) => {
         return (
             <View>
                 <Text>Your friend declined game invite</Text>
-                <Button title="Go back" onPress={() => navigation.goBack()} />
+                <CustomButton title="Go back" onPress={() => navigation.goBack()} />
             </View>
         );
     }

@@ -295,6 +295,14 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                         margin: 10,
                     }}
                 >
+                    {currentIndex != 0 && (
+                        <CustomButton
+                            onPress={() => {
+                                setCurrentIndex(currentIndex - 1);
+                            }}
+                            title={t('previous_question')}
+                        />
+                    )}
                     <CustomButton
                         onPress={() => {
                             if (currentIndex === quiz.questions.length - 1) {
@@ -312,19 +320,12 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                 });
                             }
                         }}
-                        title={`${currentIndex == quiz.questions.length - 1
-                            ? t('end_quiz')
-                            : t('next_question')
-                            }`}
+                        title={`${
+                            currentIndex == quiz.questions.length - 1
+                                ? t('save_quiz')
+                                : t('next_question')
+                        }`}
                     />
-                    {currentIndex != 0 && (
-                        <CustomButton
-                            onPress={() => {
-                                setCurrentIndex(currentIndex - 1);
-                            }}
-                            title={t('previous_question')}
-                        />
-                    )}
                 </View>
             </Layout>
         );
@@ -352,17 +353,24 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                     {t('recreate_quiz')}
                 </Text>
                 <TextInput
-                    placeholder={t("question_count")}
+                    placeholder={t('question_count')}
                     keyboardType="numeric"
                     onChangeText={(text) => setQuestionCount(parseInt(text))}
-                    style={{ width: '100%', textAlign: 'center', fontSize: fontPixel(20) }}
+                    style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: fontPixel(20),
+                    }}
                 />
                 <TextInput
-                    placeholder={t("answer_count")}
+                    placeholder={t('answer_count')}
                     keyboardType="numeric"
                     onChangeText={(text) => setAnswerCount(parseInt(text))}
-                    style={{ width: '100%', textAlign: 'center', fontSize: fontPixel(20) }}
-
+                    style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: fontPixel(20),
+                    }}
                 />
                 <View style={{ padding: 5 }}>
                     <Text
@@ -378,7 +386,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                     </Text>
                     {types.map((c) => {
                         return (
-                            <TouchableOpacity key={c} onPress={() => { }}>
+                            <TouchableOpacity key={c} onPress={() => {}}>
                                 <Text>{c}</Text>
                             </TouchableOpacity>
                         );
@@ -456,13 +464,12 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                             </TouchableOpacity>
                                         );
                                     })}
-                                <Button
+                                <CustomButton
                                     onPress={() => {
                                         setIsModalOpen(false);
                                     }}
-                                >
-                                    {t('close')}
-                                </Button>
+                                    title={t('close')}
+                                />
                             </View>
                         </View>
                     </Modal>

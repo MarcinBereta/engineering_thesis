@@ -9,6 +9,7 @@ import { quizQuestionFragment } from '@/services/quiz/quiz';
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CustomButton } from '../CustomButton';
 
 type Room = {
     id: string;
@@ -139,7 +140,7 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
     return (
         <View>
             <Text style={{ fontSize: fontPixel(40) }}>{quiz.name}</Text>
-            <Button
+            <CustomButton
                 onPress={() => {
                     if (socket)
                         socket.emit('leaveQue', {

@@ -1,5 +1,12 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TouchableOpacity, Button, Modal, StyleSheet } from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    Button,
+    Modal,
+    StyleSheet,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { AuthContext } from '../../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
@@ -16,6 +23,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CheckBox, normalizeText } from '@rneui/base';
 import { QuizzesListItem } from './QuizListItem';
 import { Layout } from '../Layout';
+import { CustomButton } from '../CustomButton';
 
 type CourseQuizzesListProps = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
@@ -84,9 +92,14 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
 
     const generateMoreQuizzes = useMutation({
         mutationFn: async (data: MoreQuizzesDto) =>
-            request(graphqlURL, generateMoreQestionsforAddictionalQuizGQL, data, {
-                Authorization: 'Bearer ' + userInfo?.token,
-            }),
+            request(
+                graphqlURL,
+                generateMoreQestionsforAddictionalQuizGQL,
+                data,
+                {
+                    Authorization: 'Bearer ' + userInfo?.token,
+                }
+            ),
         onError: (err: any) => {
             console.error('Error:', err);
         },
@@ -128,7 +141,9 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                     style={styles.generateButton}
                     onPress={() => setModalVisible(true)}
                 >
-                    <Text style={styles.generateButtonText}>{t('generate_more_quizzes')}</Text>
+                    <Text style={styles.generateButtonText}>
+                        {t('generate_more_quizzes')}
+                    </Text>
                 </TouchableOpacity>
             )}
             <Modal
@@ -139,7 +154,9 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>{t('select_quiz_types')}</Text>
+                        <Text style={styles.modalTitle}>
+                            {t('select_quiz_types')}
+                        </Text>
                         <View style={styles.checkboxContainer}>
                             <CheckBox
                                 checked={selectedOptions.includes('truefalse')}
@@ -172,18 +189,28 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                             />
                             <Text style={styles.label}>{t('multiple')}</Text>
                         </View>
-                        <Button
-                            title={t('generate')}
-                            onPress={() =>
-                                generateMoreQuizzes.mutate({
-                                    generateMoreQuestions: {
-                                        courseId,
-                                        quizOptions: selectedOptions,
-                                    },
-                                })
-                            }
-                        />
-                        <Button title={t('cancel')} onPress={() => setModalVisible(false)} />
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                            }}
+                        >
+                            <CustomButton
+                                title={t('generate')}
+                                onPress={() =>
+                                    generateMoreQuizzes.mutate({
+                                        generateMoreQuestions: {
+                                            courseId,
+                                            quizOptions: selectedOptions,
+                                        },
+                                    })
+                                }
+                            />
+                            <CustomButton
+                                title={t('cancel')}
+                                onPress={() => setModalVisible(false)}
+                            />
+                        </View>
                     </View>
                 </View>
             </Modal>

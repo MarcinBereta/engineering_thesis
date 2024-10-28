@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { CustomButton } from '@/components/CustomButton';
 
 
 export const CategorySelection = () => {
@@ -30,7 +31,7 @@ export const CategorySelection = () => {
                 <Picker.Item label={t("SPORTS")} value="SPORTS" />
                 <Picker.Item label={t("OTHER")} value="OTHER" />
             </Picker>
-            <Button
+            <CustomButton
                 title={t("select")}
                 onPress={() => {
                     setSelectedCategory(localCategory);

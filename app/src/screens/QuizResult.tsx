@@ -4,6 +4,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
+import { CustomButton } from '@/components/CustomButton';
 
 interface QuizResultProps {
     route: any;
@@ -26,7 +27,7 @@ const QuizResult = ({ route, navigation }: QuizResult) => {
                 {t('you_answered')} {score} {t('out_of').toLowerCase()} {total}{' '}
                 {t('questions_correctly').toLowerCase()}
             </Text>
-            <Button
+            <CustomButton
                 title="Go back to courses"
                 onPress={() => navigation.navigate('CoursesList')}
             />
