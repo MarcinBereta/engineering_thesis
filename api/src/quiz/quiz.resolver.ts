@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Context, Float } from '@nestjs/graphql';
-import { Quiz, RecreateQuizDto,  UserScoreExtended } from './dto/quiz.dto';
+import { Quiz, RecreateQuizDto, UserScoreExtended, MoreQuizzesDTO } from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
@@ -7,7 +7,7 @@ import { AddScore } from './dto/addScore.dto';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { CountDto, PaginationDto } from 'src/utils/pagination.dto';
 import { QuizUpdateDto } from '../quiz/dto/quiz.update';
-import { PercentageOfCategoryDTO } from './dto/percentage-of-category.dto';
+import { UniqueQuizzesPlayedDTO } from './dto/uniqueQuizzesPlayed.dto';
 @Resolver(() => Quiz)
 @UseGuards(JwtAuthGuard)
 export class QuizResolver {
@@ -80,13 +80,13 @@ export class QuizResolver {
 
     @Query(() => Number)
     async percentOfCoursesByCategory(@Args('category') category: string, @Context() context,): Promise<number> {
-        return this.quizService.percentOfCoursesByCategory(context.req.user.id, category);
+        return this.quizService.numberOfUniqueQuizzesPlayed(context.req.user.id, category);
     }
 
-    @Query(() => PercentageOfCategoryDTO)
-    async getPercentageOfCategory(@Context() context): Promise<PercentageOfCategoryDTO> {
-        const data = await this.quizService.getPercentageOfCategory(context.req.user.id);
-        return data as PercentageOfCategoryDTO;
+    @Query(() => UniqueQuizzesPlayedDTO)
+    async numberOfUniqueQuizzesPlayedByCategory(@Context() context): Promise<UniqueQuizzesPlayedDTO> {
+        const data = await this.quizService.numberOfUniqueQuizzesPlayedByCategory(context.req.user.id);
+        return data as UniqueQuizzesPlayedDTO;
     }
 
     @Mutation(() => Quiz)
@@ -110,5 +110,12 @@ export class QuizResolver {
     @Mutation(() => Quiz)
     async updateQuiz(@Args('updateQuiz') quizUpdate: QuizUpdateDto) {
         return this.quizService.updateQuizQuestions(quizUpdate);
+    }
+
+    @Mutation(() => [Quiz])
+    async generateMoreQuizzes(@Args('generateMoreQuizzes') MoreQuizzesDTO: MoreQuizzesDTO) {
+        return this.quizService.generateMoreQuizzes(
+            MoreQuizzesDTO.courseId,
+            MoreQuizzesDTO.quizOptions);
     }
 }

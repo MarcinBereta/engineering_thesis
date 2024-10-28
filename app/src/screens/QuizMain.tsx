@@ -68,7 +68,7 @@ const QuizMain = ({ route, navigation }: quiz) => {
             (question: ResultOf<typeof quizQuestionFragment>) => {
                 return {
                     ...question,
-                    userAnswer: [''],
+                    userAnswer: [],
                     answers: shuffleArray(question.answers),
                 };
             }
@@ -110,6 +110,44 @@ const QuizMain = ({ route, navigation }: quiz) => {
         navigation.navigate('QuizResult', { score: correct, total: all });
     };
 
+    const setAnswer = (answer: string, index: number) => {
+        const newQuestions = questions.map((question, i) => {
+            if (i === index) {
+                if (question.type === 'MULTIPLE_ANSWER') {
+                    if (question.userAnswer.includes(answer)) {
+                        return {
+                            ...question,
+                            userAnswer: question.userAnswer.filter(
+                                (ans) => ans !== answer
+                            ),
+                        };
+                    } else {
+                        return {
+                            ...question,
+                            userAnswer: [...question.userAnswer, answer],
+                        };
+                    }
+                } else {
+                    return {
+                        ...question,
+                        userAnswer: [answer],
+                    };
+                }
+            }
+            return question;
+        });
+        setQuestions(newQuestions);
+
+        // Przechodzenie do następnego pytania tylko dla typów innych niż MULTIPLE_ANSWER
+        if (questions[currentQuestion].type !== 'MULTIPLE_ANSWER') {
+            if (currentQuestion + 1 == questions.length) {
+                handleEndQuiz();
+            } else {
+                setCurrentQuestion(currentQuestion + 1);
+            }
+        }
+    };
+
     if (start) {
         return (
             <Layout navigation={navigation} icon="quiz">
@@ -127,41 +165,7 @@ const QuizMain = ({ route, navigation }: quiz) => {
                 <QuizQuestion
                     question={questions[currentQuestion]}
                     index={currentQuestion}
-                    setAnswer={(answer: string, index: number) => {
-                        const newQuestions = questions.map((question, i) => {
-                            if (i === index) {
-                                if (question.type === 'MULTIPLE') {
-                                    if (question.userAnswer.includes(answer)) {
-                                        return {
-                                            ...question,
-                                            userAnswer:
-                                                question.userAnswer.filter(
-                                                    (ans) => ans != answer
-                                                ),
-                                        };
-                                    } else {
-                                        return {
-                                            ...question,
-                                            userAnswer: [
-                                                ...question.userAnswer,
-                                                answer,
-                                            ],
-                                        };
-                                    }
-                                } else {
-                                    return {
-                                        ...question,
-                                        userAnswer: [answer],
-                                    };
-                                }
-                            }
-                            return question;
-                        });
-                        setQuestions(newQuestions);
-                        if (currentQuestion + 1 == questions.length) {
-                            handleEndQuiz();
-                        } else setCurrentQuestion(currentQuestion + 1);
-                    }}
+                    setAnswer={setAnswer}
                 />
                 <View
                     style={{
@@ -188,11 +192,10 @@ const QuizMain = ({ route, navigation }: quiz) => {
                                 setCurrentQuestion(currentQuestion + 1);
                             }
                         }}
-                        title={`${
-                            currentQuestion == questions.length - 1
-                                ? t('end_quiz')
-                                : t('next_question')
-                        }`}
+                        title={`${currentQuestion == questions.length - 1
+                            ? t('end_quiz')
+                            : t('next_question')
+                            }`}
                     />
                 </View>
             </Layout>

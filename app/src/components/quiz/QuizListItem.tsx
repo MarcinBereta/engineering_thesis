@@ -127,7 +127,7 @@ const QuizzesListItem = ({
                                     color: 'white',
                                 }}
                             >
-                                Edit quiz
+                                {t('edit')}
                             </Text>
                         </TouchableOpacity>
                     )}</>

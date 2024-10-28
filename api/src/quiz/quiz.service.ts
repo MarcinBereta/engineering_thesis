@@ -7,10 +7,10 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
-import { Category, Prisma } from '@prisma/client';
+import { Category, Prisma, QuestionType } from '@prisma/client';
 import { DashboardQuiz } from './dto/quiz.dashboard';
 import { QuizUpdateDto } from './dto/quiz.update';
-import { PercentageOfCategoryDTO } from './dto/percentage-of-category.dto';
+import { UniqueQuizzesPlayedDTO } from './dto/uniqueQuizzesPlayed.dto';
 
 enum QuizOptions {
     EXCLUDE_DATES,
@@ -37,7 +37,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -89,14 +89,14 @@ export class QuizService {
                 UserScores: true,
                 course: true,
             },
-            take: 3,
+            take: 4,
         });
 
         return quizzes;
     }
 
     async getQuizzesWithPagination(pagination: PaginationDto) {
-        const { search, page } = pagination;
+        const { search, page, category } = pagination;
 
         if (search) {
             return await this.prismaService.quiz.findMany({
@@ -110,11 +110,26 @@ export class QuizService {
                     UserScores: true,
                     course: true,
                 },
-                skip: page,
+                skip: (page - 1) * PAGINATION_SIZE,
                 take: PAGINATION_SIZE,
             });
         }
-
+        if (category) {
+            return await this.prismaService.quiz.findMany({
+                where: {
+                    course: {
+                        category: category as Category,
+                    },
+                },
+                include: {
+                    questions: true,
+                    UserScores: true,
+                    course: true,
+                },
+                skip: (page - 1) * PAGINATION_SIZE,
+                take: PAGINATION_SIZE,
+            });
+        }
         const cachedQuizzes = await this.cacheManager.get<Quiz[]>(
             'all_quizzes/' + page
         );
@@ -140,7 +155,7 @@ export class QuizService {
     }
 
     async getQuizzesCountWithPagination(pagination: PaginationDto) {
-        const { search } = pagination;
+        const { search, category } = pagination;
 
         if (search) {
             const count = await this.prismaService.quiz.count({
@@ -152,6 +167,18 @@ export class QuizService {
             });
 
             return { count, size: PAGINATION_SIZE };
+        }
+        if (category) {
+            const count = await this.prismaService.quiz.count({
+                where: {
+                    course: {
+                        category: category as Category,
+                    },
+                },
+            });
+            console.log('Count: ', count);
+            return { count, size: PAGINATION_SIZE };
+
         }
         const count = await this.prismaService.quiz.count();
         const cachedCount =
@@ -327,8 +354,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' questions in the quiz.'
+                    numberOfQuestions +
+                    ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -401,29 +428,29 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            'options in total.'
+                        4 * numberOfQuestions +
+                        'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            ' options in total.'
+                        4 * numberOfQuestions +
+                        ' options in total.'
                     );
                 }
 
-            if (totalCorrectAnswers !== numberOfQuestions) {
+            if (!ignoreCount && totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
             }
-
+            console.log("ELO BENC");
             return true;
         } catch (error) {
             console.error('Error while verifying quiz:', error);
@@ -458,6 +485,7 @@ export class QuizService {
         }
 
         const courseName = await this.getCourseName(courseId);
+
         if (
             questionsJson &&
             questionsJson.quiz &&
@@ -678,7 +706,6 @@ export class QuizService {
             },
         });
 
-        // this.cacheManager.del('all_quizzes/');
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
         for (const key of keys) {
@@ -751,6 +778,310 @@ export class QuizService {
             });
         }
     }
+
+    async generateMoreQestionsforAddictionalQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
+        const mergedText: string = await this.mergeTexts(courseId);
+        console.log(courseId, typeOfQuiz);
+        const courseLength = mergedText.length;
+        const numberOfQuestions = await this.getNumberOfQuestions(courseLength);
+        const courseBasic = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+        const category = courseBasic.category;
+        let oldQuestions = [];
+        try {
+            const quizzes = await this.prismaService.quiz.findMany({
+                where: {
+                    courseId: courseId,
+                },
+                select: {
+                    id: true,
+                },
+            });
+
+            const quizIds = quizzes.map(quiz => quiz.id);
+
+            oldQuestions = await this.prismaService.question.findMany({
+                where: {
+                    quizId: {
+                        in: quizIds,
+                    },
+                },
+            });
+        } catch (error) {
+            console.error('Error fetching questions:', error);
+            throw error;
+        }
+
+        const oldQuestionsTexts = oldQuestions.map((question) => question.question);
+        console.log(oldQuestionsTexts)
+        let typeOfQuizDescription = '';
+
+        switch (typeOfQuiz) {
+            case 'general':
+                typeOfQuizDescription = "Please generate only questions with general questions (don't focus on details, just on generalities).";
+                break;
+            case 'specific':
+                typeOfQuizDescription = "Please generate only questions with specific questions (focus on details, be specific).";
+                break;
+            case 'multiple':
+                typeOfQuizDescription = " Please generate only questions with multiple choice questions (more than 1 anwser), correct answer should be array in this case';";
+                break;
+            case 'truefalse':
+                typeOfQuizDescription = " Please generate only questions with true/false questions. (so only anwsers questions will be true/false";
+                break;
+            default:
+                typeOfQuizDescription = "Generate questions.";
+                break;
+        };
+
+        console.log(typeOfQuizDescription);
+
+        let specificParameters = '';
+
+        switch (category) {
+            case 'MATH':
+                specificParameters =
+                    'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                break;
+            case 'HISTORY':
+                specificParameters =
+                    'Please do not add to many questions with dates. Be more specific about events and people.';
+                break;
+            case 'GEOGRAPHY':
+                specificParameters =
+                    'Be concise and specific about locations and events depending on the course.';
+                break;
+            case 'ENGLISH':
+                specificParameters =
+                    'Please add questions about grammar, vocabulary, literature, etc. based on the text above.';
+                break;
+            case 'ART':
+                specificParameters =
+                    'Please add questions about art history, techniques, artists, etc. based on the text above.';
+                break;
+            case 'SPORTS':
+                specificParameters =
+                    'Please add questions about sports history, rules, players, etc. based on the text above.';
+                break;
+            case 'SCIENCE':
+                specificParameters =
+                    'Please add questions about science history, theories, scientists, etc. based on the text above.';
+                break;
+            case 'MUSIC':
+                specificParameters =
+                    'Please add questions about music history, genres, artists, etc. based on the text above.';
+                break;
+            case 'OTHER' as string:
+                specificParameters =
+                    'Make sure that questions are based on the text above.';
+                break;
+            default:
+                specificParameters = 'Use only text above.';
+                break;
+        }
+
+        const completion = await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'You are a helpful assistant designed to output JSON.',
+                },
+                { role: 'user', content: mergedText },
+                {
+                    role: 'user', content:
+                        'Please do not generate questions that are already in the quiz: ' +
+                        oldQuestionsTexts.join(' ')
+                },
+                {
+                    role: 'assistant',
+                    content:
+                        'Create a quiz based on the text above exactly ' +
+                        numberOfQuestions +
+                        ' questions and save it in a JSON file.(json with question, options and correct_answer) in the ' +
+                        courseBasic.language +
+                        'language. ' +
+                        specificParameters + typeOfQuizDescription,
+                },
+            ],
+            model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
+            response_format: { type: 'json_object' },
+        });
+        return completion.choices[0].message.content;
+    }
+
+    async translateTypeOfQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
+        const courseBasic = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+        const language = courseBasic.language;
+        console.log(typeOfQuiz)
+        const translations = {
+            en: {
+                general: ' general',
+                specific: ' specific',
+                multiple: ' multiple choice',
+                truefalse: ' true/false',
+            },
+            pl: {
+                general: ' ogólne',
+                specific: ' szczegółowe',
+                multiple: ' wybór wielokrotny',
+                truefalse: ' prawda/fałsz',
+            },
+            de: {
+                general: ' allgemein',
+                specific: ' spezifisch',
+                multiple: ' mehrfachauswahl',
+                truefalse: ' wahr/falsch',
+            },
+            fr: {
+                general: ' général',
+                specific: ' spécifique',
+                multiple: ' choix multiple',
+                truefalse: ' vrai/faux',
+            },
+            es: {
+                general: ' general',
+                specific: ' específico',
+                multiple: ' opción múltiple',
+                truefalse: ' verdadero/falso',
+            },
+        };
+
+        return translations[language]?.[typeOfQuiz] || translations[language]?.general || 'general';
+    }
+
+    async generateMoreQuizzes(courseId: string, typeOfQuizzes: string[]): Promise<Quiz[]> {
+        if (!this.checkCourseExistence(courseId)) {
+            throw new Error('The course does not exist.');
+        }
+        console.log(typeOfQuizzes);
+        let quizList = [];
+        const mergedText: string = await this.mergeTexts(courseId);
+        const courseLength = mergedText.length;
+        let numberOfQuestions = 0;
+        numberOfQuestions = await this.getNumberOfQuestions(courseLength);
+        for (const typeOfQuiz of typeOfQuizzes) {
+            console.log(typeOfQuiz)
+            const courseName = await this.getCourseName(courseId);
+            const typeOfQuizTranslated = await this.translateTypeOfQuiz(courseId, typeOfQuiz);
+            //check if quiz with this type already exists
+            const quiz = await this.prismaService.quiz.findFirst({
+                where: {
+                    courseId: courseId,
+                    name: courseName + typeOfQuizTranslated,
+                },
+            });
+
+            if (quiz) {
+                continue;
+            }
+
+            const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
+            const questionsJson = JSON.parse(questions);
+
+            let verified = await this.verifyQuiz(questionsJson, numberOfQuestions, typeOfQuiz === 'truefalse');
+            let tries = 2;
+            while (!verified) {
+                if (tries > 0) {
+                    const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
+                    const questionsJson = JSON.parse(questions);
+                    if (typeOfQuiz === 'truefalse' || typeOfQuiz === 'multiple') {
+                        verified = await this.verifyQuiz(
+                            questionsJson,
+                            numberOfQuestions,
+                            true
+                        );
+                    }
+                    else {
+                        verified = await this.verifyQuiz(
+                            questionsJson,
+                            numberOfQuestions
+                        );
+                    }
+                    tries--;
+                } else {
+                    throw new Error('Invalid data format.');
+                }
+            }
+
+            if (
+                questionsJson &&
+                questionsJson.quiz &&
+                Array.isArray(questionsJson.quiz)
+            ) {
+                if (typeOfQuiz === 'multiple') {
+                    const quiz = await this.prismaService.quiz.create({
+                        data: {
+                            courseId: courseId,
+                            name: courseName + typeOfQuizTranslated,
+                            questions: {
+                                create: questionsJson.quiz.map((questionData) => ({
+                                    question: questionData.question,
+                                    answers: {
+                                        set: questionData.options,
+                                    },
+                                    type: 'MULTIPLE_ANSWER',
+                                    correct: questionData.correct_answer,
+                                })),
+                            },
+                        },
+                        include: {
+                            questions: true,
+                            UserScores: true,
+                        },
+                    });
+                    console.log('MULTIPLE QUIZ READY');
+
+                    quizList.push(quiz);
+                }
+                else {
+                    const quiz = await this.prismaService.quiz.create({
+                        data: {
+                            courseId: courseId,
+                            name: courseName + typeOfQuizTranslated,
+                            questions: {
+                                create: questionsJson.quiz.map((questionData) => ({
+                                    question: questionData.question,
+                                    answers: {
+                                        set: questionData.options,
+                                    },
+                                    correct: [questionData.correct_answer],
+                                })),
+                            },
+                        },
+                        include: {
+                            questions: true,
+                            UserScores: true,
+                        },
+                    });
+                    console.log('QUIZ READY');
+
+                    quizList.push(quiz);
+                }
+            } else {
+                throw new Error('Invalid data format.');
+            }
+        }
+        const keys = await this.cacheManager.store.keys();
+        const cachesToDelete = [];
+        for (const key of keys) {
+            if (key.includes('all_quizzes')) {
+                cachesToDelete.push(this.cacheManager.del(key));
+            }
+        }
+        await Promise.all(cachesToDelete);
+
+
+        return quizList;
+    }
+
 
     async addUserScore(addScore: AddScore, userId: string): Promise<Quiz> {
         const numberOfQuestions = await this.prismaService.question.count({
@@ -864,7 +1195,7 @@ export class QuizService {
     async getNumberOfCourses(): Promise<number> {
         return await this.prismaService.course.count();
     }
-    async percentOfCoursesByCategory(
+    async numberOfUniqueQuizzesPlayed(
         userID: string,
         category: string
     ): Promise<number> {
@@ -904,14 +1235,14 @@ export class QuizService {
                 category: category as Category,
             },
         });
-        const percatage = (result[category] / courses.length) * 100;
+        const percatage = result[category];
         return percatage;
     }
 
-    async getPercentageOfCategory(
+    async numberOfUniqueQuizzesPlayedByCategory(
         userId: string
-    ): Promise<PercentageOfCategoryDTO> {
-        const result: PercentageOfCategoryDTO = {
+    ): Promise<UniqueQuizzesPlayedDTO> {
+        const result: UniqueQuizzesPlayedDTO = {
             MATH: 0,
             HISTORY: 0,
             GEOGRAPHY: 0,
@@ -924,7 +1255,7 @@ export class QuizService {
         };
         for (const category of categories) {
             result[category] =
-                ((await this.percentOfCoursesByCategory(
+                ((await this.numberOfUniqueQuizzesPlayed(
                     userId,
                     category
                 )) as number) || 0;
@@ -933,75 +1264,4 @@ export class QuizService {
         return result;
     }
 
-    // Achievements
-    /*
-    Achivements:
-    - Number of games 1 - 1000
-    - Number of games 2 - 10000
-    - Number of friends 1 - 10
-    - Number of friends 2 - 100
-    - NUmber of created courses 1 - 10
-    - Number of created courses 2 - 100
-    - Get verification 
-    - Get 100% in quiz 1 - 10
-    - Get 100% in quiz 2 - 100
-    - Get first friend
-    */
-    async isVerified(userID: string): Promise<boolean> {
-        const user = await this.prismaService.user.findUnique({
-            where: {
-                id: userID,
-            },
-        });
-        return user.verified;
-    }
-    async checkAchivements(userID: string): Promise<string[]> {
-        const userGames = await this.getAllUserGamesCount(userID);
-        const userFriends = await this.getFriendsCount(userID);
-        const userCourses = await this.getCreatedCourses(userID);
-        const userAchivements = [];
-        if (userGames >= 1 && userGames <= 1000) {
-            userAchivements.push('numberOfGames1000');
-        }
-        if (userGames >= 2 && userGames <= 10000) {
-            userAchivements.push('numberOfGames10000');
-        }
-        if (userCourses >= 1 && userCourses <= 10) {
-            userAchivements.push('numberOfCreatedCourses10');
-        }
-        if (userCourses >= 2 && userCourses <= 100) {
-            userAchivements.push('numberOfCreatedCourses10');
-        }
-        if (userFriends >= 1) {
-            userAchivements.push('getFirstFriend');
-        }
-        if (userFriends >= 10) {
-            userAchivements.push('numberOfFriends10');
-        }
-        if (userFriends >= 100) {
-            userAchivements.push('numberOfFriends100');
-        }
-        if (this.isVerified(userID)) {
-            userAchivements.push('getVerification');
-        }
-        return userAchivements;
-    }
-    //        async addAchivementToDataBaseAndShow(userID: string): Promise<void> {
-    //             const user = await this.prismaService.user.findUnique({
-    //                 where: {
-    //                     id: userID,
-    //                 },
-    //             });
-    //             const userAchivements = this.checkAchivements(userID);
-    //             await this.prismaService.user.update({
-    //                 where: {
-    //                     id: userID,
-    //                 },
-    //                 data: {
-    //                     Achievement: {
-    //                         set: (await userAchivements).map(achievement => ({ id: achievement }))
-    //                     }
-    //                 }
-    //             });
-    // }
 }

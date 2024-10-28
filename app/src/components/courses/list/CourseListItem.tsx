@@ -17,12 +17,12 @@ export const CourseListItem = ({
     children?: React.ReactNode | React.ReactNode[]
     userScore: ResultOf<typeof getUserScoreGQL>['getUserScore'];
 }) => {
-    const hasCompletedQuiz = (courseName: string) => {
-        if (userScore === undefined) {
-            return false;
-        }
-        return userScore.some((score) => score.quizName === courseName) || false;
-    };
+    // const hasCompletedQuiz = (courseName: string) => {
+    //     if (userScore === undefined) {
+    //         return false;
+    //     }
+    //     return userScore.some((score) => score.quizName === courseName) || false;
+    // };
     return (
         <TouchableOpacity
             onPress={() => {
@@ -39,14 +39,15 @@ export const CourseListItem = ({
                 }}
             >
                 <Card.Title>{course.name}
-                    {hasCompletedQuiz(course.name) && (
+                    {/* {hasCompletedQuiz(course.name) && 
+                    (
                         <Icon
                             type="font-awesome"
                             name="check"
                             size={15}
                             color="green"
                         />
-                    )}
+                    )} */}
                 </Card.Title>
                 <Card.Divider width={2} />
                 <Text style={{ marginVertical: 10 }}>{course.summary}</Text>

@@ -62,10 +62,17 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
 
     const verifyCourseMutation = useMutation({
         mutationFn: async (data: verifyCourseDto) => {
-            const result = await request(graphqlURL, verifyCourseGQL, data, {
-                Authorization: 'Bearer ' + userInfo?.token,
-            });
-            return result;
+            try {
+                console.log('Sending request with data:', data);
+                const result = await request(graphqlURL, verifyCourseGQL, data, {
+                    Authorization: 'Bearer ' + userInfo?.token,
+                });
+                console.log('Request result:', result);
+                return result;
+            } catch (error) {
+                console.error('Request error:', error);
+                throw error;
+            }
         },
         onMutate: () => {
             setIsLoading(true);
@@ -84,7 +91,8 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
         onSuccess: (data, variables, context) => {
             setProgress(100); // Complete progress
             setIsLoading(false);
-            props.navigation.push('CoursesList');
+            console.log("Done!");
+            props.navigation.push('DashboardScreen');
             refetch();
         },
         onError: () => {
@@ -120,7 +128,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                         fontSize: normalizeText(30),
                     }}
                 >
-                    Course list
+                    {t('courses_list')}
                 </Text>
                 {isLoading && <ProgressBar progress={progress} />}
                 <FlatList
@@ -136,7 +144,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                                     e.stopPropagation();
                                     handleVerify(item?.id || '');
                                 }}
-                                title="Verify"
+                                title={t("verify")}
                             />
                         </CourseListItem>
                     )}

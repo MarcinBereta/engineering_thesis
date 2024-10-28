@@ -6,11 +6,11 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ParamListBase } from "@react-navigation/native";
 
 export type NavigationType = NativeStackScreenProps<ParamListBase>['navigation']
-export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationType})=>{
-    const {userInfo} = useContext(AuthContext)
-    if(!userInfo) return null
+export const Navbar = ({ icon, navigation }: { icon: string, navigation: NavigationType }) => {
+    const { userInfo } = useContext(AuthContext)
+    if (!userInfo) return null
 
-    const handlePress = (destination:string)=>{
+    const handlePress = (destination: string) => {
         navigation.navigate(destination)
     }
 
@@ -28,7 +28,7 @@ export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationTyp
                 onPress={handlePress.bind('', 'DashboardScreen')}
                 name="home"
                 size={30}
-                color={icon == 'home' ? '#F00' : '#000'}
+                color={icon == 'home' ? 'rgba(90, 154, 230, 1)' : '#000'}
             />
             <Icon
                 type="font-awesome"
@@ -36,7 +36,7 @@ export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationTyp
                 onPress={handlePress.bind('', 'CoursesList')}
                 name="book"
                 size={30}
-                color={icon == 'course' ? '#F00' : '#000'}
+                color={icon == 'course' ? 'rgba(90, 154, 230, 1)' : '#000'}
             />
             <Icon
                 type="font-awesome"
@@ -44,7 +44,7 @@ export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationTyp
                 onPress={handlePress.bind('', 'QuizzesList')}
                 name="gamepad"
                 size={30}
-                color={icon == 'quiz' ? '#F00' : '#000'}
+                color={icon == 'quiz' ? 'rgba(90, 154, 230, 1)' : '#000'}
             />
             {userInfo.role == 'ADMIN' || userInfo.role == 'MODERATOR' ? (
                 <Icon
@@ -53,7 +53,7 @@ export const Navbar = ({icon, navigation}:{icon:string, navigation:NavigationTyp
                     onPress={handlePress.bind('', 'AdminPanel')}
                     name="lock"
                     size={30}
-                    color={icon == 'admin' ? '#F00' : '#000'}
+                    color={icon == 'admin' ? 'rgba(90, 154, 230, 1)' : '#000'}
                 />
             ) : null}
         </View>

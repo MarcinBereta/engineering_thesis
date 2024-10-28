@@ -1,4 +1,4 @@
-import { Text, Dimensions, View } from 'react-native';
+import { Text, Dimensions, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import { SetStateAction, useContext, useState } from 'react';
 import { getCoursesWithPaginationGQL } from '../services/courses/courses';
@@ -12,7 +12,7 @@ import { Layout } from '@/components/Layout';
 import { SearchBar } from '@rneui/themed';
 import { ResultOf } from 'gql.tada';
 import { CourseListItem } from '@/components/courses/list/CourseListItem';
-import { normalizeText } from '@rneui/base';
+import { Icon, normalizeText } from '@rneui/base';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
@@ -80,55 +80,26 @@ const CoursesList = (props: CoursesList) => {
     if (isLoading || data == undefined) {
         return <Text>{t('loading')}...</Text>;
     }
+
     return (
         <Layout navigation={props.navigation} icon="course">
-            <Text
-                style={{
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: normalizeText(30),
-                }}
-            >
-                {t('courses_list')}
-            </Text>
-            <View>
-                <Text
-                    style={{
-                        padding: 10,
-                        fontWeight: 'bold',
-                        fontSize: normalizeText(15),
-                    }}
-                >
-                    Select Category:
-                </Text>
-                <Picker
-                    style={{
-                        inputAndroid: {
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: 10,
-                            margin: 10,
-                            borderRadius: 10,
-                        },
-                    }}
-                    value={selectedCategory}
-                    onValueChange={(value) => {
-                        setSelectedCategory(value);
+            <View style={styles.header}>
+                <Text style={styles.title}>{t('courses_list')}</Text>
+                <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={() => {
+                        props.navigation.navigate('CategorySelection' as never, {
+                            selectedCategory,
+                            setSelectedCategory,
+                        } as never)
                         setPage(1);
                     }}
-                    items={[
-                        { label: 'All', value: '' },
-                        { label: 'History', value: 'HISTORY' },
-                        { label: 'Music', value: 'MUSIC' },
-                        { label: 'Science', value: 'SCIENCE' },
-                        { label: 'Maths', value: 'MATHS' },
-                        { label: 'Art', value: 'ART' },
-                        { label: 'English', value: 'ENGLISH' },
-                        { label: 'Geography', value: 'GEOGRAPHY' },
-                        { label: 'Sports', value: 'SPORTS' },
-                        { label: 'Other', value: 'OTHER' },
-                    ]}
-                />
+                >
+                    <Text>{selectedCategory !== "" && (
+                        <Text>Category: {t(selectedCategory)}</Text>
+                    )}</Text>
+                    <Icon name="category" size={30} color="black" />
+                </TouchableOpacity>
             </View>
             <SearchBar
                 platform="android"
@@ -157,8 +128,25 @@ const CoursesList = (props: CoursesList) => {
                 count={data.countCoursesWithPagination.count}
                 changePage={(page) => setPage(page)}
             />
-        </Layout>
+        </Layout >
     );
 };
+
+const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 10,
+    },
+    title: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: normalizeText(30),
+    },
+    iconButton: {
+        padding: 5,
+    },
+});
 
 export { CoursesList };

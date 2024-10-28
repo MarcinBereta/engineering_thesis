@@ -1,5 +1,5 @@
 import { useContext, useState, SetStateAction } from 'react';
-import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { AuthContext } from '../../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
@@ -12,13 +12,13 @@ import {
 import { useDebounce } from '@/utils/Debouncer';
 import { Pagination } from '../utils/Pagination';
 import { SearchBar } from '@rneui/themed';
-import { normalizeText } from '@rneui/base';
+import { Icon, normalizeText } from '@rneui/base';
 import { QuizzesListItem } from './QuizListItem';
 import { Layout } from '../Layout';
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Picker from 'react-native-picker-select';
+
 type QuizzesList = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
     'QuizzesList'
@@ -31,8 +31,9 @@ const QuizzesList = (props: QuizzesList) => {
 
     const debounceSearch = useDebounce(search);
     const [selectedCategory, setSelectedCategory] = useState('');
+    const debounceCategory = useDebounce(selectedCategory);
     const { data, isLoading, refetch } = useQuery({
-        queryKey: ['quizzes', page, debounceSearch],
+        queryKey: ['quizzes', page, debounceSearch, debounceCategory],
         queryFn: async () =>
             request(
                 graphqlURL,
@@ -41,6 +42,7 @@ const QuizzesList = (props: QuizzesList) => {
                     pagination: {
                         page: page,
                         search: debounceSearch,
+                        category: debounceCategory,
                     },
                 },
                 {
@@ -72,59 +74,56 @@ const QuizzesList = (props: QuizzesList) => {
         return <Text>{t('loading')}...</Text>;
     }
 
+    function getCategory(selectedCategory: string) {
+        switch (selectedCategory) {
+            case '':
+                return 'All';
+            case 'MATH':
+                return 'Math';
+            case 'ENGLISH':
+                return 'English';
+            case 'HISTORY':
+                return 'History';
+            case 'SCIENCE':
+                return 'Science';
+            case 'SPORTS':
+                return 'Sports';
+            case 'MUSIC':
+                return 'Music';
+            case 'ART':
+                return 'Art';
+            case 'GEOGRAPHY':
+                return 'Geography';
+            case 'OTHER':
+                return 'Other';
+            default:
+                return '';
+        }
+    }
+
     return (
         <Layout navigation={props.navigation} icon="quiz">
-            <Text
-                style={{
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: normalizeText(30),
-                }}
-            >
-                {t('quizzes_list')}
-            </Text>
-            <View>
-                <Text
-                    style={{
-                        padding: 10,
-                        fontWeight: 'bold',
-                        fontSize: normalizeText(15),
-                    }}
-                >
-                    Select Category:
-                </Text>
-                <Picker
-                    style={{
-                        inputAndroid: {
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: 10,
-                            margin: 10,
-                            borderRadius: 10,
-                        },
-                    }}
-                    items={[
-                        { label: 'All', value: '' },
-                        { label: 'History', value: 'HISTORY' },
-                        { label: 'Music', value: 'MUSIC' },
-                        { label: 'Science', value: 'SCIENCE' },
-                        { label: 'Maths', value: 'MATHS' },
-                        { label: 'Art', value: 'ART' },
-                        { label: 'English', value: 'ENGLISH' },
-                        { label: 'Geography', value: 'GEOGRAPHY' },
-                        { label: 'Sports', value: 'SPORTS' },
-                        { label: 'Other', value: 'OTHER' },
-                    ]}
-                    value={selectedCategory}
-                    onValueChange={(itemValue: SetStateAction<string>) => {
-                        setSelectedCategory(itemValue);
+            <View style={styles.header}>
+                <Text style={styles.title}>{t('quizzes_list')}</Text>
+                <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={() => {
+                        props.navigation.navigate('CategorySelection' as never, {
+                            selectedCategory,
+                            setSelectedCategory,
+                        } as never);
                         setPage(1);
                     }}
-                />
+                >
+                    <Text>{selectedCategory !== "" && (
+                        <Text>Category: {t(selectedCategory)}</Text>
+                    )}</Text>
+                    <Icon name="category" size={30} color="black" />
+                </TouchableOpacity>
             </View>
             <SearchBar
                 platform="android"
-                placeholder="Search"
+                placeholder={t('search')}
                 value={search}
                 onChangeText={(text) => {
                     setSearch(text);
@@ -156,5 +155,22 @@ const QuizzesList = (props: QuizzesList) => {
         </Layout>
     );
 };
+
+const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 10,
+    },
+    title: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: normalizeText(30),
+    },
+    iconButton: {
+        padding: 5,
+    },
+});
 
 export { QuizzesList };

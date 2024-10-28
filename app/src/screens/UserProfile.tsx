@@ -52,8 +52,8 @@ export const UserProfile = (props: UserProfile) => {
                         style={styleForProfile.profileImage}
                         source={{
                             uri:
-                               userInfo.image != null  ?constants.url + '/files/avatars/' + userInfo.image :
-                        'https://randomuser.me/api/portraits/men/36.jpg',
+                                userInfo.image != null ? constants.url + '/files/avatars/' + userInfo.image :
+                                    'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                     />
                     <Text style={styleForProfile.username}>
@@ -63,7 +63,13 @@ export const UserProfile = (props: UserProfile) => {
                 </View>
                 <View style={styleForProfile.button}>
                     <CustomButton
-                        title={t('My Courses')}
+                        title={t('my_achievements')}
+                        onPress={() => {
+                            props.navigation.navigate('UserAchievements');
+                        }}
+                    />
+                    <CustomButton
+                        title={t('my_courses')}
                         onPress={() => {
                             props.navigation.navigate('MyCourses');
                         }}
@@ -73,7 +79,7 @@ export const UserProfile = (props: UserProfile) => {
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
                             <Text style={styleForProfile.boldText}>
-                                {t('Role')}:
+                                {t('role')}:
                             </Text>{' '}
                             {userInfo?.role}
                         </Text>
@@ -84,7 +90,7 @@ export const UserProfile = (props: UserProfile) => {
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
                             <Text style={styleForProfile.boldText}>
-                                {t('Maxed Courses')}:
+                                {t('maxed_courses')}:
                             </Text>{' '}
                             {data.getMaxedQuizesCount}
                         </Text>
@@ -95,7 +101,7 @@ export const UserProfile = (props: UserProfile) => {
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
                             <Text style={styleForProfile.boldText}>
-                                {t('All games')}:
+                                {t('all_games')}:
                             </Text>{' '}
                             {data.getAllUserGamesCount}
                         </Text>
@@ -106,7 +112,7 @@ export const UserProfile = (props: UserProfile) => {
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
                             <Text style={styleForProfile.boldText}>
-                                {t('Friends')}:
+                                {t('friends')}:
                             </Text>{' '}
                             {data.getFriendsCount}
                         </Text>
@@ -117,7 +123,7 @@ export const UserProfile = (props: UserProfile) => {
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
                             <Text style={styleForProfile.boldText}>
-                                {t('Created Courses')}:
+                                {t('created_courses')}:
                             </Text>{' '}
                             {data.getCreatedCourses}
                         </Text>
@@ -128,7 +134,7 @@ export const UserProfile = (props: UserProfile) => {
                     <View style={styleForProfile.cardContent}>
                         <Text style={styleForProfile.cardText}>
                             <Text style={styleForProfile.boldText}>
-                                {t('Verified')}:
+                                {t('verified')}:
                             </Text>{' '}
                             {userInfo?.verified ? t('Yes') : t('No')}
                         </Text>
@@ -136,10 +142,10 @@ export const UserProfile = (props: UserProfile) => {
                 </Card>
                 <View style={styleForProfile.sectionContainer}>
                     <Text style={styleForProfile.sectionTitle}>
-                        {t('Percantage of done by category')}
+                        {t('unique_quizzes_played_by_category')}
                     </Text>
                     <Text style={styleForProfile.smallerTitle}>
-                        {t('Pick category')}:
+                        {t('pick_category')}:
                     </Text>
                     <View style={styleForProfile.pickerContainer}>
                         <RNPickerSelect
@@ -147,21 +153,21 @@ export const UserProfile = (props: UserProfile) => {
                                 setSelectedCategory(value)
                             }
                             items={[
-                                { label: t('Math'), value: 'MATH' },
-                                { label: t('History'), value: 'HISTORY' },
-                                { label: t('Geography'), value: 'GEOGRAPHY' },
-                                { label: t('English'), value: 'ENGLISH' },
-                                { label: t('Art'), value: 'ART' },
-                                { label: t('Sports'), value: 'SPORTS' },
-                                { label: t('Science'), value: 'SCIENCE' },
-                                { label: t('Music'), value: 'MUSIC' },
-                                { label: t('Other'), value: 'OTHER' },
+                                { label: t('MATH'), value: 'MATH' },
+                                { label: t('HISTORY'), value: 'HISTORY' },
+                                { label: t('GEOGRAPHY'), value: 'GEOGRAPHY' },
+                                { label: t('ENGLISH'), value: 'ENGLISH' },
+                                { label: t('ART'), value: 'ART' },
+                                { label: t('SPORTS'), value: 'SPORTS' },
+                                { label: t('SCIENCE'), value: 'SCIENCE' },
+                                { label: t('MUSIC'), value: 'MUSIC' },
+                                { label: t('OTHER'), value: 'OTHER' },
                             ]}
                             value={selectedCategory}
                             style={pickerSelectStyles}
                             useNativeAndroidPickerStyle={false}
                             placeholder={{
-                                label: t('Select a category'),
+                                label: t('select_category'),
                                 value: null,
                             }}
                         />
@@ -169,10 +175,10 @@ export const UserProfile = (props: UserProfile) => {
                     <Card containerStyle={styleForProfile.card}>
                         <View style={styleForProfile.cardContent}>
                             <Text style={styleForProfile.cardText}>
-                                {t('Percentage')}:{' '}
+                                {t('played_games')}:{' '}
                                 {
-                                    data.getPercentageOfCategory[
-                                        selectedCategory as keyof typeof data.getPercentageOfCategory
+                                    data.numberOfUniqueQuizzesPlayedByCategory[
+                                    selectedCategory as keyof typeof data.numberOfUniqueQuizzesPlayedByCategory
                                     ]
                                 }
                             </Text>

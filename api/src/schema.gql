@@ -150,7 +150,7 @@ type UserScoreExtended {
   quizName: String!
 }
 
-type PercentageOfCategoryDTO {
+type UniqueQuizzesPlayedDTO {
   MATH: Float!
   HISTORY: Float!
   GEOGRAPHY: Float!
@@ -160,6 +160,12 @@ type PercentageOfCategoryDTO {
   SCIENCE: Float!
   MUSIC: Float!
   OTHER: Float!
+}
+
+type UserAchievement {
+  userId: String!
+  name: String!
+  icon: String!
 }
 
 type Query {
@@ -191,7 +197,8 @@ type Query {
   getFriendsCount: Float!
   getNumberOfCourses: Float!
   percentOfCoursesByCategory(category: String!): Float!
-  getPercentageOfCategory: PercentageOfCategoryDTO!
+  numberOfUniqueQuizzesPlayedByCategory: UniqueQuizzesPlayedDTO!
+  getUserAchievements: [UserAchievement!]!
 }
 
 input PaginationDto {
@@ -219,6 +226,7 @@ type Mutation {
   addUserScore(addScore: AddScore!): Quiz!
   RecreateQuiz(recreateQuiz: RecreateQuizDto!): Quiz!
   updateQuiz(updateQuiz: QuizUpdateDto!): Quiz!
+  generateMoreQuizzes(generateMoreQuizzes: MoreQuizzesDTO!): [Quiz!]!
 }
 
 input SingUpUserInput {
@@ -308,4 +316,9 @@ input QuestionUpdateDto {
   answers: [String!]!
   correct: [String!]!
   type: String!
+}
+
+input MoreQuizzesDTO {
+  courseId: String!
+  quizOptions: [String!]!
 }

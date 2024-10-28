@@ -63,3 +63,11 @@ export class RecreateQuizDto {
     @Field(() => [String])
     quizOptions: string[];
 }
+
+@InputType()
+export class MoreQuizzesDTO {
+    @Field()
+    courseId: string;
+    @Field(() => [String])
+    quizOptions: string[];
+}

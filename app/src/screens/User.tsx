@@ -188,7 +188,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
                                     key={c.value}
                                     onPress={() => {}}
                                 >
-                                    <Text>{c.label}</Text>
+                                    <Text>{t(c.label)}</Text>
                                 </TouchableOpacity>
                             );
                         })}

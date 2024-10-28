@@ -64,7 +64,7 @@ const MyCourses = (props: MyCourses) => {
                                             course: item,
                                         });
                                     }}
-                                    title="View"
+                                    title={t("view")}
                                 />
                                 <CustomButton
                                     onPress={() => {
@@ -72,7 +72,7 @@ const MyCourses = (props: MyCourses) => {
                                             course: item,
                                         });
                                     }}
-                                    title="Edit"
+                                    title={t("edit")}
                                 />
                             </View>
                         </Card>

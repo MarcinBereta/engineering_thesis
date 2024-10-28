@@ -6,7 +6,7 @@ import { Dimensions, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { useTranslation } from 'react-i18next';
-const {width} = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 export const DashboardQuizSection = ({
     navigation,
     quizzes,
@@ -37,6 +37,13 @@ export const DashboardQuizSection = ({
 
     };
 
+    function shortenCourseName(courseName: string) {
+        if (courseName.length > 20) {
+            return courseName.substring(0, 20) + '...';
+        }
+        return courseName;
+    }
+
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
             <TouchableOpacity
@@ -64,12 +71,12 @@ export const DashboardQuizSection = ({
                         }}
                     >
                         <Card
-                        
-                         containerStyle={{
-                                width: width * 0.45,
+
+                            containerStyle={{
+                                width: width * 0.4,
                             }}
-                            >
-                            <Card.Title>{q.name}
+                        >
+                            <Card.Title>{shortenCourseName(q.name)}
                                 {hasCompletedQuiz(q.name) && (
                                     <Icon
                                         type="font-awesome"
