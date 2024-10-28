@@ -137,14 +137,12 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                 )}
             />
             {isAuthorized() && (
-                <TouchableOpacity
-                    style={styles.generateButton}
-                    onPress={() => setModalVisible(true)}
-                >
-                    <Text style={styles.generateButtonText}>
-                        {t('generate_more_quizzes')}
-                    </Text>
-                </TouchableOpacity>
+                <View style={{ width: '80%', left:'10%' }}>
+                    <CustomButton
+                        title={t('generate_more_quizzes')}
+                        onPress={() => setModalVisible(true)}
+                    />
+                </View>
             )}
             <Modal
                 animationType="slide"
