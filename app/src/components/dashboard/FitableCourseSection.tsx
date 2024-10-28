@@ -37,9 +37,7 @@ export const DashboardFitableCourseSection = ({
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerText}>
-                    {t('fitable_course')}
-                </Text>
+                <Text style={styles.headerText}>{t('fitable_course')}</Text>
             </View>
             <View style={styles.courseContainer}>
                 {course.map((c: any, index: number) => (
@@ -55,18 +53,22 @@ export const DashboardFitableCourseSection = ({
                                 index === 0 && styles.highlightedCard,
                             ]}
                         >
-                            <Card.Title style={index === 0 && styles.highlightedCardTitle}>
+                            <Card.Title
+                                style={
+                                    index === 0 && styles.highlightedCardTitle
+                                }
+                            >
                                 {c.name}
-                                {/* {hasCompletedQuiz(c.name) && (
-                                    <Icon
-                                        type="font-awesome"
-                                        name="check"
-                                        size={15}
-                                        color="green"
-                                    />
-                                )} */}
                             </Card.Title>
                             <Card.Divider />
+                            <Card.FeaturedSubtitle
+                                style={{
+                                    color: 'purple',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {t('creator')}: {c.creator.username}
+                            </Card.FeaturedSubtitle>
                         </Card>
                     </TouchableOpacity>
                 ))}
@@ -111,6 +113,6 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     highlightedCardTitle: {
-        color: '#4A90E2',
+        color: 'black',
     },
 });

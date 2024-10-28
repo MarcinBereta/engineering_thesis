@@ -181,7 +181,7 @@ type Query {
   dashboardCourses: [ExtendedCourse!]!
   unVerifiedCourses: [Course!]!
   getCoursesWithPagination(pagination: PaginationDto!): [Course!]!
-  getMostFitCourse: [Course!]!
+  getMostFitCourse: [ExtendedCourse!]!
   countCoursesWithPagination(pagination: PaginationDto!): CountDto!
   MyCourses: [Course!]!
   getQuizById(id: String!): Quiz!

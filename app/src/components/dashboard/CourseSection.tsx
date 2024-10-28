@@ -68,27 +68,20 @@ export const DashboardCourseSection = ({
                                 width: width * 0.4,
                             }}
                         >
-                            <Card.Title>{shortenCourseName(c.name)}
-                                {/* {hasCompletedQuiz(c.name) && (
-                                    <Icon
-                                        type="font-awesome"
-                                        name="check"
-                                        size={15}
-                                        color="green"
-                                    />
-                                )} */}
-                            </Card.Title>
+                            <Card.Title>{shortenCourseName(c.name)}</Card.Title>
                             <Card.Divider />
-                            <Card.FeaturedSubtitle style={{
-                                color: 'purple',
-                                textAlign: 'center',
-                            }}>{t('creator')}: {c.creator.username}</Card.FeaturedSubtitle>
-                            {/* {c.name} */}
-                            {/* </Card.FeaturedSubtitle> */}
+                            <Card.FeaturedSubtitle
+                                style={{
+                                    color: 'purple',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {t('creator')}: {c.creator.username}
+                            </Card.FeaturedSubtitle>
                         </Card>
                     </TouchableOpacity>
                 ))}
             </View>
-        </View >
+        </View>
     );
 };

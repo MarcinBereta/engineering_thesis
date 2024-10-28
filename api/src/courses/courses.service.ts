@@ -102,6 +102,19 @@ export class CoursesService {
             }
         }
     }
+
+    async getCourseById(id: string) {
+        return await this.prismaService.course.findUnique({
+            where: {
+                id: id,
+            },
+            include: {
+                text: true,
+                creator: true,
+            },
+        });
+    }
+
     async addCourse(course: CourseInput, user: simpleUser) {
         if (!user.verified) {
             throw new Error('User is not verified');

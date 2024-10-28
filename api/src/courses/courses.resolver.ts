@@ -47,11 +47,16 @@ export class CoursesResolver {
     ) {
         return await this.courseService.getAllCoursesWithPagination(pagination);
     }
-    @Query(() => [Course])
+    @Query(() => [ExtendedCourse])
     async getMostFitCourse(@Context() context) {
         const userId = context.req.user.id;
         const course = await this.courseService.getMostFitCourse(userId);
-        return course;
+        const courses = []
+        for (let i = 0; i < course.length; i++) {
+            const fixedCourse = await this.courseService.getCourseById(course[i].id);
+            courses.push(fixedCourse)
+        }
+        return courses;
     }
 
     @Query(() => CountDto)

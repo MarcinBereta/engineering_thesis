@@ -11,8 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
 import { Card } from '@rneui/base';
-import { fontPixel, widthPixel } from '@/utils/Normalize';
-import { CustomButton } from '@/components/CustomButton';
+import { widthPixel } from '@/utils/Normalize';
 import constants from '../../constants';
 type FriendProfile = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
