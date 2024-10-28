@@ -1,5 +1,17 @@
-import { Resolver, Query, Mutation, Args, Context, Float } from '@nestjs/graphql';
-import { Quiz, RecreateQuizDto, UserScoreExtended, MoreQuizzesDTO } from './dto/quiz.dto';
+import {
+    Resolver,
+    Query,
+    Mutation,
+    Args,
+    Context,
+    Float,
+} from '@nestjs/graphql';
+import {
+    Quiz,
+    RecreateQuizDto,
+    UserScoreExtended,
+    MoreQuizzesDTO,
+} from './dto/quiz.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { QuizService } from './quiz.service';
@@ -11,7 +23,7 @@ import { UniqueQuizzesPlayedDTO } from './dto/uniqueQuizzesPlayed.dto';
 @Resolver(() => Quiz)
 @UseGuards(JwtAuthGuard)
 export class QuizResolver {
-    constructor(private quizService: QuizService) { }
+    constructor(private quizService: QuizService) {}
 
     @Query(() => Quiz)
     async getQuizById(@Args('id') id: string): Promise<Quiz> {
@@ -54,9 +66,16 @@ export class QuizResolver {
     async getUserScore(@Context() context): Promise<any[]> {
         return this.quizService.getUserScore(context.req.user.id);
     }
+
     @Query(() => Float)
     async getCreatedCourses(@Context() context): Promise<number> {
         return this.quizService.getCreatedCourses(context.req.user.id);
+    }
+    @Query(() => Float)
+    async getCreatedCoursesByUserId(
+        @Args('userId') userId: string
+    ): Promise<number> {
+        return this.quizService.getCreatedCourses(userId);
     }
 
     @Query(() => Number)
@@ -65,28 +84,75 @@ export class QuizResolver {
     }
 
     @Query(() => Number)
+    async getAllUserGamesCountByUserId(
+        @Args('userId') userId: string
+    ): Promise<number> {
+        return this.quizService.getAllUserGamesCount(userId);
+    }
+
+    @Query(() => Number)
     async getMaxedQuizesCount(@Context() context): Promise<number> {
         return this.quizService.getMaxedQuizesCount(context.req.user.id);
+    }
+
+    @Query(() => Number)
+    async getMaxedQuizesCountByUserId(
+        @Args('userId') userId: string
+    ): Promise<number> {
+        return this.quizService.getMaxedQuizesCount(userId);
     }
 
     @Query(() => Number)
     async getFriendsCount(@Context() context): Promise<number> {
         return this.quizService.getFriendsCount(context.req.user.id);
     }
+
     @Query(() => Number)
-    async getNumberOfCourses(): Promise<number> {
-        return this.quizService.getNumberOfCourses();
+    async getFriendsCountByUserId(
+        @Args('userId') userId: string
+    ): Promise<number> {
+        return this.quizService.getFriendsCount(userId);
     }
 
     @Query(() => Number)
-    async percentOfCoursesByCategory(@Args('category') category: string, @Context() context,): Promise<number> {
-        return this.quizService.numberOfUniqueQuizzesPlayed(context.req.user.id, category);
+    async getNumberOfCourses(@Context() context): Promise<number> {
+        return this.quizService.getNumberOfCourses(context.req.user.id);
+    }
+
+    @Query(() => Number)
+    async getNumberOfCoursesByUserId(
+        @Args('userId') userId: string
+    ): Promise<number> {
+        return this.quizService.getNumberOfCourses(userId);
+    }
+
+    @Query(() => Number)
+    async percentOfCoursesByCategory(
+        @Args('category') category: string,
+        @Context() context
+    ): Promise<number> {
+        return this.quizService.numberOfUniqueQuizzesPlayed(
+            context.req.user.id,
+            category
+        );
     }
 
     @Query(() => UniqueQuizzesPlayedDTO)
-    async numberOfUniqueQuizzesPlayedByCategory(@Context() context): Promise<UniqueQuizzesPlayedDTO> {
-        const data = await this.quizService.numberOfUniqueQuizzesPlayedByCategory(context.req.user.id);
-        return data as UniqueQuizzesPlayedDTO;
+    async numberOfUniqueQuizzesPlayedByCategory(
+        @Context() context
+    ): Promise<UniqueQuizzesPlayedDTO> {
+       return (await this.quizService.numberOfUniqueQuizzesPlayedByCategory(
+            context.req.user.id
+        )) as UniqueQuizzesPlayedDTO;
+    }
+
+    @Query(() => UniqueQuizzesPlayedDTO)
+    async numberOfUniqueQuizzesPlayedByCategoryByUserId(
+        @Args('userId') userId:string
+    ): Promise<UniqueQuizzesPlayedDTO> {
+        return (await this.quizService.numberOfUniqueQuizzesPlayedByCategory(
+            userId
+        )) as UniqueQuizzesPlayedDTO;
     }
 
     @Mutation(() => Quiz)
@@ -113,9 +179,12 @@ export class QuizResolver {
     }
 
     @Mutation(() => [Quiz])
-    async generateMoreQuizzes(@Args('generateMoreQuizzes') MoreQuizzesDTO: MoreQuizzesDTO) {
+    async generateMoreQuizzes(
+        @Args('generateMoreQuizzes') MoreQuizzes: MoreQuizzesDTO
+    ) {
         return this.quizService.generateMoreQuizzes(
-            MoreQuizzesDTO.courseId,
-            MoreQuizzesDTO.quizOptions);
+            MoreQuizzes.courseId,
+            MoreQuizzes.quizOptions
+        );
     }
 }

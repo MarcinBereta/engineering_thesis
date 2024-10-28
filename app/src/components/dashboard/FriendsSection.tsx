@@ -39,9 +39,11 @@ export const DashboardFriendsSection = ({
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                 {friendsList.map((f) => (
                     <TouchableOpacity
-                    // onPress={() => {
-                    //     navigation.push('course', { course: c });
-                    // }}
+                        onPress={() => {
+                            navigation.push('FriendProfile', {
+                                friend: f,
+                            });
+                        }}
                     >
                         <Card
                             containerStyle={{

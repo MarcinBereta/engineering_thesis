@@ -1,10 +1,12 @@
 import { AuthContext } from '@/contexts/AuthContext';
 import { ResultOf } from '@/graphql';
+import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import {
     FriendUserFragmentGQL,
     removeFriendGQL,
 } from '@/services/friends/friends';
 import { graphqlURL } from '@/services/settings';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { useContext, useState } from 'react';
@@ -16,11 +18,17 @@ import {
     Button,
     TouchableOpacity,
 } from 'react-native';
+import { CustomButton } from '../CustomButton';
 
 export const FriendItem = ({
     friend,
+    navigation,
 }: {
     friend: ResultOf<typeof FriendUserFragmentGQL>;
+    navigation: NativeStackScreenProps<
+        AuthenticatedRootStackParamList,
+        'Friends'
+    >['navigation'];
 }) => {
     const { userInfo } = useContext(AuthContext);
     const queryClient = useQueryClient();
@@ -57,23 +65,49 @@ export const FriendItem = ({
                     setIsModalOpen(false);
                 }}
             >
-                <Text>Do you want to remove this user from friend list</Text>
-                <Button
-                    title="Yes"
-                    onPress={() => {
-                        removeFriend.mutate();
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        marginBottom: 10,
+                        color: 'black',
                     }}
-                />
-                <Button
-                    title="No"
-                    onPress={() => {
-                        setIsModalOpen(false);
+                >
+                    Do you want to remove this user from friend list{' '}
+                </Text>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
                     }}
-                />
+                >
+                    <View style={{ width: '45%' }}>
+                        <CustomButton
+                            title="Yes"
+                            onPress={() => {
+                                removeFriend.mutate();
+                            }}
+                        />
+                    </View>
+                    <View style={{ width: '45%' }}>
+                        <CustomButton
+                            title="No"
+                            onPress={() => {
+                                setIsModalOpen(false);
+                            }}
+                        />
+                    </View>
+                </View>
             </Modal>
             <TouchableOpacity
-                onPress={() => {
+                onLongPress={() => {
                     setIsModalOpen(true);
+                }}
+                onPress={() => {
+                    navigation.push('FriendProfile', {
+                        friend,
+                    });
                 }}
                 style={{
                     width: '80%',

@@ -192,12 +192,18 @@ type Query {
   countQuizWithPagination(pagination: PaginationDto!): CountDto!
   getUserScore: [UserScoreExtended!]!
   getCreatedCourses: Float!
+  getCreatedCoursesByUserId(userId: String!): Float!
   getAllUserGamesCount: Float!
+  getAllUserGamesCountByUserId(userId: String!): Float!
   getMaxedQuizesCount: Float!
+  getMaxedQuizesCountByUserId(userId: String!): Float!
   getFriendsCount: Float!
+  getFriendsCountByUserId(userId: String!): Float!
   getNumberOfCourses: Float!
+  getNumberOfCoursesByUserId(userId: String!): Float!
   percentOfCoursesByCategory(category: String!): Float!
   numberOfUniqueQuizzesPlayedByCategory: UniqueQuizzesPlayedDTO!
+  numberOfUniqueQuizzesPlayedByCategoryByUserId(userId: String!): UniqueQuizzesPlayedDTO!
   getUserAchievements: [UserAchievement!]!
 }
 

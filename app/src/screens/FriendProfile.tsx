@@ -6,7 +6,7 @@ import { AuthenticatedRootStackParamList } from './Navigator';
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { userStatsGQL } from '@/services/courses/courses';
+import { getFriendStatsGQL } from '@/services/courses/courses';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
@@ -14,21 +14,23 @@ import { Card } from '@rneui/base';
 import { fontPixel, widthPixel } from '@/utils/Normalize';
 import { CustomButton } from '@/components/CustomButton';
 import constants from '../../constants';
-type UserProfile = NativeStackScreenProps<
+type FriendProfile = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
-    'UserProfile'
+    'FriendProfile'
 >;
-export const UserProfile = (props: UserProfile) => {
+export const FriendProfile = (props: FriendProfile) => {
     const { userInfo } = useContext(AuthContext);
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState<string>('MATH');
-    const { data, isLoading, refetch, isError, error } = useQuery({
+    const { data } = useQuery({
         queryKey: ['stats'],
         queryFn: async () =>
             request(
                 graphqlURL,
-                userStatsGQL,
-                {},
+                getFriendStatsGQL,
+                {
+                    userId: props.route.params.friend.id,
+                },
                 {
                     Authorization: 'Bearer ' + userInfo?.token,
                 }
@@ -37,7 +39,7 @@ export const UserProfile = (props: UserProfile) => {
     if (!userInfo || !data) {
         return null;
     }
-
+    const { friend } = props.route.params;
     return (
         <Layout icon="dashboard" navigation={props.navigation}>
             <ScrollView contentContainerStyle={styleForProfile.container}>
@@ -46,31 +48,17 @@ export const UserProfile = (props: UserProfile) => {
                         style={styleForProfile.profileImage}
                         source={{
                             uri:
-                                userInfo.image != null
+                                friend.image != null
                                     ? constants.url +
                                       '/files/avatars/' +
-                                      userInfo.image
+                                      friend.image
                                     : 'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                     />
                     <Text style={styleForProfile.username}>
-                        {userInfo?.username}
+                        {friend?.username}
                     </Text>
                     <Text style={styleForProfile.email}>{userInfo?.email}</Text>
-                </View>
-                <View style={[styleForProfile.button, { gap: fontPixel(20) }]}>
-                    <CustomButton
-                        title={t('my_achievements')}
-                        onPress={() => {
-                            props.navigation.navigate('UserAchievements');
-                        }}
-                    />
-                    <CustomButton
-                        title={t('my_courses')}
-                        onPress={() => {
-                            props.navigation.navigate('MyCourses');
-                        }}
-                    />
                 </View>
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
@@ -89,7 +77,7 @@ export const UserProfile = (props: UserProfile) => {
                             <Text style={styleForProfile.boldText}>
                                 {t('maxed_courses')}:
                             </Text>{' '}
-                            {data.getMaxedQuizesCount}
+                            {data.getMaxedQuizesCountByUserId}
                         </Text>
                     </View>
                 </Card>
@@ -100,7 +88,7 @@ export const UserProfile = (props: UserProfile) => {
                             <Text style={styleForProfile.boldText}>
                                 {t('all_games')}:
                             </Text>{' '}
-                            {data.getAllUserGamesCount}
+                            {data.getAllUserGamesCountByUserId}
                         </Text>
                     </View>
                 </Card>
@@ -111,7 +99,7 @@ export const UserProfile = (props: UserProfile) => {
                             <Text style={styleForProfile.boldText}>
                                 {t('friends')}:
                             </Text>{' '}
-                            {data.getFriendsCount}
+                            {data.getFriendsCountByUserId}
                         </Text>
                     </View>
                 </Card>
@@ -122,7 +110,7 @@ export const UserProfile = (props: UserProfile) => {
                             <Text style={styleForProfile.boldText}>
                                 {t('created_courses')}:
                             </Text>{' '}
-                            {data.getCreatedCourses}
+                            {data.getCreatedCoursesByUserId}
                         </Text>
                     </View>
                 </Card>
@@ -174,8 +162,9 @@ export const UserProfile = (props: UserProfile) => {
                             <Text style={styleForProfile.cardText}>
                                 {t('played_games')}:{' '}
                                 {
-                                    data.numberOfUniqueQuizzesPlayedByCategory[
-                                        selectedCategory as keyof typeof data.numberOfUniqueQuizzesPlayedByCategory
+                                    data
+                                        .numberOfUniqueQuizzesPlayedByCategoryByUserId[
+                                        selectedCategory as keyof typeof data.numberOfUniqueQuizzesPlayedByCategoryByUserId
                                     ]
                                 }
                             </Text>

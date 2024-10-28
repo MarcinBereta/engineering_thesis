@@ -37,7 +37,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) { }
+    ) {}
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -178,7 +178,6 @@ export class QuizService {
             });
             console.log('Count: ', count);
             return { count, size: PAGINATION_SIZE };
-
         }
         const count = await this.prismaService.quiz.count();
         const cachedCount =
@@ -354,8 +353,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' questions in the quiz.'
+                        numberOfQuestions +
+                        ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -428,29 +427,29 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                        4 * numberOfQuestions +
-                        'options in total.'
+                            4 * numberOfQuestions +
+                            'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                        4 * numberOfQuestions +
-                        ' options in total.'
+                            4 * numberOfQuestions +
+                            ' options in total.'
                     );
                 }
 
             if (!ignoreCount && totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' correct answers.'
+                        numberOfQuestions +
+                        ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' correct answers.'
+                        numberOfQuestions +
+                        ' correct answers.'
                 );
             }
-            console.log("ELO BENC");
+            console.log('ELO BENC');
             return true;
         } catch (error) {
             console.error('Error while verifying quiz:', error);
@@ -779,7 +778,10 @@ export class QuizService {
         }
     }
 
-    async generateMoreQestionsforAddictionalQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
+    async generateMoreQestionsforAddictionalQuiz(
+        courseId: string,
+        typeOfQuiz: string
+    ): Promise<string> {
         const mergedText: string = await this.mergeTexts(courseId);
         console.log(courseId, typeOfQuiz);
         const courseLength = mergedText.length;
@@ -801,7 +803,7 @@ export class QuizService {
                 },
             });
 
-            const quizIds = quizzes.map(quiz => quiz.id);
+            const quizIds = quizzes.map((quiz) => quiz.id);
 
             oldQuestions = await this.prismaService.question.findMany({
                 where: {
@@ -815,27 +817,33 @@ export class QuizService {
             throw error;
         }
 
-        const oldQuestionsTexts = oldQuestions.map((question) => question.question);
-        console.log(oldQuestionsTexts)
+        const oldQuestionsTexts = oldQuestions.map(
+            (question) => question.question
+        );
+        console.log(oldQuestionsTexts);
         let typeOfQuizDescription = '';
 
         switch (typeOfQuiz) {
             case 'general':
-                typeOfQuizDescription = "Please generate only questions with general questions (don't focus on details, just on generalities).";
+                typeOfQuizDescription =
+                    "Please generate only questions with general questions (don't focus on details, just on generalities).";
                 break;
             case 'specific':
-                typeOfQuizDescription = "Please generate only questions with specific questions (focus on details, be specific).";
+                typeOfQuizDescription =
+                    'Please generate only questions with specific questions (focus on details, be specific).';
                 break;
             case 'multiple':
-                typeOfQuizDescription = " Please generate only questions with multiple choice questions (more than 1 anwser), correct answer should be array in this case';";
+                typeOfQuizDescription =
+                    " Please generate only questions with multiple choice questions (more than 1 anwser), correct answer should be array in this case';";
                 break;
             case 'truefalse':
-                typeOfQuizDescription = " Please generate only questions with true/false questions. (so only anwsers questions will be true/false";
+                typeOfQuizDescription =
+                    ' Please generate only questions with true/false questions. (so only anwsers questions will be true/false';
                 break;
             default:
-                typeOfQuizDescription = "Generate questions.";
+                typeOfQuizDescription = 'Generate questions.';
                 break;
-        };
+        }
 
         console.log(typeOfQuizDescription);
 
@@ -892,9 +900,10 @@ export class QuizService {
                 },
                 { role: 'user', content: mergedText },
                 {
-                    role: 'user', content:
+                    role: 'user',
+                    content:
                         'Please do not generate questions that are already in the quiz: ' +
-                        oldQuestionsTexts.join(' ')
+                        oldQuestionsTexts.join(' '),
                 },
                 {
                     role: 'assistant',
@@ -904,7 +913,8 @@ export class QuizService {
                         ' questions and save it in a JSON file.(json with question, options and correct_answer) in the ' +
                         courseBasic.language +
                         'language. ' +
-                        specificParameters + typeOfQuizDescription,
+                        specificParameters +
+                        typeOfQuizDescription,
                 },
             ],
             model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
@@ -913,14 +923,17 @@ export class QuizService {
         return completion.choices[0].message.content;
     }
 
-    async translateTypeOfQuiz(courseId: string, typeOfQuiz: string): Promise<string> {
+    async translateTypeOfQuiz(
+        courseId: string,
+        typeOfQuiz: string
+    ): Promise<string> {
         const courseBasic = await this.prismaService.course.findUnique({
             where: {
                 id: courseId,
             },
         });
         const language = courseBasic.language;
-        console.log(typeOfQuiz)
+        console.log(typeOfQuiz);
         const translations = {
             en: {
                 general: ' general',
@@ -954,23 +967,33 @@ export class QuizService {
             },
         };
 
-        return translations[language]?.[typeOfQuiz] || translations[language]?.general || 'general';
+        return (
+            translations[language]?.[typeOfQuiz] ||
+            translations[language]?.general ||
+            'general'
+        );
     }
 
-    async generateMoreQuizzes(courseId: string, typeOfQuizzes: string[]): Promise<Quiz[]> {
+    async generateMoreQuizzes(
+        courseId: string,
+        typeOfQuizzes: string[]
+    ): Promise<Quiz[]> {
         if (!this.checkCourseExistence(courseId)) {
             throw new Error('The course does not exist.');
         }
         console.log(typeOfQuizzes);
-        let quizList = [];
+        const quizList = [];
         const mergedText: string = await this.mergeTexts(courseId);
         const courseLength = mergedText.length;
         let numberOfQuestions = 0;
         numberOfQuestions = await this.getNumberOfQuestions(courseLength);
         for (const typeOfQuiz of typeOfQuizzes) {
-            console.log(typeOfQuiz)
+            console.log(typeOfQuiz);
             const courseName = await this.getCourseName(courseId);
-            const typeOfQuizTranslated = await this.translateTypeOfQuiz(courseId, typeOfQuiz);
+            const typeOfQuizTranslated = await this.translateTypeOfQuiz(
+                courseId,
+                typeOfQuiz
+            );
             //check if quiz with this type already exists
             const quiz = await this.prismaService.quiz.findFirst({
                 where: {
@@ -983,23 +1006,36 @@ export class QuizService {
                 continue;
             }
 
-            const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
+            const questions = await this.generateMoreQestionsforAddictionalQuiz(
+                courseId,
+                typeOfQuiz
+            );
             const questionsJson = JSON.parse(questions);
 
-            let verified = await this.verifyQuiz(questionsJson, numberOfQuestions, typeOfQuiz === 'truefalse');
+            let verified = await this.verifyQuiz(
+                questionsJson,
+                numberOfQuestions,
+                typeOfQuiz === 'truefalse'
+            );
             let tries = 2;
             while (!verified) {
                 if (tries > 0) {
-                    const questions = await this.generateMoreQestionsforAddictionalQuiz(courseId, typeOfQuiz);
+                    const questions =
+                        await this.generateMoreQestionsforAddictionalQuiz(
+                            courseId,
+                            typeOfQuiz
+                        );
                     const questionsJson = JSON.parse(questions);
-                    if (typeOfQuiz === 'truefalse' || typeOfQuiz === 'multiple') {
+                    if (
+                        typeOfQuiz === 'truefalse' ||
+                        typeOfQuiz === 'multiple'
+                    ) {
                         verified = await this.verifyQuiz(
                             questionsJson,
                             numberOfQuestions,
                             true
                         );
-                    }
-                    else {
+                    } else {
                         verified = await this.verifyQuiz(
                             questionsJson,
                             numberOfQuestions
@@ -1022,14 +1058,16 @@ export class QuizService {
                             courseId: courseId,
                             name: courseName + typeOfQuizTranslated,
                             questions: {
-                                create: questionsJson.quiz.map((questionData) => ({
-                                    question: questionData.question,
-                                    answers: {
-                                        set: questionData.options,
-                                    },
-                                    type: 'MULTIPLE_ANSWER',
-                                    correct: questionData.correct_answer,
-                                })),
+                                create: questionsJson.quiz.map(
+                                    (questionData) => ({
+                                        question: questionData.question,
+                                        answers: {
+                                            set: questionData.options,
+                                        },
+                                        type: 'MULTIPLE_ANSWER',
+                                        correct: questionData.correct_answer,
+                                    })
+                                ),
                             },
                         },
                         include: {
@@ -1040,20 +1078,21 @@ export class QuizService {
                     console.log('MULTIPLE QUIZ READY');
 
                     quizList.push(quiz);
-                }
-                else {
+                } else {
                     const quiz = await this.prismaService.quiz.create({
                         data: {
                             courseId: courseId,
                             name: courseName + typeOfQuizTranslated,
                             questions: {
-                                create: questionsJson.quiz.map((questionData) => ({
-                                    question: questionData.question,
-                                    answers: {
-                                        set: questionData.options,
-                                    },
-                                    correct: [questionData.correct_answer],
-                                })),
+                                create: questionsJson.quiz.map(
+                                    (questionData) => ({
+                                        question: questionData.question,
+                                        answers: {
+                                            set: questionData.options,
+                                        },
+                                        correct: [questionData.correct_answer],
+                                    })
+                                ),
                             },
                         },
                         include: {
@@ -1078,10 +1117,8 @@ export class QuizService {
         }
         await Promise.all(cachesToDelete);
 
-
         return quizList;
     }
-
 
     async addUserScore(addScore: AddScore, userId: string): Promise<Quiz> {
         const numberOfQuestions = await this.prismaService.question.count({
@@ -1192,8 +1229,12 @@ export class QuizService {
             },
         });
     }
-    async getNumberOfCourses(): Promise<number> {
-        return await this.prismaService.course.count();
+    async getNumberOfCourses(userId: string): Promise<number> {
+        return await this.prismaService.course.count({
+            where: {
+                creatorId: userId,
+            },
+        });
     }
     async numberOfUniqueQuizzesPlayed(
         userID: string,
@@ -1230,11 +1271,7 @@ export class QuizService {
                 }
             }
         }
-        const courses = await this.prismaService.course.findMany({
-            where: {
-                category: category as Category,
-            },
-        });
+
         const percatage = result[category];
         return percatage;
     }
@@ -1263,5 +1300,4 @@ export class QuizService {
         console.log(result);
         return result;
     }
-
 }

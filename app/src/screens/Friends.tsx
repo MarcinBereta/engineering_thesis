@@ -61,7 +61,7 @@ const Friends = (props: Friends) => {
         onSuccess: (data, variables, context) => {
             setIsModalOpen(false);
             refetch();
-    },
+        },
         onError: (data, variables, context) => {},
     });
 
@@ -96,20 +96,40 @@ const Friends = (props: Friends) => {
                         onChangeText={(text) => {
                             setUsername(text);
                         }}
-                    />
-
-                    <CustomButton
-                        title={t('add')}
-                        onPress={() => {
-                            addFriend.mutate(username);
+                        style={{
+                            width: '90%',
+                            height: heightPixel(50),
+                            borderColor: 'gray',
+                            borderWidth: 1,
+                            borderRadius: 10,
+                            margin: 10,
+                            padding: 10,
+                            fontSize: fontPixel(20),
                         }}
                     />
-                    <CustomButton
-                        title={t('cancel')}
-                        onPress={() => {
-                            setIsModalOpen(false);
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-around',
                         }}
-                    />
+                    >
+                        <View style={{ width: '45%' }}>
+                            <CustomButton
+                                title={t('add')}
+                                onPress={() => {
+                                    addFriend.mutate(username);
+                                }}
+                            />
+                        </View>
+                        <View style={{ width: '45%' }}>
+                            <CustomButton
+                                title={t('cancel')}
+                                onPress={() => {
+                                    setIsModalOpen(false);
+                                }}
+                            />
+                        </View>
+                    </View>
                 </Modal>
                 {friends.length > 0 && (
                     <>
@@ -128,7 +148,10 @@ const Friends = (props: Friends) => {
                         <FlatList
                             data={friends}
                             renderItem={({ item }) => (
-                                <FriendItem friend={item} />
+                                <FriendItem
+                                    friend={item}
+                                    navigation={props.navigation}
+                                />
                             )}
                         />
                     </>

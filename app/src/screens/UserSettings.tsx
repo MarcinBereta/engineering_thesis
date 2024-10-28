@@ -1,6 +1,6 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Text, TextInput, View, Button, Image, StyleSheet } from 'react-native';
+import { Text, TextInput, View, Image, StyleSheet } from 'react-native';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
@@ -8,11 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 import { useTranslation } from 'react-i18next';
 import DocumentPicker from 'react-native-document-picker';
-import {
-    addAvatar,
-    addCourseGQL,
-    changeDataGQL,
-} from '@/services/courses/courses';
+import { addAvatar, changeDataGQL } from '@/services/courses/courses';
 import { CustomButton } from '@/components/CustomButton';
 import constants from '../../constants';
 import request from 'graphql-request';
@@ -27,7 +23,7 @@ type UserSettings = NativeStackScreenProps<
 
 export type changeDataDto = VariablesOf<typeof changeDataGQL>;
 export const UserSettings = (props: UserSettings) => {
-    const { userInfo, updateUserImage, updateUserData } =
+    const { userInfo, updateUserImage, updateUserData, logout } =
         useContext(AuthContext);
     const { t, i18n } = useTranslation();
 
@@ -40,9 +36,14 @@ export const UserSettings = (props: UserSettings) => {
         mutationFn: async (data: changeDataDto) => {
             console.log('Sending request with data:', data);
             try {
-                const response = await request(graphqlURL, changeDataGQL, data, {
-                    Authorization: 'Bearer ' + userInfo?.token,
-                });
+                const response = await request(
+                    graphqlURL,
+                    changeDataGQL,
+                    data,
+                    {
+                        Authorization: 'Bearer ' + userInfo?.token,
+                    }
+                );
                 console.log('Response:', response);
                 return response;
             } catch (error) {
@@ -51,10 +52,10 @@ export const UserSettings = (props: UserSettings) => {
             }
         },
         onSuccess: () => {
-            console.log(email, userName)
+            console.log(email, userName);
             updateUserData(email || '', userName || '');
             clearCache();
-            console.log('Updated')
+            console.log('Updated');
         },
     });
     useEffect(() => {
@@ -85,7 +86,7 @@ export const UserSettings = (props: UserSettings) => {
         file.name = `${id}.${ending}`;
         await addAvatar(res[0], userInfo?.id || '');
         setImage(file.name);
-        updateUserImage(file.name)
+        updateUserImage(file.name);
         await clearCache();
     };
 
@@ -163,6 +164,14 @@ export const UserSettings = (props: UserSettings) => {
                         style={pickerSelectStyles}
                     />
                 </View>
+                <View>
+                    <CustomButton
+                        title={t('logout')}
+                        onPress={() => {
+                            logout();
+                        }}
+                    />
+                </View>
             </View>
         </Layout>
     );
@@ -183,8 +192,6 @@ function generateRandomId() {
     }
     return result;
 }
-
-
 
 const styles = StyleSheet.create({
     container: {

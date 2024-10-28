@@ -124,6 +124,27 @@ export const userStatsGQL = graphql(`
     }
 `);
 
+export const getFriendStatsGQL = graphql(`
+    query getFriendStats($userId: String!) {
+        getCreatedCoursesByUserId(userId: $userId)
+        getAllUserGamesCountByUserId(userId: $userId)
+        getMaxedQuizesCountByUserId(userId: $userId)
+        getFriendsCountByUserId(userId: $userId)
+        getNumberOfCoursesByUserId(userId: $userId)
+        numberOfUniqueQuizzesPlayedByCategoryByUserId(userId: $userId) {
+            MATH
+            HISTORY
+            GEOGRAPHY
+            ENGLISH
+            ART
+            SPORTS
+            SCIENCE
+            MUSIC
+            OTHER
+        }
+    }
+`);
+
 export const getMyCoursesGQL = graphql(`
     query getCourses {
         MyCourses {

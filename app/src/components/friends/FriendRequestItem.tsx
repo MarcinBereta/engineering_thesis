@@ -18,6 +18,7 @@ import {
     Button,
     TouchableOpacity,
 } from 'react-native';
+import { CustomButton } from '../CustomButton';
 
 export const FriendRequestItem = ({
     friend,
@@ -79,19 +80,36 @@ export const FriendRequestItem = ({
                     setIsModalOpen(false);
                 }}
             >
-                <Text>Do you want to accept this request</Text>
-                <Button
-                    title="Yes"
-                    onPress={() => {
-                        acceptFriendRequest.mutate();
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        marginBottom: 10,
+                        color: 'black',
                     }}
-                />
-                <Button
-                    title="No"
-                    onPress={() => {
-                        removeFriendRequest.mutate();
-                    }}
-                />
+                >
+                    Do you want to accept this request
+                </Text>
+
+                <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                    <View style={{ width: '45%' }}>
+                        <CustomButton
+                            title="Yes"
+                            onPress={() => {
+                                acceptFriendRequest.mutate();
+                            }}
+                        />
+                    </View>
+                    <View style={{ width: '45%' }}>
+                        <CustomButton
+                            title="No"
+                            onPress={() => {
+                                removeFriendRequest.mutate();
+                            }}
+                        />
+                    </View>
+                </View>
             </Modal>
             <TouchableOpacity
                 onPress={() => {

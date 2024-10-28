@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AchievementsService {
-    constructor(private prismaService: PrismaService) { }
+    constructor(private prismaService: PrismaService) {}
 
     async getUserAchievements(userId: string): Promise<UserAchievement[]> {
         const achievements = await this.checkAchivements(userId);
@@ -15,13 +15,13 @@ export class AchievementsService {
                 userId: userId,
                 icon: 'default-icon',
             });
-            console.log(achievement)
-            const userAchievement = await this.prismaService.achievement.findFirst({
-                where: {
-                    userId: userId,
-                    name: achievement,
-                },
-            });
+            const userAchievement =
+                await this.prismaService.achievement.findFirst({
+                    where: {
+                        userId: userId,
+                        name: achievement,
+                    },
+                });
             if (!userAchievement) {
                 await this.prismaService.achievement.create({
                     data: {
@@ -33,7 +33,7 @@ export class AchievementsService {
             }
         }
 
-        console.log(userAchievements)
+        console.log(userAchievements);
         return userAchievements;
     }
     /*
@@ -82,7 +82,7 @@ export class AchievementsService {
         const userGames = await this.getAllUserGamesCount(userID);
         const userFriends = await this.getFriendsCount(userID);
         const userCourses = await this.getCreatedCourses(userID);
-        console.log(userGames, userFriends, userCourses)
+        console.log(userGames, userFriends, userCourses);
         const userAchivements = [];
         if (userGames >= 1000) {
             userAchivements.push('numberOfGames1000');
@@ -111,5 +111,4 @@ export class AchievementsService {
         console.log(userAchivements);
         return userAchivements;
     }
-
 }
