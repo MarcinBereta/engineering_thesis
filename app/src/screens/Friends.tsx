@@ -79,55 +79,78 @@ const Friends = (props: Friends) => {
             <View style={{ flexDirection: 'column', flex: 1 }}>
                 <Modal
                     animationType="slide"
-                    transparent={false}
+                    transparent={true}
                     visible={isModalOpen}
                     style={{
-                        flex: 1,
+                        width: '100%',
+                        height: '100%',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        backgroundColor: 'darkgrey',
                     }}
                     onRequestClose={() => {
                         setIsModalOpen(false);
                     }}
                 >
-                    <TextInput
-                        placeholder={t('enter_username')}
-                        onChangeText={(text) => {
-                            setUsername(text);
-                        }}
-                        style={{
-                            width: '90%',
-                            height: heightPixel(50),
-                            borderColor: 'gray',
-                            borderWidth: 1,
-                            borderRadius: 10,
-                            margin: 10,
-                            padding: 10,
-                            fontSize: fontPixel(20),
-                        }}
-                    />
                     <View
                         style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-around',
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: 'rgba(0,0,0,0.5)',
                         }}
                     >
-                        <View style={{ width: '45%' }}>
-                            <CustomButton
-                                title={t('add')}
-                                onPress={() => {
-                                    addFriend.mutate(username);
+                        <View
+                            style={{
+                                width: '80%',
+                                flexDirection: 'column',
+                                height: heightPixel(200),
+                                backgroundColor: 'white',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius:fontPixel(20)
+                            }}
+                        >
+                            <TextInput
+                                placeholder={t('enter_username')}
+                                onChangeText={(text) => {
+                                    setUsername(text);
+                                }}
+                                style={{
+                                    width: '90%',
+                                    height: heightPixel(50),
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 10,
+                                    margin: 10,
+                                    padding: 10,
+                                    fontSize: fontPixel(20),
                                 }}
                             />
-                        </View>
-                        <View style={{ width: '45%' }}>
-                            <CustomButton
-                                title={t('cancel')}
-                                onPress={() => {
-                                    setIsModalOpen(false);
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-around',
                                 }}
-                            />
+                            >
+                                <View style={{ width: '45%' }}>
+                                    <CustomButton
+                                        title={t('add')}
+                                        onPress={() => {
+                                            addFriend.mutate(username);
+                                        }}
+                                    />
+                                </View>
+                                <View style={{ width: '45%' }}>
+                                    <CustomButton
+                                        title={t('cancel')}
+                                        onPress={() => {
+                                            setIsModalOpen(false);
+                                        }}
+                                    />
+                                </View>
+                            </View>
                         </View>
                     </View>
                 </Modal>
@@ -184,8 +207,9 @@ const Friends = (props: Friends) => {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            width: '100%',
+                            width: '80%',
                             height: '100%',
+                            left:'10%'
                         }}
                     >
                         <CustomButton
@@ -206,7 +230,10 @@ const Friends = (props: Friends) => {
                         />
                     </View>
                 ) : (
-                    <View>
+                    <View style={{
+                        width: '80%',
+                        left:'10%'
+                    }}>
                         <CustomButton
                             title={t('add_friend')}
                             onPress={() => {

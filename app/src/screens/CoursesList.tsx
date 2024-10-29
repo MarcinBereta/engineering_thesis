@@ -1,4 +1,11 @@
-import { Text, Dimensions, View, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+    Text,
+    Dimensions,
+    View,
+    TouchableOpacity,
+    StyleSheet,
+    Modal,
+} from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import { SetStateAction, useContext, useState } from 'react';
 import { getCoursesWithPaginationGQL } from '../services/courses/courses';
@@ -16,8 +23,8 @@ import { Icon, normalizeText } from '@rneui/base';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
-import Picker from 'react-native-picker-select';
 import { getUserScoreGQL } from '@/services/quiz/quiz';
+import { CategorySelection } from './CategorySelection';
 const { height } = Dimensions.get('window');
 
 export type Course = ResultOf<
@@ -38,6 +45,8 @@ const CoursesList = (props: CoursesList) => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const debounceSearch = useDebounce(search);
     const debounceCategory = useDebounce(selectedCategory);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const { data, isLoading, refetch, isError, error } = useQuery({
         queryKey: ['courses', page, debounceSearch, debounceCategory],
         queryFn: async () =>
@@ -83,21 +92,37 @@ const CoursesList = (props: CoursesList) => {
 
     return (
         <Layout navigation={props.navigation} icon="course">
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isModalOpen}
+                onRequestClose={() => {
+                    setIsModalOpen(false);
+                }}
+            >
+                <CategorySelection
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={(category) => {
+                        setSelectedCategory(category);
+                        setIsModalOpen(false);
+                        setPage(1);
+                    }}
+                />
+            </Modal>
             <View style={styles.header}>
                 <Text style={styles.title}>{t('courses_list')}</Text>
                 <TouchableOpacity
                     style={styles.iconButton}
                     onPress={() => {
-                        props.navigation.navigate('CategorySelection' as never, {
-                            selectedCategory,
-                            setSelectedCategory,
-                        } as never)
-                        setPage(1);
+                        setIsModalOpen(true);
+                        // setPage(1);
                     }}
                 >
-                    <Text>{selectedCategory !== "" && (
-                        <Text>Category: {t(selectedCategory)}</Text>
-                    )}</Text>
+                    <Text>
+                        {selectedCategory !== '' && (
+                            <Text>Category: {t(selectedCategory)}</Text>
+                        )}
+                    </Text>
                     <Icon name="category" size={30} color="black" />
                 </TouchableOpacity>
             </View>
@@ -128,7 +153,7 @@ const CoursesList = (props: CoursesList) => {
                 count={data.countCoursesWithPagination.count}
                 changePage={(page) => setPage(page)}
             />
-        </Layout >
+        </Layout>
     );
 };
 

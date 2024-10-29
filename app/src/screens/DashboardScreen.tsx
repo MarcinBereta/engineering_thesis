@@ -102,13 +102,6 @@ const DashboardScreen = (props: DashboardScreen) => {
                             alignItems: 'center',
                         }}
                     >
-                        <Icon
-                            type="font-awesome"
-                            name="bell"
-                            size={width * 0.08}
-                            color="black"
-                            containerStyle={{ margin: 5 }}
-                        />
                         <TouchableOpacity
                             onPress={() => {
                                 props.navigation.navigate('UserSettings');

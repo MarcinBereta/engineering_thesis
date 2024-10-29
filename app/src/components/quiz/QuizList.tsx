@@ -1,5 +1,5 @@
 import { useContext, useState, SetStateAction } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { AuthContext } from '../../contexts/AuthContext';
 import { graphqlURL } from '@/services/settings';
@@ -18,6 +18,7 @@ import { Layout } from '../Layout';
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedRootStackParamList } from '@/screens/Navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CategorySelection } from '@/screens/CategorySelection';
 
 type QuizzesList = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
@@ -28,7 +29,7 @@ const QuizzesList = (props: QuizzesList) => {
     const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const debounceSearch = useDebounce(search);
     const [selectedCategory, setSelectedCategory] = useState('');
     const debounceCategory = useDebounce(selectedCategory);
@@ -103,21 +104,36 @@ const QuizzesList = (props: QuizzesList) => {
 
     return (
         <Layout navigation={props.navigation} icon="quiz">
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isModalOpen}
+                onRequestClose={() => {
+                    setIsModalOpen(false);
+                }}
+            >
+                <CategorySelection
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={(category) => {
+                        setSelectedCategory(category);
+                        setIsModalOpen(false);
+                        setPage(1);
+                    }}
+                />
+            </Modal>
             <View style={styles.header}>
                 <Text style={styles.title}>{t('quizzes_list')}</Text>
                 <TouchableOpacity
                     style={styles.iconButton}
                     onPress={() => {
-                        props.navigation.navigate('CategorySelection' as never, {
-                            selectedCategory,
-                            setSelectedCategory,
-                        } as never);
-                        setPage(1);
+                        setIsModalOpen(true);
                     }}
                 >
-                    <Text>{selectedCategory !== "" && (
-                        <Text>Category: {t(selectedCategory)}</Text>
-                    )}</Text>
+                    <Text>
+                        {selectedCategory !== '' && (
+                            <Text>Category: {t(selectedCategory)}</Text>
+                        )}
+                    </Text>
                     <Icon name="category" size={30} color="black" />
                 </TouchableOpacity>
             </View>

@@ -96,9 +96,8 @@ export type AuthenticatedRootStackParamList = {
     UserSettings: undefined;
     UserProfile: undefined;
     FriendProfile: {
-        friend: ResultOf<typeof FriendUserFragmentGQL>
+        friend: ResultOf<typeof FriendUserFragmentGQL>;
     };
-    CategorySelection: undefined;
     UserAchievements: undefined;
     CourseQuizzesList: {
         courseId: string;
@@ -217,10 +216,6 @@ const Navigator = ({}: {}) => {
                         <AuthenticatedStack.Screen
                             component={VerifyAccount}
                             name="VerifyAccount"
-                        />
-                        <AuthenticatedStack.Screen
-                            component={CategorySelection}
-                            name="CategorySelection"
                         />
                         <AuthenticatedStack.Screen
                             component={UserAchievements}

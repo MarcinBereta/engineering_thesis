@@ -22,7 +22,7 @@ export const FriendProfile = (props: FriendProfile) => {
     const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState<string>('MATH');
     const { data } = useQuery({
-        queryKey: ['stats'],
+        queryKey: ['friendStats', props.route.params.friend.id],
         queryFn: async () =>
             request(
                 graphqlURL,
@@ -38,6 +38,7 @@ export const FriendProfile = (props: FriendProfile) => {
     if (!userInfo || !data) {
         return null;
     }
+
     const { friend } = props.route.params;
     return (
         <Layout icon="dashboard" navigation={props.navigation}>

@@ -19,6 +19,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { CustomButton } from '../CustomButton';
+import { fontPixel, heightPixel } from '@/utils/Normalize';
 
 export const FriendItem = ({
     friend,
@@ -56,47 +57,77 @@ export const FriendItem = ({
     });
 
     return (
-        <View>
+        <View
+            style={{
+                width: '80%',
+                backgroundColor: 'white',
+                padding: fontPixel(20),
+                left: '10%',
+                borderRadius: fontPixel(10),
+                flexDirection: 'column',
+            }}
+        >
             <Modal
                 animationType="slide"
-                transparent={false}
+                transparent={true}
                 visible={isModalOpen}
                 onRequestClose={() => {
                     setIsModalOpen(false);
                 }}
             >
-                <Text
-                    style={{
-                        textAlign: 'center',
-                        fontSize: 20,
-                        fontWeight: 'bold',
-                        marginBottom: 10,
-                        color: 'black',
-                    }}
-                >
-                    Do you want to remove this user from friend list{' '}
-                </Text>
                 <View
                     style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0,0,0,0.5)',
                     }}
                 >
-                    <View style={{ width: '45%' }}>
-                        <CustomButton
-                            title="Yes"
-                            onPress={() => {
-                                removeFriend.mutate();
+                    <View
+                        style={{
+                            width: '80%',
+                            flexDirection: 'column',
+                            height: heightPixel(200),
+                            backgroundColor: 'white',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: fontPixel(20),
+                        }}
+                    >
+                        <Text
+                            style={{
+                                textAlign: 'center',
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                                marginBottom: 10,
+                                color: 'black',
                             }}
-                        />
-                    </View>
-                    <View style={{ width: '45%' }}>
-                        <CustomButton
-                            title="No"
-                            onPress={() => {
-                                setIsModalOpen(false);
+                        >
+                            Do you want to remove this user from friend list{' '}
+                        </Text>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-around',
                             }}
-                        />
+                        >
+                            <View style={{ width: '45%' }}>
+                                <CustomButton
+                                    title="Yes"
+                                    onPress={() => {
+                                        removeFriend.mutate();
+                                    }}
+                                />
+                            </View>
+                            <View style={{ width: '45%' }}>
+                                <CustomButton
+                                    title="No"
+                                    onPress={() => {
+                                        setIsModalOpen(false);
+                                    }}
+                                />
+                            </View>
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -112,13 +143,21 @@ export const FriendItem = ({
                 style={{
                     width: '80%',
                     flex: 1,
-                    flexDirection: 'row',
+                    flexDirection: 'column',
                     justifyContent: 'space-around',
                 }}
             >
                 {friend.image ? <Image src={friend.image} /> : null}
-                <Text>{friend.username}</Text>
-                <Text>{friend.email}</Text>
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        fontSize: fontPixel(20),
+                        fontWeight: 'bold',
+                    }}
+                >
+                    {friend.username}
+                </Text>
+                <Text style={{ textAlign: 'center' }}>{friend.email}</Text>
             </TouchableOpacity>
         </View>
     );

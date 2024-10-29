@@ -20,9 +20,9 @@ type UserProfile = NativeStackScreenProps<
 >;
 export const UserProfile = (props: UserProfile) => {
     const { userInfo } = useContext(AuthContext);
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState<string>('MATH');
-    const { data, isLoading, refetch, isError, error } = useQuery({
+    const { data } = useQuery({
         queryKey: ['stats'],
         queryFn: async () =>
             request(
@@ -34,8 +34,16 @@ export const UserProfile = (props: UserProfile) => {
                 }
             ),
     });
+    console.log(data)
+
     if (!userInfo || !data) {
         return null;
+    }
+
+    const createKeyEntry = (key: keyof typeof data.numberOfUniqueQuizzesPlayedByCategory)=>{
+        const values = data.numberOfUniqueQuizzesPlayedByCategory
+        const val = values[key] || 0;
+        return `${t(key)} (${val})`
     }
 
     return (
@@ -150,15 +158,15 @@ export const UserProfile = (props: UserProfile) => {
                                 setSelectedCategory(value)
                             }
                             items={[
-                                { label: t('MATH'), value: 'MATH' },
-                                { label: t('HISTORY'), value: 'HISTORY' },
-                                { label: t('GEOGRAPHY'), value: 'GEOGRAPHY' },
-                                { label: t('ENGLISH'), value: 'ENGLISH' },
-                                { label: t('ART'), value: 'ART' },
-                                { label: t('SPORTS'), value: 'SPORTS' },
-                                { label: t('SCIENCE'), value: 'SCIENCE' },
-                                { label: t('MUSIC'), value: 'MUSIC' },
-                                { label: t('OTHER'), value: 'OTHER' },
+                                { label: createKeyEntry('MATH'), value: 'MATH'  },
+                                { label: createKeyEntry('HISTORY'), value: 'HISTORY' },
+                                { label: createKeyEntry('GEOGRAPHY'), value: 'GEOGRAPHY' },
+                                { label: createKeyEntry('ENGLISH'), value: 'ENGLISH' },
+                                { label: createKeyEntry('ART'), value: 'ART' },
+                                { label: createKeyEntry('SPORTS'), value: 'SPORTS' },
+                                { label: createKeyEntry('SCIENCE'), value: 'SCIENCE' },
+                                { label: createKeyEntry('MUSIC'), value: 'MUSIC' },
+                                { label: createKeyEntry('OTHER'), value: 'OTHER' },
                             ]}
                             value={selectedCategory}
                             style={pickerSelectStyles}
