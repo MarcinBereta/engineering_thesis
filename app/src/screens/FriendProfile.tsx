@@ -39,6 +39,14 @@ export const FriendProfile = (props: FriendProfile) => {
         return null;
     }
 
+    const createKeyEntry = (
+        key: keyof typeof data.numberOfUniqueQuizzesPlayedByCategoryByUserId
+    ) => {
+        const values = data.numberOfUniqueQuizzesPlayedByCategoryByUserId;
+        const val = values[key] || 0;
+        return `${t(key)} (${val})`;
+    };
+
     const { friend } = props.route.params;
     return (
         <Layout icon="dashboard" navigation={props.navigation}>
@@ -138,15 +146,15 @@ export const FriendProfile = (props: FriendProfile) => {
                                 setSelectedCategory(value)
                             }
                             items={[
-                                { label: t('MATH'), value: 'MATH' },
-                                { label: t('HISTORY'), value: 'HISTORY' },
-                                { label: t('GEOGRAPHY'), value: 'GEOGRAPHY' },
-                                { label: t('ENGLISH'), value: 'ENGLISH' },
-                                { label: t('ART'), value: 'ART' },
-                                { label: t('SPORTS'), value: 'SPORTS' },
-                                { label: t('SCIENCE'), value: 'SCIENCE' },
-                                { label: t('MUSIC'), value: 'MUSIC' },
-                                { label: t('OTHER'), value: 'OTHER' },
+                                { label: createKeyEntry('MATH'), value: 'MATH' },
+                                { label: createKeyEntry('HISTORY'), value: 'HISTORY' },
+                                { label: createKeyEntry('GEOGRAPHY'), value: 'GEOGRAPHY' },
+                                { label: createKeyEntry('ENGLISH'), value: 'ENGLISH' },
+                                { label: createKeyEntry('ART'), value: 'ART' },
+                                { label: createKeyEntry('SPORTS'), value: 'SPORTS' },
+                                { label: createKeyEntry('SCIENCE'), value: 'SCIENCE' },
+                                { label: createKeyEntry('MUSIC'), value: 'MUSIC' },
+                                { label: createKeyEntry('OTHER'), value: 'OTHER' },
                             ]}
                             value={selectedCategory}
                             style={pickerSelectStyles}
