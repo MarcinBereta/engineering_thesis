@@ -107,5 +107,7 @@
     "create_new_course": "Neuen Kurs erstellen",
     "create": "Erstellen",
     "choose_category": "Kategorie auswählen",
-    "verify": "Verifizieren"
+    "verify": "Verifizieren",
+    "user_achievements": "Benutzererfolge",
+    "my_achievements": "Meine Erfolge"
 }
