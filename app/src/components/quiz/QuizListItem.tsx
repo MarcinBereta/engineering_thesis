@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { getQuizzesWithPaginationGQL, getUserScoreGQL } from '@/services/quiz/quiz';
 import { Card, Icon } from '@rneui/themed';
 import { NavigationType } from '../Navbar';
@@ -12,6 +12,7 @@ import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
 import { getMyCoursesGQL } from '@/services/courses/courses';
 import Course from '../courses/course/CourseItem';
+
 const QuizzesListItem = ({
     navigation,
     item,
@@ -30,6 +31,7 @@ const QuizzesListItem = ({
         }
         return userScore.some((score) => score.quizName === quizName) || false;
     };
+
     const getResultOfQuiz = (quizName: string) => {
         if (userScore === undefined) {
             return '';
@@ -41,8 +43,8 @@ const QuizzesListItem = ({
 
         const { score, noQuest } = quizResult;
         return `${score}/${noQuest}`;
-
     };
+
     const { userInfo } = useContext(AuthContext);
     const isAuthorized = () => {
         return (
@@ -52,53 +54,77 @@ const QuizzesListItem = ({
         );
     };
 
+    const getQuizTypeIcon = (typeOfQuiz: string) => {
+        switch (typeOfQuiz) {
+            case 'general':
+                return <Icon type="font-awesome" name="globe" size={30} color="blue" />;
+            case 'specific':
+                return <Icon type="font-awesome" name="bullseye" size={30} color="blue" />;
+            case 'multiple_choice':
+                return <Icon type="font-awesome" name="list-ul" size={30} color="blue" />;
+            case 'true/false':
+                return <Icon type="font-awesome" name="adjust" size={30} color="blue" />;
+            default:
+                return null;
+        }
+    };
+
+    const extractQuizType = (quizName: string) => {
+        const lowerCaseName = quizName.toLowerCase();
+        if (lowerCaseName.includes('general')) {
+            return 'general';
+        } else if (lowerCaseName.includes('specific')) {
+            return 'specific';
+        } else if (lowerCaseName.includes('multiple_choice')) {
+            return 'multiple_choice';
+        } else if (lowerCaseName.includes('true/false')) {
+            return 'true/false';
+        } else {
+            return '';
+        }
+    };
+
+    const quizType = extractQuizType(item.name);
+
     return (
         <Card
-            containerStyle={{
-                padding: 15,
-                width: '90%',
-                marginLeft: '5%',
-                borderRadius: 20,
-            }}
+            containerStyle={styles.cardContainer}
         >
             <TouchableOpacity
                 onPress={() => {
                     navigation.push('quiz', { quiz: item });
                 }}
             >
-                <Card.Title>{item.name}
+                <View style={styles.iconContainer}>
+                    {quizType && getQuizTypeIcon(quizType)}
+                </View>
+                <Card.Title style={styles.cardTitle}>
+                    <Text style={{ marginLeft: quizType ? 10 : 0 }}>
+                        {item.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
+                    </Text>
                     {hasCompletedQuiz(item.name) && (
                         <Icon
                             type="font-awesome"
                             name="check"
                             size={15}
-                            color="green" />
+                            color="green"
+                            style={{ marginLeft: 10 }}
+                        />
                     )}
                 </Card.Title>
-                <Text
-                    style={{
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                        fontSize: 14,
-                        color: 'blue',
-                    }}
-
-                >{getResultOfQuiz(item.name)}</Text>
+                <Text style={styles.resultText}>
+                    {getResultOfQuiz(item.name)}
+                </Text>
                 <Card.Divider />
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                    }}
-                >
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontWeight: 'bold' }}>
+                <View style={styles.infoContainer}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>
                             {t('course')}:
                         </Text>
                         <Text> {item.course?.name}</Text>
                     </View>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontWeight: 'bold' }}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>
                             {t('category')}:
                         </Text>
                         <Text> {t(item.course?.category as string)}</Text>
@@ -107,33 +133,69 @@ const QuizzesListItem = ({
                 <>
                     {isAuthorized() && (
                         <TouchableOpacity
-                            style={{
-                                width: '80%',
-                                padding: 5,
-                                backgroundColor: 'lightblue',
-                                marginLeft: '10%',
-                                borderRadius: 20,
-                                marginTop: 20,
-                            }}
+                            style={styles.editButton}
                             onPress={() => {
                                 navigation.push('QuizEdit', { quiz: item });
                             }}
                         >
-                            <Text
-                                style={{
-                                    textAlign: 'center',
-                                    fontWeight: 'bold',
-                                    fontSize: 15,
-                                    color: 'white',
-                                }}
-                            >
+                            <Text style={styles.editButtonText}>
                                 {t('edit')}
                             </Text>
                         </TouchableOpacity>
-                    )}</>
+                    )}
+                </>
             </TouchableOpacity>
         </Card>
     );
 };
+
+const styles = StyleSheet.create({
+    cardContainer: {
+        padding: 15,
+        width: '90%',
+        marginLeft: '5%',
+        borderRadius: 20,
+    },
+    iconContainer: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+    },
+    cardTitle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 40, // Przesunięcie tytułu w prawo, aby zrobić miejsce na ikonę
+    },
+    resultText: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 14,
+        color: 'blue',
+    },
+    infoContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    infoRow: {
+        flexDirection: 'row',
+    },
+    infoLabel: {
+        fontWeight: 'bold',
+    },
+    editButton: {
+        width: '80%',
+        padding: 5,
+        backgroundColor: 'lightblue',
+        marginLeft: '10%',
+        borderRadius: 20,
+        marginTop: 20,
+    },
+    editButtonText: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 15,
+        color: 'white',
+    },
+});
 
 export { QuizzesListItem };
