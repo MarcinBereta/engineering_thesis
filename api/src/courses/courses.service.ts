@@ -233,7 +233,7 @@ export class CoursesService {
 
         const category = course.category;
         const choices = await this.getAndCheckOptions(category, true, '');
-
+        const language = course.language;
         const text = course.text
             .filter((t) => t.type == 'text')
             .map((item) => item.value)
@@ -249,7 +249,8 @@ export class CoursesService {
                 {
                     role: 'assistant',
                     content:
-                        'Please summarize the text in a few sentences. (max length: 200 characters)',
+                        'Please summarize the text in a few sentences. (max length: 200 characters)' +
+                        ' The text is in ' + language + ' language.',
                 },
             ],
             model: 'gpt-4o-mini',

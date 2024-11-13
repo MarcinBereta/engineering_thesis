@@ -275,7 +275,7 @@ export class QuizService {
         switch (category) {
             case 'MATH':
                 specificParameters =
-                    'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                    'When topic is about history of mathematician try do not generate questions about calculations. Be more specific about mathematicians and their work.';
                 break;
             case 'HISTORY':
                 specificParameters =
@@ -561,7 +561,7 @@ export class QuizService {
         switch (category) {
             case 'MATH':
                 specificParameters =
-                    'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                    'When topic is about history of mathematician try do not generate questions about calculations. Be more specific about mathematicians and their work.';
                 break;
             case 'HISTORY':
                 specificParameters =
@@ -818,6 +818,7 @@ export class QuizService {
         const oldQuestionsTexts = oldQuestions.map(
             (question) => question.question
         );
+        console.log(oldQuestionsTexts);
         let typeOfQuizDescription = '';
 
         switch (typeOfQuiz) {
@@ -847,7 +848,7 @@ export class QuizService {
         switch (category) {
             case 'MATH':
                 specificParameters =
-                    'When topic of course is about something specific like algebra, geometry, calculus, etc. you can create task to calculate something based on the text above. For example: Calculate the area of the triangle with sides 3, 4, 5. ';
+                    'When topic is about history of mathematician try do not generate questions about calculations. Be more specific about mathematicians and their work.';
                 break;
             case 'HISTORY':
                 specificParameters =
@@ -897,8 +898,8 @@ export class QuizService {
                 {
                     role: 'user',
                     content:
-                        'Please do not generate questions that are already in the quiz: ' +
-                        oldQuestionsTexts.join(' '),
+                        'Please do not generate questions that are already in the database: ' +
+                        oldQuestionsTexts.join(' ') + "If possible, do not generate a quiz with topics covered in older questions",
                 },
                 {
                     role: 'assistant',
