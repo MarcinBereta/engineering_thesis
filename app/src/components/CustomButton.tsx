@@ -1,15 +1,19 @@
 import { heightPixel, widthPixel } from '@/utils/Normalize';
 import { Button, ButtonProps } from '@rneui/themed';
 import React from 'react';
-
-export const CustomButton = (props: ButtonProps) => {
+type extendedProps = ButtonProps & {
+    backgroundColor?: string;
+};
+export const CustomButton = (props: extendedProps) => {
     return (
         <Button
             {...props}
             iconContainerStyle={{ marginRight: 10 }}
             titleStyle={{ fontWeight: '700' }}
             buttonStyle={{
-                backgroundColor: 'rgba(90, 154, 230, 1)',
+                backgroundColor: props.backgroundColor
+                    ? props.backgroundColor
+                    : 'rgba(90, 154, 230, 1)',
                 borderColor: 'transparent',
                 borderWidth: 0,
                 borderRadius: 30,

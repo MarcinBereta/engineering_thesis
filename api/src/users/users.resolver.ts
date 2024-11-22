@@ -83,10 +83,23 @@ export class UsersResolver {
         return this.userService.verifyUser(VerifyUserInput.requestId);
     }
 
+    @Mutation(() => User)
+    async declineUserVerification(
+        @Args('VerifyUser') VerifyUserInput: VerifyUser,
+        @Context() context
+    ): Promise<User> {
+        const user = context.req.user;
+        if (user.role != 'ADMIN' && user.role != 'MODERATOR') {
+            throw new Error('You are not allowed to verify users');
+        }
+        return this.userService.declineUserVerification(VerifyUserInput.requestId);
+    }
+
     @Query(() => [VerificationFormData])
     @UseInterceptors(CacheInterceptor)
     @CacheKey('verification_requests')
     async getVerifyRequests(): Promise<VerificationFormData[]> {
+        console.log(await this.userService.getVerificationForms())
         return this.userService.getVerificationForms();
     }
 

@@ -29,9 +29,5 @@ export class VerificationFormData {
     @Field()
     text: string;
     @Field()
-    createdAt: Date;
-    @Field()
-    updatedAt: Date;
-    @Field()
     User: simpleUser;
 }

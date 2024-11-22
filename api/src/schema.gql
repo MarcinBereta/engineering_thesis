@@ -48,8 +48,6 @@ type VerificationFormData {
   id: String!
   userId: String!
   text: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
   User: simpleUser!
 }
 
@@ -221,6 +219,7 @@ type Mutation {
   updateUser(UserEdit: UserEdit!): User!
   addVerificationForm(VerificationForm: VerificationForm!): User!
   verifyUser(VerifyUser: VerifyUser!): User!
+  declineUserVerification(VerifyUser: VerifyUser!): User!
   addFriendRequest(friendName: String!): NullResponse!
   acceptFriendRequest(friendId: String!): NullResponse!
   declineFriendRequest(friendId: String!): NullResponse!
@@ -229,6 +228,7 @@ type Mutation {
   addCourse(newCourse: CourseInput!): Course!
   editCourse(editCourse: EditCourseInput!): Course!
   verifyCourse(verifyCourse: VerifyCourseDto!): Course!
+  declineCourse(verifyCourse: VerifyCourseDto!): Course!
   addUserScore(addScore: AddScore!): Quiz!
   RecreateQuiz(recreateQuiz: RecreateQuizDto!): Quiz!
   updateQuiz(updateQuiz: QuizUpdateDto!): Quiz!

@@ -235,6 +235,7 @@ export class UsersService {
     }
 
     async addVerificationForm(text: string, userId: string) {
+        console.log(text, userId)
         const user = await this.getUserById(userId);
         if (!user) {
             throw new Error('User doesn`t exist');
@@ -289,6 +290,35 @@ export class UsersService {
                 verified: true,
             },
         });
+
+        await this.prismaService.verificationForm.delete({
+            where: {
+                id: requestId,
+            },
+        });
+        await this.cacheManager.del('verification_requests');
+        await this.deleteUserCache();
+
+        return user;
+    }
+
+    async declineUserVerification(requestId: string) {
+        const verificationForm =
+            await this.prismaService.verificationForm.findUnique({
+                where: {
+                    id: requestId,
+                },
+            });
+        if (!verificationForm) {
+            throw new Error('Verification form not found');
+        }
+        const user = await this.getUserById(verificationForm.userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        if (user.verified) {
+            throw new Error('User is already verified');
+        }
 
         await this.prismaService.verificationForm.delete({
             where: {

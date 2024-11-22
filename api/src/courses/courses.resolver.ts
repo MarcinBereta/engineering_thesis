@@ -99,4 +99,17 @@ export class CoursesResolver {
             throw new Error('You are not allowed to do this action');
         return await this.courseService.verifyCourse(verifyCourse.courseId);
     }
+
+    @Mutation(() => Course)
+    async declineCourse(
+        @Args('verifyCourse') verifyCourse: VerifyCourseDto,
+        @Context() context
+    ) {
+        if (
+            context.req.user.role != 'ADMIN' &&
+            context.req.user.role != 'MODERATOR'
+        )
+            throw new Error('You are not allowed to do this action');
+        return await this.courseService.declineCourse(verifyCourse.courseId);
+    }
 }
