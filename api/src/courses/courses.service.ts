@@ -565,7 +565,6 @@ export class CoursesService {
             throw new Error('Course is already verified');
         }
 
-        await this.quizService.addQuizToDataBase(courseId);
         await this.prismaService.courseItem.deleteMany({
             where: {
                 courseId: courseId,

@@ -150,7 +150,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
             setProgress(100); // Complete progress
             setIsLoading(false);
             console.log('Done!');
-            props.navigation.push('DashboardScreen');
+            props.navigation.push('UnVerifiedCourses');
             refetch();
         },
         onError: () => {
@@ -166,7 +166,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
             },
         });
     };
-       const handleDecline = async (courseId: string) => {
+    const handleDecline = async (courseId: string) => {
         declineCourseMutation.mutate({
             verifyCourse: {
                 courseId,
@@ -177,7 +177,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
     if (isLoading || data == undefined) {
         return (
             <View>
-                <Text>Quiz generation...</Text>
+                <Text>Removing course...</Text>
                 <ProgressBar progress={progress} />
             </View>
         );
@@ -198,7 +198,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                 {isLoading && <ProgressBar progress={progress} />}
                 <FlatList
                     data={data.unVerifiedCourses}
-                    contentContainerStyle={{ maxHeight: height * 0.6 }}
+                    // contentContainerStyle={{ maxHeight: height * 0.5 }}
                     renderItem={({ item }) => (
                         <CourseListItem
                             course={item}
