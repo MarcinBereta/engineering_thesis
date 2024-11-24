@@ -554,6 +554,47 @@ export class CoursesService {
         return course;
     }
 
+    async declineCourse(courseId: string) {
+        const courseToVerify = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+
+        if (courseToVerify.verified) {
+            throw new Error('Course is already verified');
+        }
+
+        await this.prismaService.courseItem.deleteMany({
+            where: {
+                courseId: courseId,
+            },
+        })
+
+        const course = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
+
+        await this.prismaService.course.delete({
+            where: {
+                id: courseId,
+            },
+        });
+        
+        const moderator = await this.prismaService.moderator.findUnique({
+            where: {
+                id: course.moderatorId,
+            },
+        });
+
+        await this.cacheManager.del('my_courses/' + course.creatorId);
+        await this.cacheManager.del('unverified_courses/' + moderator.userId);
+        return course;
+    }
+
+
     async getDashboardCourses() {
         const cachedCourses = await this.cacheManager.get('dashboard_courses');
         if (cachedCourses && (cachedCourses as any[]).length == 4) {

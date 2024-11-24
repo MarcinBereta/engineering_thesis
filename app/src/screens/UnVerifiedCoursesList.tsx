@@ -5,6 +5,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
 import {
+    declineCourseGQL,
     getUnverifiedCoursesGQL,
     verifyCourseGQL,
 } from '@/services/courses/courses';
@@ -25,10 +26,18 @@ type UnVerifiedCourses = NativeStackScreenProps<
 >;
 
 export type verifyCourseDto = VariablesOf<typeof verifyCourseGQL>;
+export type declineCourseDto = VariablesOf<typeof declineCourseGQL>;
+
 
 const ProgressBar = ({ progress }: { progress: number }) => {
     return (
-        <View style={{ width: '100%', backgroundColor: '#e0e0df', borderRadius: 5 }}>
+        <View
+            style={{
+                width: '100%',
+                backgroundColor: '#e0e0df',
+                borderRadius: 5,
+            }}
+        >
             <View
                 style={{
                     width: `${progress}%`,
@@ -64,9 +73,14 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
         mutationFn: async (data: verifyCourseDto) => {
             try {
                 console.log('Sending request with data:', data);
-                const result = await request(graphqlURL, verifyCourseGQL, data, {
-                    Authorization: 'Bearer ' + userInfo?.token,
-                });
+                const result = await request(
+                    graphqlURL,
+                    verifyCourseGQL,
+                    data,
+                    {
+                        Authorization: 'Bearer ' + userInfo?.token,
+                    }
+                );
                 console.log('Request result:', result);
                 return result;
             } catch (error) {
@@ -91,8 +105,52 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
         onSuccess: (data, variables, context) => {
             setProgress(100); // Complete progress
             setIsLoading(false);
-            console.log("Done!");
+            console.log('Done!');
             props.navigation.push('DashboardScreen');
+            refetch();
+        },
+        onError: () => {
+            setIsLoading(false);
+            setProgress(0);
+        },
+    });
+
+    const declineCourseMutation = useMutation({
+        mutationFn: async (data: declineCourseDto) => {
+            try {
+                const result = await request(
+                    graphqlURL,
+                    declineCourseGQL,
+                    data,
+                    {
+                        Authorization: 'Bearer ' + userInfo?.token,
+                    }
+                );
+                return result;
+            } catch (error) {
+                console.error('Request error:', error);
+                throw error;
+            }
+        },
+        onMutate: () => {
+            setIsLoading(true);
+            setProgress(0);
+            const interval = setInterval(() => {
+                setProgress((prev) => {
+                    if (prev < 90) {
+                        return prev + 10;
+                    } else {
+                        clearInterval(interval);
+                        return prev;
+                    }
+                });
+            }, 500);
+        },
+        onSuccess: (data, variables, context) => {
+            setProgress(100); // Complete progress
+            setIsLoading(false);
+            console.log('Done!');
+            props.navigation.push('UnVerifiedCourses');
             refetch();
         },
         onError: () => {
@@ -108,11 +166,18 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
             },
         });
     };
+    const handleDecline = async (courseId: string) => {
+        declineCourseMutation.mutate({
+            verifyCourse: {
+                courseId,
+            },
+        });
+    };
 
     if (isLoading || data == undefined) {
         return (
             <View>
-                <Text>Quiz generation...</Text>
+                <Text>Removing course...</Text>
                 <ProgressBar progress={progress} />
             </View>
         );
@@ -133,19 +198,39 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                 {isLoading && <ProgressBar progress={progress} />}
                 <FlatList
                     data={data.unVerifiedCourses}
-                    contentContainerStyle={{ maxHeight: height * 0.6 }}
+                    // contentContainerStyle={{ maxHeight: height * 0.5 }}
                     renderItem={({ item }) => (
                         <CourseListItem
                             course={item}
-                            navigation={props.navigation} userScore={[]}                        >
-                            <CustomButton
-                                onPress={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleVerify(item?.id || '');
+                            navigation={props.navigation}
+                            userScore={[]}
+                        >
+                            <View
+                                style={{
+                                    justifyContent: 'space-around',
+                                    flexDirection: 'row',
                                 }}
-                                title={t("verify")}
-                            />
+                            >
+                                <View>
+                                    <CustomButton
+                                        onPress={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleVerify(item?.id || '');
+                                        }}
+                                        title={t('verify')}
+                                    />
+                                </View>
+                                <View>
+                                    <CustomButton
+                                        onPress={() => {
+                                            handleDecline(item.id);
+                                        }}
+                                        backgroundColor="red"
+                                        title="Decline"
+                                    />
+                                </View>
+                            </View>
                         </CourseListItem>
                     )}
                 />

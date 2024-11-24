@@ -30,8 +30,6 @@ export const getVerifyRequestsGQL = graphql(`
             id
             userId
             text
-            createdAt
-            updatedAt
             User {
                 id
                 email
@@ -67,6 +65,19 @@ export const updateUserDataGQL = graphql(`
 export const verifyUserDataGQL = graphql(`
     mutation verifyUser($VerifyUser: VerifyUser!) {
         verifyUser(VerifyUser: $VerifyUser) {
+            id
+            email
+            username
+            role
+            verified
+            image
+        }
+    }
+`);
+
+export const declineUserDataGQL = graphql(`
+    mutation DeclineUserVerification($verifyUser: VerifyUser!) {
+        declineUserVerification(VerifyUser: $verifyUser) {
             id
             email
             username

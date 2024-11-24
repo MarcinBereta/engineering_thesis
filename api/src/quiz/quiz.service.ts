@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
-import { Category, Prisma, QuestionType } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 import { DashboardQuiz } from './dto/quiz.dashboard';
 import { QuizUpdateDto } from './dto/quiz.update';
 import { UniqueQuizzesPlayedDTO } from './dto/uniqueQuizzesPlayed.dto';
@@ -37,7 +37,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) { }
+    ) {}
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -353,8 +353,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' questions in the quiz.'
+                        numberOfQuestions +
+                        ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -427,26 +427,26 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                        4 * numberOfQuestions +
-                        'options in total.'
+                            4 * numberOfQuestions +
+                            'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                        4 * numberOfQuestions +
-                        ' options in total.'
+                            4 * numberOfQuestions +
+                            ' options in total.'
                     );
                 }
 
             if (!ignoreCount && totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' correct answers.'
+                        numberOfQuestions +
+                        ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                    numberOfQuestions +
-                    ' correct answers.'
+                        numberOfQuestions +
+                        ' correct answers.'
                 );
             }
             return true;
@@ -832,7 +832,7 @@ export class QuizService {
                 break;
             case 'multiple':
                 typeOfQuizDescription =
-                    " Please generate questions with multiple choice of answers (more than 1 answer), correct answer should be array in this case.";
+                    ' Please generate questions with multiple choice of answers (more than 1 answer), correct answer should be array in this case.';
                 break;
             case 'truefalse':
                 typeOfQuizDescription =
@@ -899,7 +899,8 @@ export class QuizService {
                     role: 'user',
                     content:
                         'Please do not generate questions that are already in the database: ' +
-                        oldQuestionsTexts.join(' ') + "If possible, do not generate a quiz with topics covered in older questions",
+                        oldQuestionsTexts.join(' ') +
+                        'If possible, do not generate a quiz with topics covered in older questions',
                 },
                 {
                     role: 'assistant',
@@ -980,8 +981,7 @@ export class QuizService {
         }
         console.log(typeOfQuizzes);
         const quizList = [];
-        const mergedText: string = await this.mergeTexts(courseId);
-        let numberOfQuestions = 10; // fixed number of questions
+        const numberOfQuestions = 10; // fixed number of questions
         for (const typeOfQuiz of typeOfQuizzes) {
             console.log(typeOfQuiz);
             const courseName = await this.getCourseName(courseId);

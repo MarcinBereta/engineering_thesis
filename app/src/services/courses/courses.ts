@@ -41,6 +41,15 @@ export const verifyCourseGQL = graphql(`
         }
     }
 `);
+
+export const declineCourseGQL = graphql(`
+    mutation DeclineCourse($verifyCourse: VerifyCourseDto!) {
+        declineCourse(verifyCourse: $verifyCourse) {
+            id
+        }
+    }
+`);
+
 export const editCourseGQL = graphql(
     `
         mutation EditCourse($EditCourseInput: EditCourseInput!) {

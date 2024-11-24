@@ -37,6 +37,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('fightWithFriend')
     @UseGuards(SocketGuard)
     async handleFightInvite(socket: Socket, payload: any) {
+        console.log('fight with', payload.username);
         this.socketService.fightWithFriend(
             socket,
             payload.quizId,
