@@ -1,6 +1,6 @@
-import { View, Button, TextInput, Text } from 'react-native';
+import { View, TextInput, Text, StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
-import { AuthContext, UserInfo } from '../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 import { addVerificationRequestGQL } from '../../services/admin/admin';
 import { graphqlURL } from '@/services/settings';
 import { useMutation } from '@tanstack/react-query';
@@ -11,28 +11,31 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CustomButton } from '../CustomButton';
 import { fontPixel, heightPixel } from '@/utils/Normalize';
 import { useTranslation } from 'react-i18next';
+
 export type addVerificationRequestDto = VariablesOf<
     typeof addVerificationRequestGQL
 >;
+
 type VerifyAccount = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
     'VerifyAccount'
 >;
-const VerifyAccount = ({ route, navigation }: any) => {
+
+const VerifyAccount = ({ route, navigation }: VerifyAccount) => {
     const { userInfo } = useContext(AuthContext);
     const { t } = useTranslation();
     const [text, setText] = useState('');
     const [isError, setIsError] = useState(false);
+
     const verifyAccountMutation = useMutation({
         mutationFn: async (data: addVerificationRequestDto) =>
             request(graphqlURL, addVerificationRequestGQL, data, {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
-        onSuccess: (data, variables, context) => {
+        onSuccess: () => {
             navigation.push('DashboardScreen');
         },
-        onError: (err, variables) => {
-            console.log(err);
+        onError: () => {
             setIsError(true);
         },
     });
@@ -46,47 +49,65 @@ const VerifyAccount = ({ route, navigation }: any) => {
     };
 
     return (
-        <View
-            style={{
-                flexDirection: 'column',
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <Text
-                style={{
-                    fontSize: fontPixel(20),
-                    margin: 10,
-                    color: 'black',
-                    fontWeight: 'bold',
-                }}
-            >
+        <View style={styles.container}>
+            <Text style={styles.title}>
                 {t('enter_reason_for_verification')}
             </Text>
+            <Text style={styles.instruction}>
+                {t('please_provide_reason')}
+            </Text>
             <TextInput
-                style={{
-                    width: '90%',
-                    maxHeight: heightPixel(300),
-                    textAlign: 'center',
-                    color: 'black',
-                    margin: 5,
-                    padding: 5,
-                    borderWidth: 1,
-                    borderColor: isError ? 'red' : '#5a9ae6',
-                    borderRadius: fontPixel(20),
-                }}
+                style={[styles.textInput, { borderColor: isError ? 'red' : '#5a9ae6' }]}
                 multiline={true}
                 value={text}
-                placeholder="Enter why you should be verified"
+                placeholder={t('enter_reason_placeholder')}
                 onChange={(e) => setText(e.nativeEvent.text)}
             />
             {isError && (
-                <Text style={{ color: 'red' }}>{t('form_already_sent')}</Text>
+                <Text style={styles.errorText}>{t('form_already_sent')}</Text>
             )}
-            <CustomButton title="Submit" onPress={handleSave} />
+            <CustomButton title={t('submit')} onPress={handleSave} />
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        // justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f5f5f5',
+    },
+    title: {
+        fontSize: fontPixel(24),
+        marginBottom: 10,
+        color: 'black',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    instruction: {
+        fontSize: fontPixel(16),
+        marginBottom: 20,
+        color: 'gray',
+        textAlign: 'center',
+    },
+    textInput: {
+        width: '100%',
+        maxHeight: heightPixel(200),
+        textAlign: 'left',
+        color: 'black',
+        marginBottom: 20,
+        padding: 10,
+        borderWidth: 1,
+        borderRadius: fontPixel(10),
+        backgroundColor: 'white',
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+});
 
 export { VerifyAccount };

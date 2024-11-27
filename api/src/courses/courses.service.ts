@@ -8,7 +8,7 @@ import { Category, Moderator, Prisma } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PaginationDto } from 'src/utils/pagination.dto';
-import { PAGINATION_SIZE } from 'src/utils/pagination.settings';
+import { PAGINATION_SIZE_COURSES } from 'src/utils/pagination.settings';
 import OpenAI from 'openai';
 
 @Injectable()
@@ -361,8 +361,8 @@ export class CoursesService {
                         mode: 'insensitive',
                     },
                 },
-                skip: (page - 1) * PAGINATION_SIZE,
-                take: PAGINATION_SIZE,
+                skip: (page - 1) * PAGINATION_SIZE_COURSES,
+                take: PAGINATION_SIZE_COURSES,
             });
             return courses;
         }
@@ -375,8 +375,8 @@ export class CoursesService {
                     verified: true,
                     category: category as Category,
                 },
-                skip: (page - 1) * PAGINATION_SIZE,
-                take: PAGINATION_SIZE,
+                skip: (page - 1) * PAGINATION_SIZE_COURSES,
+                take: PAGINATION_SIZE_COURSES,
             });
             return courses;
         }
@@ -395,8 +395,8 @@ export class CoursesService {
             where: {
                 verified: true,
             },
-            skip: (page - 1) * PAGINATION_SIZE,
-            take: PAGINATION_SIZE,
+            skip: (page - 1) * PAGINATION_SIZE_COURSES,
+            take: PAGINATION_SIZE_COURSES,
         });
 
         await this.cacheManager.set('all_courses/' + page, courses);
@@ -416,7 +416,7 @@ export class CoursesService {
                 },
             });
 
-            return { count, size: PAGINATION_SIZE };
+            return { count, size: PAGINATION_SIZE_COURSES };
         }
         if (category) {
             const count = await this.prismaService.course.count({
@@ -426,7 +426,7 @@ export class CoursesService {
                 },
             });
 
-            return { count, size: PAGINATION_SIZE };
+            return { count, size: PAGINATION_SIZE_COURSES };
         }
         const count = await this.prismaService.course.count({
             where: {
@@ -439,13 +439,13 @@ export class CoursesService {
         if (coursesCountCached && (coursesCountCached as number) === count) {
             return {
                 count: coursesCountCached,
-                size: PAGINATION_SIZE,
+                size: PAGINATION_SIZE_COURSES,
             };
         }
 
         await this.cacheManager.set('courses_count', count);
 
-        return { count, size: PAGINATION_SIZE };
+        return { count, size: PAGINATION_SIZE_COURSES };
     }
 
     async getAllCourses() {
@@ -582,7 +582,7 @@ export class CoursesService {
                 id: courseId,
             },
         });
-        
+
         const moderator = await this.prismaService.moderator.findUnique({
             where: {
                 id: course.moderatorId,
@@ -607,8 +607,38 @@ export class CoursesService {
             },
             where: {
                 verified: true,
+                AND: [
+                    {
+                        name: {
+                            not: {
+                                endsWith: 'general',
+                            },
+                        },
+                    },
+                    {
+                        name: {
+                            not: {
+                                endsWith: 'true/false',
+                            },
+                        },
+                    },
+                    {
+                        name: {
+                            not: {
+                                endsWith: 'specific',
+                            },
+                        },
+                    },
+                    {
+                        name: {
+                            not: {
+                                endsWith: 'multiple',
+                            },
+                        },
+                    },
+                ],
             },
-            take: 4,
+            take: 2,
         });
         await this.cacheManager.set('dashboard_courses', courses);
         return courses;
@@ -638,17 +668,23 @@ export class CoursesService {
     async getRandomCourse() {
         const randomId = await this.prismaService
             .$queryRaw`select id from "Course" order by random() limit 1`;
-        const randomCourse = await this.prismaService.course.findMany({
-            include: {
-                text: true,
-            },
-            where: {
-                verified: true,
-                id: randomId[0].id,
-            },
-            take: 1,
-        });
-        return randomCourse;
+        try {
+            const randomCourse = await this.prismaService.course.findMany({
+                include: {
+                    text: true,
+                },
+                where: {
+                    verified: true,
+                    id: randomId[0].id,
+                },
+                take: 1,
+            });
+            return randomCourse;
+        }
+        catch (e) {
+            console.log('Failed to find any random course');
+            return null;
+        }
     }
 
     async getBestCategoryFromLast5days(userID: string) {

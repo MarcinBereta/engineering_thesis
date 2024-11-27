@@ -1,7 +1,6 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
+import { Image, ScrollView, StyleSheet, Text, View, FlatList, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
@@ -11,16 +10,32 @@ import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
 import { Card } from '@rneui/base';
-import { widthPixel } from '@/utils/Normalize';
+import { fontPixel, widthPixel } from '@/utils/Normalize';
 import constants from '../../constants';
+
+const { width } = Dimensions.get('window');
+
 type FriendProfile = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
     'FriendProfile'
 >;
+
+const categories = [
+    { label: 'MATH', value: 'MATH' },
+    { label: 'HISTORY', value: 'HISTORY' },
+    { label: 'GEOGRAPHY', value: 'GEOGRAPHY' },
+    { label: 'ENGLISH', value: 'ENGLISH' },
+    { label: 'ART', value: 'ART' },
+    { label: 'SPORTS', value: 'SPORTS' },
+    { label: 'SCIENCE', value: 'SCIENCE' },
+    { label: 'MUSIC', value: 'MUSIC' },
+    { label: 'OTHER', value: 'OTHER' },
+];
+
 export const FriendProfile = (props: FriendProfile) => {
     const { userInfo } = useContext(AuthContext);
     const { t } = useTranslation();
-    const [selectedCategory, setSelectedCategory] = useState<string>('MATH');
+    const [showCategories, setShowCategories] = useState(false);
     const { data } = useQuery({
         queryKey: ['friendStats', props.route.params.friend.id],
         queryFn: async () =>
@@ -35,6 +50,7 @@ export const FriendProfile = (props: FriendProfile) => {
                 }
             ),
     });
+
     if (!userInfo || !data) {
         return null;
     }
@@ -58,8 +74,8 @@ export const FriendProfile = (props: FriendProfile) => {
                             uri:
                                 friend.image != null
                                     ? constants.url +
-                                      '/files/avatars/' +
-                                      friend.image
+                                    '/files/avatars/' +
+                                    friend.image
                                     : 'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                     />
@@ -67,6 +83,25 @@ export const FriendProfile = (props: FriendProfile) => {
                         {friend?.username}
                     </Text>
                     <Text style={styleForProfile.email}>{userInfo?.email}</Text>
+                    <Card containerStyle={styleForProfile.card}>
+                        <View style={styleForProfile.cardContent}>
+                            <View style={styleForProfile.row}>
+                                <Text style={styleForProfile.cardText}>
+                                    <Text style={styleForProfile.boldText}>
+                                        {t('unique_quizzes_played_by_category')}:
+                                    </Text>
+                                </Text>
+                                <TouchableOpacity
+                                    onPress={() => setShowCategories(true)}
+                                    style={styleForProfile.customButton}
+                                >
+                                    <Text style={styleForProfile.customButtonText}>
+                                        {t('show_categories')}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Card>
                 </View>
                 <Card containerStyle={styleForProfile.card}>
                     <View style={styleForProfile.cardContent}>
@@ -133,67 +168,54 @@ export const FriendProfile = (props: FriendProfile) => {
                         </Text>
                     </View>
                 </Card>
-                <View style={styleForProfile.sectionContainer}>
-                    <Text style={styleForProfile.sectionTitle}>
-                        {t('unique_quizzes_played_by_category')}
-                    </Text>
-                    <Text style={styleForProfile.smallerTitle}>
-                        {t('pick_category')}:
-                    </Text>
-                    <View style={styleForProfile.pickerContainer}>
-                        <RNPickerSelect
-                            onValueChange={(value) =>
-                                setSelectedCategory(value)
-                            }
-                            items={[
-                                { label: createKeyEntry('MATH'), value: 'MATH' },
-                                { label: createKeyEntry('HISTORY'), value: 'HISTORY' },
-                                { label: createKeyEntry('GEOGRAPHY'), value: 'GEOGRAPHY' },
-                                { label: createKeyEntry('ENGLISH'), value: 'ENGLISH' },
-                                { label: createKeyEntry('ART'), value: 'ART' },
-                                { label: createKeyEntry('SPORTS'), value: 'SPORTS' },
-                                { label: createKeyEntry('SCIENCE'), value: 'SCIENCE' },
-                                { label: createKeyEntry('MUSIC'), value: 'MUSIC' },
-                                { label: createKeyEntry('OTHER'), value: 'OTHER' },
-                            ]}
-                            value={selectedCategory}
-                            style={pickerSelectStyles}
-                            useNativeAndroidPickerStyle={false}
-                            placeholder={{
-                                label: t('select_category'),
-                                value: null,
-                            }}
-                        />
-                    </View>
-                    <Card containerStyle={styleForProfile.card}>
-                        <View style={styleForProfile.cardContent}>
-                            <Text style={styleForProfile.cardText}>
-                                {t('played_games')}:{' '}
-                                {
-                                    data
-                                        .numberOfUniqueQuizzesPlayedByCategoryByUserId[
-                                        selectedCategory as keyof typeof data.numberOfUniqueQuizzesPlayedByCategoryByUserId
-                                    ]
-                                }
-                            </Text>
-                        </View>
-                    </Card>
-                </View>
             </ScrollView>
+            <Modal
+                visible={showCategories}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setShowCategories(false)}
+            >
+                <View style={styleForProfile.modalOverlay}>
+                    <View style={styleForProfile.modalContent}>
+                        <Text style={styleForProfile.modalTitle}>
+                            {t('unique_quizzes_played_by_category')}
+                        </Text>
+                        <FlatList
+                            data={categories}
+                            keyExtractor={(item) => item.value}
+                            renderItem={({ item }) => (
+                                <Card containerStyle={styleForProfile.modalCard}>
+                                    <View style={styleForProfile.cardContent}>
+                                        <Text style={styleForProfile.cardText}>
+                                            {t(item.label)}:{' '}
+                                            {
+                                                data.numberOfUniqueQuizzesPlayedByCategoryByUserId[
+                                                item.value as keyof typeof data.numberOfUniqueQuizzesPlayedByCategoryByUserId
+                                                ]
+                                            }
+                                        </Text>
+                                    </View>
+                                </Card>
+                            )}
+                        />
+                        <TouchableOpacity
+                            onPress={() => setShowCategories(false)}
+                            style={styleForProfile.customButton}
+                        >
+                            <Text style={styleForProfile.customButtonText}>
+                                {t('close')}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </Layout>
     );
 };
 
 const styleForProfile = StyleSheet.create({
     container: {
-        padding: 10,
         alignItems: 'center',
-    },
-    pickerContainer: {
-        marginVertical: 10,
-        paddingHorizontal: 10,
-        borderRadius: 8,
-        fontWeight: 'bold',
     },
     header: {
         alignItems: 'center',
@@ -207,12 +229,10 @@ const styleForProfile = StyleSheet.create({
     username: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 5,
     },
     email: {
         fontSize: 18,
         color: 'gray',
-        marginBottom: 10,
     },
     card: {
         width: '100%',
@@ -226,49 +246,56 @@ const styleForProfile = StyleSheet.create({
     cardText: {
         fontSize: 15,
     },
-    sectionContainer: {
-        marginVertical: 20,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 10,
-        shadowColor: '#000',
-        borderColor: '#f0f0f0',
-        alignItems: 'center',
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    smallerTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     button: {
         marginVertical: 10,
+        width: '40%',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        width: '90%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+    },
+    modalCard: {
+        width: '100%',
+        marginVertical: 5,
+        alignSelf: 'center',
+        marginBottom: 5,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    customButton: {
+        backgroundColor: '#4A90E2',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 10,
+    },
+    customButtonText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
 });
 
-const pickerSelectStyles = StyleSheet.create({
-    inputIOS: {
-        fontSize: 16,
-        backgroundColor: '#f2f',
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        borderWidth: 1,
-        borderRadius: 10,
-        color: 'black',
-    },
-    inputAndroid: {
-        fontSize: 20,
-        backgroundColor: 'rgba(90, 154, 230, 1)',
-        color: 'white',
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        borderColor: 'transparent',
-        borderWidth: 0,
-        borderRadius: 30,
-        minWidth: widthPixel(150),
-        textAlign: 'center',
-    },
-});
+export default FriendProfile;

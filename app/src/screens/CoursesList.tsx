@@ -134,6 +134,7 @@ const CoursesList = (props: CoursesList) => {
                     setSearch(text);
                     setPage(1);
                 }}
+                inputContainerStyle={{ height: 35 }}
             />
             <FlatList
                 data={data.getCoursesWithPagination}

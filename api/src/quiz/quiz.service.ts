@@ -37,7 +37,7 @@ export class QuizService {
         private prismaService: PrismaService,
 
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    ) { }
 
     async getQuizById(id: string): Promise<Quiz> {
         const cachedQuiz = await this.cacheManager.get<Quiz>(`quiz/${id}`);
@@ -89,7 +89,7 @@ export class QuizService {
                 UserScores: true,
                 course: true,
             },
-            take: 4,
+            take: 2,
         });
 
         return quizzes;
@@ -353,8 +353,8 @@ export class QuizService {
             ) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' questions in the quiz.'
+                    numberOfQuestions +
+                    ' questions in the quiz.'
                 );
                 console.log(
                     'There is exacly ' + quizJson.quiz.length + ' questions'
@@ -427,26 +427,26 @@ export class QuizService {
                 if (totalOptions !== 4 * numberOfQuestions) {
                     console.log(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            'options in total.'
+                        4 * numberOfQuestions +
+                        'options in total.'
                     );
                     throw new Error(
                         'There must be exactly ' +
-                            4 * numberOfQuestions +
-                            ' options in total.'
+                        4 * numberOfQuestions +
+                        ' options in total.'
                     );
                 }
 
             if (!ignoreCount && totalCorrectAnswers !== numberOfQuestions) {
                 console.log(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
                 throw new Error(
                     'There must be exactly ' +
-                        numberOfQuestions +
-                        ' correct answers.'
+                    numberOfQuestions +
+                    ' correct answers.'
                 );
             }
             return true;
@@ -758,22 +758,29 @@ export class QuizService {
     }
 
     async deleteQuestionAndQuiz(courseId: string): Promise<void> {
-        const quiz = await this.prismaService.quiz.findFirst({
+        const quiz = await this.prismaService.quiz.findMany({
             where: {
                 courseId: courseId,
             },
         });
         if (quiz) {
-            await this.prismaService.question.deleteMany({
-                where: {
-                    quizId: quiz.id,
-                },
-            });
-            await this.prismaService.quiz.delete({
-                where: {
-                    id: quiz.id,
-                },
-            });
+            for (const id of quiz.map((q) => q.id)) {
+                await this.prismaService.userScores.deleteMany({
+                    where: {
+                        quizId: id,
+                    },
+                });
+                await this.prismaService.question.deleteMany({
+                    where: {
+                        quizId: id,
+                    },
+                });
+                await this.prismaService.quiz.delete({
+                    where: {
+                        id: id,
+                    },
+                });
+            }
         }
     }
 

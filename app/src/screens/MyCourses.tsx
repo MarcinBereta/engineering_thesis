@@ -42,12 +42,12 @@ const MyCourses = (props: MyCourses) => {
     return (
         <Layout navigation={props.navigation} icon="course">
             <View style={{ flexDirection: 'column', flex: 1 }}>
-                <Text>{t('courses_list')}: </Text>
+                <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{t('courses_list')}</Text>
                 <FlatList
                     data={data.MyCourses}
                     renderItem={({ item }) => (
                         <Card>
-                            <Text style={{ flex: 6, textAlign: 'center' }}>
+                            <Text style={{ flex: 6, textAlign: 'center', fontSize: 18 }}>
                                 {item.name}
                             </Text>
                             <Card.Divider />

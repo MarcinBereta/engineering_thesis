@@ -1,5 +1,6 @@
 {
     "hello": "Cześć",
+    "submit": "Zatwierdź",
     "featured_courses": "Polecane kursy",
     "friends": "Znajomi",
     "featured_quizzes": "Polecane quizy",
@@ -19,7 +20,7 @@
     "friend_list": "Lista znajomych",
     "friend_request": "Zaproszenie do znajomych",
     "add_friend": "Dodaj znajomego",
-    "course_create_description": "Wszystkie teksty będą pełnowymiarowe po utworzeniu, możesz przeciągać i upuszczać wszystkie pola tekstowe i obrazy, aby poprawić ich położenie ",
+    "course_create_description": "Wszystkie teksty będą pełnowymiarowe po utworzeniu, możesz przeciągać i upuszczać wszystkie pola tekstowe i obrazy, aby poprawić ich położenie.",
     "course_name": "Nazwa kursu",
     "MATH": "Matematyka",
     "SCIENCE": "Nauki ścisłe",
@@ -109,5 +110,12 @@
     "choose_category": "Wybierz kategorię",
     "verify": "Zweryfikuj",
     "user_achievements": "Osiągnięcia użytkownika",
-    "my_achievements": "Moje osiągnięcia"
+    "my_achievements": "Moje osiągnięcia",
+    "go_back_to_courses": "Wróć do kursów",
+    "show_categories": "Pokaż kategorie",
+    "generate_more_quizzes": "Generuj więcej quizów",
+    "additional_quiz_only_editable": "Dodatkowy quiz jest tylko edytowalny, nie można go ponownie wygenerować",
+    "enter_reason_for_verification": "Wprowadź powód weryfikacji",
+    "enter_reason_placeholder": "Wprowadź powód",
+    "please_provide_reason": "Proszę podać powód, opisać swoje umiejętności, pokazać swoje doświadczenie i wiedzę."
 }
