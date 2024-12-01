@@ -1,6 +1,14 @@
 import { Layout } from '@/components/Layout';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Image, StyleSheet, Text, View, TouchableOpacity, FlatList, Modal } from 'react-native';
+import {
+    Image,
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    FlatList,
+    Modal,
+} from 'react-native';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
@@ -59,15 +67,11 @@ export const UserProfile = (props: UserProfile) => {
                 source={{
                     uri:
                         userInfo.image != null
-                            ? constants.url +
-                            '/files/avatars/' +
-                            userInfo.image
+                            ? constants.url + '/files/avatars/' + userInfo.image
                             : 'https://randomuser.me/api/portraits/men/36.jpg',
                 }}
             />
-            <Text style={styleForProfile.username}>
-                {userInfo?.username}
-            </Text>
+            <Text style={styleForProfile.username}>{userInfo?.username}</Text>
 
             <Text style={styleForProfile.email}>{userInfo?.email}</Text>
             <Card containerStyle={styleForProfile.card}>
@@ -154,7 +158,17 @@ export const UserProfile = (props: UserProfile) => {
                     </Text>
                 </View>
             </Card>
-            <View style={[styleForProfile.buttonContainer, { gap: fontPixel(10), margin: 15 }]}>
+            <View
+                style={[
+                    {
+                        gap: fontPixel(10),
+                        margin: 15,
+                        width: '80%',
+                        flexDirection:'row',
+                        justifyContent:'space-between'
+                    },
+                ]}
+            >
                 <CustomButton
                     title={t('my_achievements')}
                     onPress={() => {
@@ -195,13 +209,16 @@ export const UserProfile = (props: UserProfile) => {
                             data={categories}
                             keyExtractor={(item) => item.value}
                             renderItem={({ item }) => (
-                                <Card containerStyle={styleForProfile.modalCard}>
+                                <Card
+                                    containerStyle={styleForProfile.modalCard}
+                                >
                                     <View style={styleForProfile.cardContent}>
                                         <Text style={styleForProfile.cardText}>
                                             {t(item.label)}:{' '}
                                             {
-                                                data.numberOfUniqueQuizzesPlayedByCategory[
-                                                item.value as keyof typeof data.numberOfUniqueQuizzesPlayedByCategory
+                                                data
+                                                    .numberOfUniqueQuizzesPlayedByCategory[
+                                                    item.value as keyof typeof data.numberOfUniqueQuizzesPlayedByCategory
                                                 ]
                                             }
                                         </Text>

@@ -316,6 +316,7 @@ export class CoursesService {
                 name: course.name,
                 category: course.category,
                 language: course.language,
+                verified:false
             },
         });
 
@@ -324,6 +325,9 @@ export class CoursesService {
                 courseId: course.id,
             },
         });
+
+      
+
         await this.processCourse(course, course.id);
         if (courseToEdit.verified) {
             await this.quizService.deleteQuestionAndQuiz(course.id);
