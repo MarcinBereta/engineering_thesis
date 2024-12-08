@@ -68,10 +68,11 @@ export const SocketHandler = () => {
                     backgroundColor="red"
                     title="Decline"
                     onPress={() => {
-                        socket.emit('declineGameRequest', {
+                        socket.emit('declineFight', {
                             friendId: gameRequest.userId,
                             userId: userInfo.id,
                         });
+                        setGameRequest(null);
                     }}
                 />
             </View>

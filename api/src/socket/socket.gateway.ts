@@ -6,12 +6,8 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { parse } from 'path';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { SocketGuard } from 'src/auth/guards/socket.guard';
-import { ContextUtils } from '@nestjs/core/helpers/context-utils';
-import { Context } from '@nestjs/graphql';
 import { SocketService } from './socket.service';
 
 @WebSocketGateway({
@@ -24,8 +20,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     public server: Server;
     constructor(private socketService: SocketService) {}
 
-    async handleConnection(socket: Socket) {}
-    async handleDisconnect(socket: Socket) {}
+    async handleConnection() {}
+    async handleDisconnect() {}
 
     @SubscribeMessage('connectToOwnRoom')
     @UseGuards(SocketGuard)
