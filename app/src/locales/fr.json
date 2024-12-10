@@ -117,5 +117,12 @@
     "additional_quiz_only_editable": "Le quiz supplémentaire est uniquement modifiable, il ne peut pas être régénéré",
     "enter_reason_for_verification": "Entrez la raison de la vérification",
     "enter_reason_placeholder": "Entrez la raison",
-    "please_provide_reason": "Veuillez fournir une raison"
+    "please_provide_reason": "Veuillez fournir une raison",
+    "compare_achievements": "Comparer les réalisations",
+    "compare_achievements_screen": "Réalisations comparées",
+    "friend": "Ami",
+    "you": "Vous",
+    "achievement": "Réalisations",
+    "friend_achievements": "Réalisations des amis",
+    "your_achievements": "Vos réalisations"
 }

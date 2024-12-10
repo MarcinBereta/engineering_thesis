@@ -12,6 +12,7 @@ import { graphqlURL } from '@/services/settings';
 import { Card } from '@rneui/base';
 import { fontPixel, widthPixel } from '@/utils/Normalize';
 import constants from '../../constants';
+import { CustomButton } from '@/components/CustomButton';
 
 const { width } = Dimensions.get('window');
 
@@ -168,6 +169,26 @@ export const FriendProfile = (props: FriendProfile) => {
                         </Text>
                     </View>
                 </Card>
+                <View
+                    style={[
+                        {
+                            margin: 15,
+                            width: '85%',
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                        },
+                    ]}
+                >
+                    <CustomButton
+                        title={t('compare_achievements')}
+                        onPress={() => {
+                            props.navigation.navigate('FriendsAchievements', {
+                                friendId: props.route.params.friend.id,
+                            });
+                        }}
+                        buttonStyle={styleForProfile.button}
+                    />
+                </View>
             </ScrollView>
             <Modal
                 visible={showCategories}

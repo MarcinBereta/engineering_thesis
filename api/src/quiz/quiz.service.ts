@@ -532,6 +532,9 @@ export class QuizService {
         numberOfQuestions: number,
         numberOfAnswers: number
     ) {
+        console.log(options);
+        console.log(numberOfAnswers);
+        console.log(numberOfQuestions);
         const quiz = await this.prismaService.quiz.findUnique({
             where: {
                 id: quizId,
@@ -612,6 +615,9 @@ export class QuizService {
         if (options.includes(QuizOptions.TRUE_FALSE.toString())) {
             specificParameters += 'Please add true/false questions.';
         }
+        else {
+            specificParameters += 'Please add only single answer questions.';
+        }
 
         const completion = await this.openai.chat.completions.create({
             messages: [
@@ -635,6 +641,7 @@ export class QuizService {
             model: 'gpt-4o-mini', // test this model instead of gpt-4o because of price
             response_format: { type: 'json_object' },
         });
+        console.log(completion.choices[0].message.content)
         return completion.choices[0].message.content;
     }
 
@@ -703,7 +710,6 @@ export class QuizService {
                 UserScores: true,
             },
         });
-
         const keys = await this.cacheManager.store.keys();
         const cachesToDelete = [];
         for (const key of keys) {

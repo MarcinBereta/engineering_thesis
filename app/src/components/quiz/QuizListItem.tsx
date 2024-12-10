@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 25, // Przesunięcie tytułu w prawo, aby zrobić miejsce na ikonę
+        marginLeft: 25,
     },
     resultText: {
         textAlign: 'center',

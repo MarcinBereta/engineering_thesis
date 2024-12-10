@@ -117,5 +117,12 @@
     "additional_quiz_only_editable" : "El cuestionario adicional solo es editable, no se puede regenerar",
     "enter_reason_for_verification": "Introduzca el motivo de la verificación",
     "enter_reason_placeholder": "Introduzca el motivo",
-    "please_provide_reason": "Por favor, proporcione un motivo, describa sus habilidades, muestre su experiencia y conocimientos."
+    "please_provide_reason": "Por favor, proporcione un motivo, describa sus habilidades, muestre su experiencia y conocimientos.",
+    "compare_achievements": "Comparar logros",
+    "compare_achievements_screen": "Logros comparados",
+    "friend": "Amigo",
+    "you": "Tú",
+    "achievement": "Logro",
+    "friend_achievements": "Logros de amigos",
+    "your_achievements": "Tus logros"
 }

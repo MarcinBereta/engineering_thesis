@@ -117,5 +117,12 @@
     "additional_quiz_only_editable" : "Additional quiz is only editable, cannot be regenerated",
     "enter_reason_for_verification": "Enter reason for verification",
     "enter_reason_placeholder": "Enter reason",
-    "please_provide_reason": "Please provide reason, describe your abilities, show your experience and knowledge."
+    "please_provide_reason": "Please provide reason, describe your abilities, show your experience and knowledge.",
+    "compare_achievements": "Compare achievements",
+    "compare_achievements_screen": "Compared achievements",
+    "friend": "Friend",
+    "you": "You",
+    "achievement": "Achievement",
+    "friend_achievements": "Friend achievements",
+    "your_achievements": "Your achievements"
 }

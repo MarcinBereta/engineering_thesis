@@ -9,3 +9,14 @@ export const getUserAchievementsGQl = graphql(`
         }
     }
     `);
+
+
+export const getFriendAchievementsGQl = graphql(`
+        query getFriendAchievements($friendId: String!) {
+            getFriendAchievements(friendId: $friendId) {
+                userId
+                name
+                icon
+            }
+        }
+    `);

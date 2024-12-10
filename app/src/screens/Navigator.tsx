@@ -31,9 +31,10 @@ import { UserProfile } from './UserProfile';
 import QuizEdit from './QuizEdit';
 import { CourseQuizzesList } from '@/components/quiz/CourseQuizList';
 import { CategorySelection } from '@/screens/CategorySelection';
-import { UserAchievements } from './UserAchiements';
+import { UserAchievements } from './UserAchievements';
 import { FriendProfile } from './FriendProfile';
 import { FriendUserFragmentGQL } from '@/services/friends/friends';
+import { FriendsAchievements } from './FriendsAchievements';
 
 const Stack = createNativeStackNavigator();
 
@@ -98,13 +99,16 @@ export type AuthenticatedRootStackParamList = {
     FriendProfile: {
         friend: ResultOf<typeof FriendUserFragmentGQL>;
     };
+    FriendsAchievements: {
+        friendId: string;
+    }
     UserAchievements: undefined;
     CourseQuizzesList: {
         courseId: string;
     };
 };
 
-const Navigator = ({}: {}) => {
+const Navigator = ({ }: {}) => {
     const { userInfo, refreshLoading } = useContext(AuthContext);
     const AuthenticatedStack =
         createNativeStackNavigator<AuthenticatedRootStackParamList>();
@@ -199,6 +203,10 @@ const Navigator = ({}: {}) => {
                         <AuthenticatedStack.Screen
                             component={FriendProfile}
                             name="FriendProfile"
+                        />
+                        <AuthenticatedStack.Screen
+                            component={FriendsAchievements}
+                            name="FriendsAchievements"
                         />
                         <AuthenticatedStack.Screen
                             component={UserList}

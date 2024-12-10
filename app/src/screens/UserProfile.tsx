@@ -161,9 +161,8 @@ export const UserProfile = (props: UserProfile) => {
             <View
                 style={[
                     {
-                        gap: fontPixel(10),
                         margin: 15,
-                        width: '80%',
+                        width: '85%',
                         flexDirection:'row',
                         justifyContent:'space-between'
                     },

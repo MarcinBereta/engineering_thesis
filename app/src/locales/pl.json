@@ -117,5 +117,12 @@
     "additional_quiz_only_editable": "Dodatkowy quiz jest tylko edytowalny, nie można go ponownie wygenerować",
     "enter_reason_for_verification": "Wprowadź powód weryfikacji",
     "enter_reason_placeholder": "Wprowadź powód",
-    "please_provide_reason": "Proszę podać powód, opisać swoje umiejętności, pokazać swoje doświadczenie i wiedzę."
+    "please_provide_reason": "Proszę podać powód, opisać swoje umiejętności, pokazać swoje doświadczenie i wiedzę.",
+    "compare_achievements": "Porównaj osiągnięcia",
+    "compare_achievements_screen": "Porównane osiągnięcia",
+    "friend": "Znajomy",
+    "you": "Ty",
+    "achievement": "Osiągnięcie",
+    "friend_achievements": "Osiągnięcia znajomego",
+    "your_achievements": "Twoje osiągnięcia"
 }

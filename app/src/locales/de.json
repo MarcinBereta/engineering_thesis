@@ -117,5 +117,12 @@
     "additional_quiz_only_editable" : "Zusätzliches Quiz ist nur bearbeitbar, kann nicht neu generiert werden",
     "enter_reason_for_verification": "Grund für die Verifizierung eingeben",
     "enter_reason_placeholder": "Grund eingeben",
-    "please_provide_reason": "Bitte geben Sie einen Grund an, beschreiben Sie Ihre Fähigkeiten, zeigen Sie Ihre Erfahrung und Ihr Wissen."
+    "please_provide_reason": "Bitte geben Sie einen Grund an, beschreiben Sie Ihre Fähigkeiten, zeigen Sie Ihre Erfahrung und Ihr Wissen.",
+    "compare_achievements": "Erfolge vergleichen",
+    "compare_achievements_screen": "Verglichene Erfolge",
+    "friend": "Freund",
+    "you": "Du",
+    "achievement": "Erfolg",
+    "friend_achievements": "Freund Erfolge",
+    "your_achievements": "Deine Erfolge"
 }
