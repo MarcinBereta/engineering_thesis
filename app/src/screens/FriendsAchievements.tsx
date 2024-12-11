@@ -95,7 +95,7 @@ export const FriendsAchievements = (props: FriendsAchievements) => {
                         <Text style={styles.achievementTitle}>{item.title}</Text>
                         <View style={styles.iconContainer}>
                             {isUserAchieved ? (
-                                <Icon name="trophy" type="font-awesome" color="#f50" style={styles.trophyIcon} />
+                                <Icon name="trophy" type="font-awesome" color='purple' style={styles.trophyIcon} />
                             ) : (
                                 <Icon name="times-circle" type="font-awesome" color="#ccc" style={styles.trophyIcon} />
                             )}

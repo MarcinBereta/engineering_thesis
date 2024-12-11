@@ -107,7 +107,7 @@ export const UserAchievements = (props: UserAchievements) => {
                     <View style={styles.achievementContainer}>
                         <Text style={styles.achievementTitle}>{item.title}</Text>
                         {isAchieved && (
-                            <Icon name="trophy" type="font-awesome" color="#f50" style={styles.trophyIcon} />
+                            <Icon name="trophy" type="font-awesome" color="#b80" style={styles.trophyIcon} />
                         )}
                     </View>
                     <View style={styles.progressBarContainer}>
@@ -126,7 +126,6 @@ export const UserAchievements = (props: UserAchievements) => {
                     textAlign: 'center',
                     fontWeight: 'bold',
                     fontSize: 24,
-                    marginVertical: 20,
                 }}
             >
                 {t('user_achievements')}
