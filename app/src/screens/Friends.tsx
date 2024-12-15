@@ -112,13 +112,13 @@ const Friends = (props: Friends) => {
                         </View>
                     </View>
                 </Modal>
-                {friends.length > 0 && (
+                {friends?.length > 0 && (
                     <>
                         <Text style={styles.sectionTitle}>
                             {t('friend_list')}
                         </Text>
                         <FlatList
-                            data={friends}
+                            data={friends || []}
                             renderItem={({ item }) => (
                                 <View style={styles.card}>
                                     <FriendItem
@@ -131,13 +131,13 @@ const Friends = (props: Friends) => {
                     </>
                 )}
 
-                {friendRequests.length > 0 && (
+                {friendRequests?.length > 0 && (
                     <>
                         <Text style={styles.sectionTitle}>
                             {t('friend_request')}
                         </Text>
                         <FlatList
-                            data={friendRequests}
+                            data={friendRequests || []}
                             renderItem={({ item }) => (
                                 <View style={styles.card}>
                                     <FriendRequestItem friend={item} />
@@ -146,7 +146,7 @@ const Friends = (props: Friends) => {
                         />
                     </>
                 )}
-                {friendRequests.length === 0 && friends.length === 0 ? (
+                {friendRequests?.length === 0 && friends?.length === 0 ? (
                     <View style={styles.emptyState}>
                         <CustomButton
                             title={t('add_friend')}

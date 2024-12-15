@@ -7,6 +7,14 @@ import { fontPixel } from '@/utils/Normalize';
 
 export const SocketHandler = () => {
     const { socket, userInfo } = useContext(AuthContext);
+
+    function shortenName(courseName: string, length: number) {
+        if (courseName.length > length) {
+            return courseName.substring(0, length) + '...';
+        }
+        return courseName;
+    }
+
     const [gameRequest, setGameRequest] = useState<null | {
         userId: string;
         quizId: string;
@@ -42,8 +50,8 @@ export const SocketHandler = () => {
             }}
         >
             <Text>
-                {gameRequest.userName} wants to play with you in{' '}
-                {gameRequest.quiz.name}
+                {shortenName(gameRequest.userName, 8)} wants to play with you in{' '}
+                {shortenName(gameRequest.quiz.name, 20)}
             </Text>
             <View
                 style={{

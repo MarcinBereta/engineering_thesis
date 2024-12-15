@@ -1,4 +1,4 @@
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { fontPixel } from '../../utils/Normalize';
 import { useContext, useEffect, useState } from 'react';
@@ -90,21 +90,24 @@ const QuizFriends = ({ route, navigation }: QuizWithFriends) => {
 
     if (gameStage == 'answer') {
         return (
-            <View>
-                <Text>Correct answer is {question?.correct}</Text>
+            <View style={styles.container}>
+                <View style={styles.answerContainer}>
+                    <Text style={styles.message}>Correct answer is:</Text>
+                    <Text style={styles.correctAnswer}>{question?.correct}</Text>
+                </View>
             </View>
         );
     }
 
     if (gameStage == 'lobby' && room) {
         return (
-            <View>
-                <Text>Game starting in 5 seconds</Text>
-                <Text>Players:</Text>
+            <View style={styles.container2}>
+                <Text style={styles.message2}>Game starting in 5 seconds</Text>
+                <Text style={styles.subMessage}>Players:</Text>
                 <FlatList
                     data={room.users}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => <Text>{item.username}</Text>}
+                    renderItem={({ item }) => <Text style={styles.player}>{item.username}</Text>}
                 />
             </View>
         );
@@ -133,17 +136,24 @@ const QuizFriends = ({ route, navigation }: QuizWithFriends) => {
 
     if (gameStage == 'end' && room) {
         return (
-            <View>
-                <Text>Game ended</Text>
-                <Text>Players:</Text>
+            <View style={endStyles.container}>
+                <Text style={endStyles.message}>Game ended</Text>
+                <Text style={endStyles.subMessage}>Players:</Text>
                 <FlatList
                     data={room.users}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
-                        <Text>
-                            {item.username} - {item.score}
-                        </Text>
+                        <View style={endStyles.playerContainer}>
+                            <Text style={endStyles.playerName}>{item.username}</Text>
+                            <Text style={endStyles.playerScore}>{item.score}</Text>
+                        </View>
                     )}
+                />
+                <CustomButton
+                    title="Go to Dashboard"
+                    onPress={() => navigation.navigate('DashboardScreen')}
+                    buttonStyle={endStyles.button}
+                    titleStyle={endStyles.buttonTitle}
                 />
             </View>
         );
@@ -151,19 +161,154 @@ const QuizFriends = ({ route, navigation }: QuizWithFriends) => {
 
     if (gameCancelled) {
         return (
-            <View>
-                <Text>Your friend declined game invite</Text>
-                <CustomButton title="Go back" onPress={() => navigation.goBack()} />
+            <View style={styles.container}>
+                <Text style={styles.message}>Your friend declined game invite</Text>
+                <CustomButton
+                    title="Go back"
+                    onPress={() => navigation.goBack()}
+                    buttonStyle={styles.button}
+                    titleStyle={styles.buttonTitle}
+                />
             </View>
         );
     }
 
     return (
-        <View>
-            {/* <Text style={{fontSize: fontPixel(40)}}>{quiz.name}</Text> */}
-            <Text>Loading game with friends</Text>
+        <View style={styles.container}>
+            <ActivityIndicator size="large" color="#4A90E2" />
+            <Text style={styles.message}>Loading game with friends...</Text>
         </View>
     );
 };
 
+const styles = StyleSheet.create({
+    container2: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f8f9fa',
+    },
+    message2: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+        color: '#333',
+    },
+    subMessage: {
+        fontSize: 18,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginBottom: 10,
+        color: '#555',
+    },
+    player: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: '#333',
+        marginBottom: 5,
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f8f9fa',
+    },
+    answerContainer: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+    },
+    message: {
+        fontSize: fontPixel(20),
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+        color: '#333',
+    },
+    correctAnswer: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#4A90E2',
+    },
+    button: {
+        backgroundColor: '#4A90E2',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+    },
+    buttonTitle: {
+        fontWeight: '700',
+        fontSize: fontPixel(16),
+    },
+});
+const endStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f8f9fa',
+    },
+    message: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+        color: '#333',
+    },
+    subMessage: {
+        fontSize: 20,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginBottom: 10,
+        color: '#555',
+    },
+    playerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        marginBottom: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+    },
+    playerName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    playerScore: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#4A90E2',
+    },
+    button: {
+        backgroundColor: '#4A90E2',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    buttonTitle: {
+        fontWeight: '700',
+        fontSize: 16,
+        color: '#fff',
+    },
+});
 export default QuizFriends;

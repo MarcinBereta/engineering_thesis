@@ -20,6 +20,8 @@ import {
 } from 'react-native';
 import { CustomButton } from '../CustomButton';
 import { fontPixel, heightPixel } from '@/utils/Normalize';
+import constants from '../../../constants';
+import { Avatar } from '@rneui/themed';
 
 export const FriendItem = ({
     friend,
@@ -57,16 +59,7 @@ export const FriendItem = ({
     });
 
     return (
-        <View
-            style={{
-                width: '80%',
-                backgroundColor: 'white',
-                padding: fontPixel(20),
-                left: '10%',
-                borderRadius: fontPixel(10),
-                flexDirection: 'column',
-            }}
-        >
+        <View>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -141,23 +134,38 @@ export const FriendItem = ({
                     });
                 }}
                 style={{
-                    width: '80%',
-                    flex: 1,
-                    flexDirection: 'column',
-                    justifyContent: 'space-around',
+                    width: '100%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                 }}
             >
-                {friend.image ? <Image src={friend.image} /> : null}
-                <Text
-                    style={{
-                        textAlign: 'center',
-                        fontSize: fontPixel(20),
-                        fontWeight: 'bold',
+                <Avatar
+                    source={{
+                        uri:
+                            friend.image != null
+                                ? constants.url +
+                                '/files/avatars/' +
+                                friend.image
+                                : 'https://randomuser.me/api/portraits/men/36.jpg',
                     }}
-                >
-                    {friend.username}
-                </Text>
-                <Text style={{ textAlign: 'center' }}>{friend.email}</Text>
+                    containerStyle={{
+                        width: 50,
+                        height: 50,
+                        marginRight: 15,
+                    }}
+                />
+                <View style={{ flex: 1 }}>
+                    <Text
+                        style={{
+                            fontSize: fontPixel(20),
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        {friend.username}
+                    </Text>
+                    <Text>{friend.email}</Text>
+                </View>
             </TouchableOpacity>
         </View>
     );

@@ -19,6 +19,9 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { CustomButton } from '../CustomButton';
+import { Avatar } from '@rneui/themed';
+import constants from '../../../constants';
+import { fontPixel } from '@/utils/Normalize';
 
 export const FriendRequestItem = ({
     friend,
@@ -92,7 +95,7 @@ export const FriendRequestItem = ({
                     Do you want to accept this request
                 </Text>
 
-                <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                     <View style={{ width: '45%' }}>
                         <CustomButton
                             title="Yes"
@@ -122,9 +125,32 @@ export const FriendRequestItem = ({
                     justifyContent: 'space-around',
                 }}
             >
-                {friend.image ? <Image src={friend.image} /> : null}
-                <Text>{friend.username}</Text>
-                <Text>{friend.email}</Text>
+                <Avatar
+                    source={{
+                        uri:
+                            friend.image != null
+                                ? constants.url +
+                                '/files/avatars/' +
+                                friend.image
+                                : 'https://randomuser.me/api/portraits/men/36.jpg',
+                    }}
+                    containerStyle={{
+                        width: 50,
+                        height: 50,
+                        marginRight: 15,
+                    }}
+                />
+                <View style={{ flex: 1 }}>
+                    <Text
+                        style={{
+                            fontSize: fontPixel(20),
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        {friend.username}
+                    </Text>
+                    <Text>{friend.email}</Text>
+                </View>
             </TouchableOpacity>
         </View>
     );
