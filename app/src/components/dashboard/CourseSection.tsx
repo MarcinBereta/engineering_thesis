@@ -30,9 +30,9 @@ export const DashboardCourseSection = ({
     //     return (completedQuizzes.length === uniqueQuizzes.size && uniqueQuizzes.size !== 0);
     // };
 
-    function shortenCourseName(courseName: string) {
-        if (courseName.length > 20) {
-            return courseName.substring(0, 20) + '...';
+    function shortenCourseName(courseName: string, length: number) {
+        if (courseName.length > length) {
+            return courseName.substring(0, length) + '...';
         }
         return courseName;
     }
@@ -68,7 +68,11 @@ export const DashboardCourseSection = ({
                                 width: width * 0.4,
                             }}
                         >
-                            <Card.Title>{shortenCourseName(c.name)}</Card.Title>
+                            <Card.Title>
+                                <Text numberOfLines={1} ellipsizeMode="tail">
+                                    {shortenCourseName(c.name, 15)}
+                                </Text>
+                            </Card.Title>
                             <Card.Divider />
                             <Card.FeaturedSubtitle
                                 style={{
@@ -76,7 +80,7 @@ export const DashboardCourseSection = ({
                                     textAlign: 'center',
                                 }}
                             >
-                                {t('creator')}: {c.creator.username}
+                                {t('creator')}: {shortenCourseName(c.creator.username, 8)}
                             </Card.FeaturedSubtitle>
                         </Card>
                     </TouchableOpacity>

@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AchievementsService {
-    constructor(private prismaService: PrismaService) {}
+    constructor(private prismaService: PrismaService) { }
 
     async getUserAchievements(userId: string): Promise<UserAchievement[]> {
         const achievements = await this.checkAchivements(userId);
@@ -36,6 +36,23 @@ export class AchievementsService {
         console.log(userAchievements);
         return userAchievements;
     }
+
+    async getFriendAchievements(userId: string): Promise<UserAchievement[]> {
+        const achievements = await this.checkAchivements(userId);
+        const userAchievements: UserAchievement[] = [];
+        for (const achievement of achievements) {
+            userAchievements.push({
+                name: achievement,
+                userId: userId,
+                icon: 'default-icon',
+            });
+        }
+
+        console.log(userAchievements);
+        return userAchievements;
+
+    }
+
     /*
     Achivements:
     - Number of games 1 - 1000

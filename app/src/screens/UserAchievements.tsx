@@ -78,17 +78,17 @@ export const UserAchievements = (props: UserAchievements) => {
     const getProgress = (achievementName: string) => {
         switch (achievementName) {
             case 'numberOfGames1000':
-                return statsData.getAllUserGamesCount / 1000;
+                return Math.min(statsData.getAllUserGamesCount / 1000, 1);
             case 'numberOfGames10000':
-                return statsData.getAllUserGamesCount / 10000;
+                return Math.min(statsData.getAllUserGamesCount / 10000, 1);
             case 'numberOfFriends10':
-                return statsData.getFriendsCount / 10;
+                return Math.min(statsData.getFriendsCount / 10, 1);
             case 'numberOfFriends100':
-                return statsData.getFriendsCount / 100;
+                return Math.min(statsData.getFriendsCount / 100, 1);
             case 'numberOfCreatedCourses10':
-                return statsData.getCreatedCourses / 10;
+                return Math.min(statsData.getCreatedCourses / 10, 1);
             case 'numberOfCreatedCourses100':
-                return statsData.getCreatedCourses / 100;
+                return Math.min(statsData.getCreatedCourses / 100, 1);
             case 'getVerification':
                 return userInfo.verified ? 1 : 0;
             case 'getFirstFriend':
@@ -107,7 +107,7 @@ export const UserAchievements = (props: UserAchievements) => {
                     <View style={styles.achievementContainer}>
                         <Text style={styles.achievementTitle}>{item.title}</Text>
                         {isAchieved && (
-                            <Icon name="trophy" type="font-awesome" color="#f50" style={styles.trophyIcon} />
+                            <Icon name="trophy" type="font-awesome" color="#b80" style={styles.trophyIcon} />
                         )}
                     </View>
                     <View style={styles.progressBarContainer}>
@@ -126,7 +126,6 @@ export const UserAchievements = (props: UserAchievements) => {
                     textAlign: 'center',
                     fontWeight: 'bold',
                     fontSize: 24,
-                    marginVertical: 20,
                 }}
             >
                 {t('user_achievements')}

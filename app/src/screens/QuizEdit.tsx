@@ -5,6 +5,7 @@ import {
     TextInput,
     Modal,
     ActivityIndicator,
+    StyleSheet,
 } from 'react-native';
 import { fontPixel } from '../utils/Normalize';
 import { useContext, useState } from 'react';
@@ -24,7 +25,7 @@ import { CustomButton } from '../components/CustomButton';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
-import { Button } from '@rneui/base';
+import { Button, Icon } from '@rneui/base';
 
 const allOptions = ['EXCLUDE_DATES', 'MULTIPLE_CHOICES', 'TRUE_FALSE'];
 
@@ -83,6 +84,37 @@ const QuizEdit = ({ route, navigation }: quiz) => {
             </Layout>
         );
     }
+    const getQuizTypeIcon = (typeOfQuiz: string) => {
+        switch (typeOfQuiz) {
+            case 'general':
+                return <Icon type="font-awesome" name="globe" size={25} color="blue" />;
+            case 'specific':
+                return <Icon type="font-awesome" name="bullseye" size={25} color="blue" />;
+            case 'multiple_choice':
+                return <Icon type="font-awesome" name="list-ul" size={25} color="blue" />;
+            case 'true/false':
+                return <Icon type="font-awesome" name="adjust" size={25} color="blue" />;
+            default:
+                return null;
+        }
+    };
+
+    const extractQuizType = (quizName: string) => {
+        const lowerCaseName = quizName.toLowerCase();
+        if (lowerCaseName.endsWith('general')) {
+            return 'general';
+        } else if (lowerCaseName.endsWith('specific')) {
+            return 'specific';
+        } else if (lowerCaseName.endsWith('multiple_choice')) {
+            return 'multiple_choice';
+        } else if (lowerCaseName.endsWith('true/false')) {
+            return 'true/false';
+        } else {
+            return '';
+        }
+    };
+
+    const quizType = extractQuizType(quiz.name);
 
     const generateQuestionLayout = (index: number) => {
         if (quiz.questions[index].type === 'TRUE_FALSE') {
@@ -276,14 +308,15 @@ const QuizEdit = ({ route, navigation }: quiz) => {
     if (editActive) {
         return (
             <Layout navigation={navigation} icon="quiz">
-                <Text
-                    style={{
-                        fontSize: fontPixel(40),
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                    }}
-                >
-                    {quiz.name}
+                <View style={styles.iconContainer}>
+                    {quizType && getQuizTypeIcon(quizType)}
+                </View>
+                <Text style={{
+                    fontSize: fontPixel(40),
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                }}>
+                    {quiz.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
                 </Text>
                 <View>{generateQuestionLayout(currentIndex)}</View>
                 <View
@@ -320,11 +353,10 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                 });
                             }
                         }}
-                        title={`${
-                            currentIndex == quiz.questions.length - 1
-                                ? t('save_quiz')
-                                : t('next_question')
-                        }`}
+                        title={`${currentIndex == quiz.questions.length - 1
+                            ? t('save_quiz')
+                            : t('next_question')
+                            }`}
                     />
                 </View>
             </Layout>
@@ -333,14 +365,15 @@ const QuizEdit = ({ route, navigation }: quiz) => {
 
     return (
         <Layout navigation={navigation} icon="quiz">
-            <Text
-                style={{
-                    fontSize: fontPixel(40),
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                }}
-            >
-                {quiz.name}
+            <View style={styles.iconContainer}>
+                {quizType && getQuizTypeIcon(quizType)}
+            </View>
+            <Text style={{
+                fontSize: fontPixel(40),
+                textAlign: 'center',
+                fontWeight: 'bold',
+            }}>
+                {quiz.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
             </Text>
 
             <View
@@ -349,146 +382,154 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                     width: '100%',
                 }}
             >
-                <Text style={{ textAlign: 'center', fontSize: fontPixel(40) }}>
-                    {t('recreate_quiz')}
-                </Text>
-                <TextInput
-                    placeholder={t('question_count')}
-                    keyboardType="numeric"
-                    onChangeText={(text) => setQuestionCount(parseInt(text))}
-                    style={{
-                        width: '100%',
-                        textAlign: 'center',
-                        fontSize: fontPixel(20),
-                    }}
-                />
-                <TextInput
-                    placeholder={t('answer_count')}
-                    keyboardType="numeric"
-                    onChangeText={(text) => setAnswerCount(parseInt(text))}
-                    style={{
-                        width: '100%',
-                        textAlign: 'center',
-                        fontSize: fontPixel(20),
-                    }}
-                />
-                <View style={{ padding: 5 }}>
-                    <Text
-                        style={{
-                            fontSize: fontPixel(20),
-                            padding: 10,
-                            color: 'black',
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                        }}
-                    >
-                        {t('moderator_categories')}
+                {quizType ? (
+                    <Text style={{ textAlign: 'center', fontSize: fontPixel(20), color: 'red' }}>
+                        {t('additional_quiz_only_editable')}
                     </Text>
-                    {types.map((c) => {
-                        return (
-                            <TouchableOpacity key={c} onPress={() => {}}>
-                                <Text>{c}</Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                    <CustomButton
-                        title={t('add_options')}
-                        onPress={() => {
-                            setIsModalOpen(true);
-                        }}
-                    />
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={isModalOpen}
-                        onRequestClose={() => {
-                            setIsModalOpen(false);
-                        }}
-                    >
-                        <View
+                ) : (
+                    <>
+                        <Text style={{ textAlign: 'center', fontSize: fontPixel(40) }}>
+                            {t('recreate_quiz')}
+                        </Text>
+                        <TextInput
+                            placeholder={t('question_count')}
+                            keyboardType="numeric"
+                            onChangeText={(text) => setQuestionCount(parseInt(text))}
                             style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                backgroundColor: 'rgba(0,0,0,0.5)',
+                                width: '100%',
+                                textAlign: 'center',
+                                fontSize: fontPixel(20),
                             }}
-                        >
-                            <View
+                        />
+                        <TextInput
+                            placeholder={t('answer_count')}
+                            keyboardType="numeric"
+                            onChangeText={(text) => setAnswerCount(parseInt(text))}
+                            style={{
+                                width: '100%',
+                                textAlign: 'center',
+                                fontSize: fontPixel(20),
+                            }}
+                        />
+                        <View style={{ padding: 5 }}>
+                            <Text
                                 style={{
-                                    backgroundColor: 'white',
-                                    padding: 20,
-                                    margin: 20,
-                                    borderRadius: 10,
+                                    fontSize: fontPixel(20),
+                                    padding: 10,
+                                    color: 'black',
+                                    fontWeight: 'bold',
+                                    textAlign: 'center',
                                 }}
                             >
-                                <Text>{t('select_categories_to_add')}</Text>
-                                {types.map((c) => {
-                                    return (
-                                        <TouchableOpacity
-                                            key={c}
-                                            onPress={() => {
-                                                setTypes((typ) => {
-                                                    return typ.filter(
-                                                        (t) => t !== c
-                                                    );
-                                                });
-                                            }}
-                                        >
-                                            <Text>{c}</Text>
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                                <Text>{t('remaining_categories')}</Text>
-                                {allOptions
-                                    .filter((option) => !types.includes(option))
-                                    .map((c) => {
-                                        return (
-                                            <TouchableOpacity
-                                                key={c}
-                                                style={{
-                                                    padding: 5,
-                                                    backgroundColor:
-                                                        'lightgray',
-                                                    margin: 2,
-                                                    display: 'flex',
-                                                    flexDirection: 'row',
-                                                    justifyContent: 'center',
-                                                }}
-                                                onPress={() => {
-                                                    setTypes((typ) => {
-                                                        return [...typ, c];
-                                                    });
-                                                }}
-                                            >
-                                                <Text>{t(c)}</Text>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                <CustomButton
-                                    onPress={() => {
-                                        setIsModalOpen(false);
+                                {t('moderator_categories')}
+                            </Text>
+                            {types.map((c) => {
+                                return (
+                                    <TouchableOpacity key={c} onPress={() => { }}>
+                                        <Text>{c}</Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                            <CustomButton
+                                title={t('add_options')}
+                                onPress={() => {
+                                    setIsModalOpen(true);
+                                }}
+                            />
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={isModalOpen}
+                                onRequestClose={() => {
+                                    setIsModalOpen(false);
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        backgroundColor: 'rgba(0,0,0,0.5)',
                                     }}
-                                    title={t('close')}
-                                />
-                            </View>
+                                >
+                                    <View
+                                        style={{
+                                            backgroundColor: 'white',
+                                            padding: 20,
+                                            margin: 20,
+                                            borderRadius: 10,
+                                        }}
+                                    >
+                                        <Text>{t('select_categories_to_add')}</Text>
+                                        {types.map((c) => {
+                                            return (
+                                                <TouchableOpacity
+                                                    key={c}
+                                                    onPress={() => {
+                                                        setTypes((typ) => {
+                                                            return typ.filter(
+                                                                (t) => t !== c
+                                                            );
+                                                        });
+                                                    }}
+                                                >
+                                                    <Text>{c}</Text>
+                                                </TouchableOpacity>
+                                            );
+                                        })}
+                                        <Text>{t('remaining_categories')}</Text>
+                                        {allOptions
+                                            .filter((option) => !types.includes(option))
+                                            .map((c) => {
+                                                return (
+                                                    <TouchableOpacity
+                                                        key={c}
+                                                        style={{
+                                                            padding: 5,
+                                                            backgroundColor:
+                                                                'lightgray',
+                                                            margin: 2,
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            justifyContent: 'center',
+                                                        }}
+                                                        onPress={() => {
+                                                            setTypes((typ) => {
+                                                                return [...typ, c];
+                                                            });
+                                                        }}
+                                                    >
+                                                        <Text>{t(c)}</Text>
+                                                    </TouchableOpacity>
+                                                );
+                                            })}
+                                        <CustomButton
+                                            onPress={() => {
+                                                setIsModalOpen(false);
+                                            }}
+                                            title={t('close')}
+                                        />
+                                    </View>
+                                </View>
+                            </Modal>
                         </View>
-                    </Modal>
-                </View>
-                <View style={{ height: 10 }} />
+                        <View style={{ height: 10 }} />
 
-                <CustomButton
-                    onPress={() => {
-                        regenerateQuiz.mutate({
-                            recreateQuiz: {
-                                quizId: quiz.id,
-                                questionCount: questionCount,
-                                answerCount: answerCount,
-                                quizOptions: types,
-                            },
-                        });
-                    }}
-                    title={t('recreate_quiz')}
-                />
+                        <CustomButton
+                            onPress={() => {
+                                regenerateQuiz.mutate({
+                                    recreateQuiz: {
+                                        quizId: quiz.id,
+                                        questionCount: questionCount,
+                                        answerCount: answerCount,
+                                        quizOptions: types,
+                                    },
+                                });
+                            }}
+                            title={t('recreate_quiz')}
+                        />
+                    </>
+                )}
                 <View style={{ height: 10 }} />
                 <CustomButton
                     onPress={() => {
@@ -500,5 +541,13 @@ const QuizEdit = ({ route, navigation }: quiz) => {
         </Layout>
     );
 };
+
+const styles = StyleSheet.create({
+    iconContainer: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+    },
+});
 
 export default QuizEdit;

@@ -183,7 +183,7 @@ export const CourseForm = (props: CourseForm) => {
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <Text
                     style={{
-                        fontSize: fontPixel(30),
+                        fontSize: fontPixel(33),
                         textAlign: 'center',
                     }}
                 >
@@ -198,7 +198,9 @@ export const CourseForm = (props: CourseForm) => {
                     value={courseName}
                     onChangeText={(text) => setCourseName(text)}
                 />
-                <Text>{t('category')}</Text>
+                <Text
+                    style={{ fontSize: fontPixel(20) }}
+                >{t('category')}</Text>
                 <RNPickerSelect
                     onValueChange={handleCategoryChange}
                     items={[
@@ -215,7 +217,9 @@ export const CourseForm = (props: CourseForm) => {
                     ]}
                     value={category}
                 />
-                <Text>{t('language')}</Text>
+                <Text
+                    style={{ fontSize: fontPixel(20) }}
+                >{t('language')}</Text>
                 <RNPickerSelect
                     onValueChange={(value) => {
                         setLanguage(value);
@@ -260,6 +264,7 @@ export const CourseForm = (props: CourseForm) => {
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-around',
+                        width: '90%',
                     }}
                     onPressOut={() => {
                         setIsDialogOpen(false);
@@ -299,12 +304,15 @@ export const CourseForm = (props: CourseForm) => {
                     onPressOut={() => {
                         setIsTextFormOpen(false);
                     }}
+                    overlayStyle={{
+                        width: '90%',
+                    }}
                 >
                     <TextInput
                         value={textForm}
                         onChangeText={(text) => setTextForm(text)}
                         style={{
-                            fontSize: fontPixel(30),
+                            fontSize: fontPixel(20),
                             textAlign: 'center',
                             maxHeight: height * 0.6,
                         }}

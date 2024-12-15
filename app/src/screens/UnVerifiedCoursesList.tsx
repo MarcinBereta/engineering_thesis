@@ -184,7 +184,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
     }
 
     return (
-        <Layout navigation={props.navigation} icon="course">
+        <Layout navigation={props.navigation} icon="admin">
             <View style={{ flexDirection: 'column', flex: 1 }}>
                 <Text
                     style={{
@@ -193,7 +193,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
                         fontSize: normalizeText(30),
                     }}
                 >
-                    {t('courses_list')}
+                    {t('unverified_courses_list')}
                 </Text>
                 {isLoading && <ProgressBar progress={progress} />}
                 <FlatList

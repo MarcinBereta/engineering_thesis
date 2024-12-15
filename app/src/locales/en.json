@@ -1,5 +1,6 @@
 {
     "hello": "Hello",
+    "submit": "Submit",
     "featured_courses": "Featured courses",
     "friends": "Friends",
     "featured_quizzes": "Featured quizzes",
@@ -19,7 +20,7 @@
     "friend_list": "Friend list",
     "friend_request": "Friend request",
     "add_friend": "Add friend",
-    "course_create_description": "All the texts will be full size once created, you can drag and drop all inputs and images to correct their position ",
+    "course_create_description": "All the texts will be full size once created, you can drag and drop all inputs and images to correct their position. ",
     "course_name": "Course name",
     "MATH": "Math",
     "SCIENCE": "Science",
@@ -109,5 +110,19 @@
     "choose_category": "Choose category",
     "verify": "Verify",
     "user_achievements": "User achievements",
-    "my_achievements": "My achievements"
+    "my_achievements": "My achievements",
+    "go_back_to_courses": "Go back to courses",
+    "show_categories": "Show categories",
+    "generate_more_quizzes": "Generate more quizzes",
+    "additional_quiz_only_editable" : "Additional quiz is only editable, cannot be regenerated",
+    "enter_reason_for_verification": "Enter reason for verification",
+    "enter_reason_placeholder": "Enter reason",
+    "please_provide_reason": "Please provide reason, describe your abilities, show your experience and knowledge.",
+    "compare_achievements": "Compare achievements",
+    "compare_achievements_screen": "Compared achievements",
+    "friend": "Friend",
+    "you": "You",
+    "achievement": "Achievement",
+    "friend_achievements": "Friend achievements",
+    "your_achievements": "Your achievements"
 }

@@ -57,13 +57,13 @@ const QuizzesListItem = ({
     const getQuizTypeIcon = (typeOfQuiz: string) => {
         switch (typeOfQuiz) {
             case 'general':
-                return <Icon type="font-awesome" name="globe" size={30} color="blue" />;
+                return <Icon type="font-awesome" name="globe" size={25} color="blue" />;
             case 'specific':
-                return <Icon type="font-awesome" name="bullseye" size={30} color="blue" />;
+                return <Icon type="font-awesome" name="bullseye" size={25} color="blue" />;
             case 'multiple_choice':
-                return <Icon type="font-awesome" name="list-ul" size={30} color="blue" />;
+                return <Icon type="font-awesome" name="list-ul" size={25} color="blue" />;
             case 'true/false':
-                return <Icon type="font-awesome" name="adjust" size={30} color="blue" />;
+                return <Icon type="font-awesome" name="adjust" size={25} color="blue" />;
             default:
                 return null;
         }
@@ -99,7 +99,7 @@ const QuizzesListItem = ({
                     {quizType && getQuizTypeIcon(quizType)}
                 </View>
                 <Card.Title style={styles.cardTitle}>
-                    <Text style={{ marginLeft: quizType ? 10 : 0 }}>
+                    <Text style={{ marginLeft: 0 }}>
                         {item.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
                     </Text>
                     {hasCompletedQuiz(item.name) && (
@@ -151,7 +151,7 @@ const QuizzesListItem = ({
 
 const styles = StyleSheet.create({
     cardContainer: {
-        padding: 15,
+        padding: 10,
         width: '90%',
         marginLeft: '5%',
         borderRadius: 20,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 40, // Przesunięcie tytułu w prawo, aby zrobić miejsce na ikonę
+        marginLeft: 25,
     },
     resultText: {
         textAlign: 'center',

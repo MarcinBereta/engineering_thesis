@@ -22,21 +22,27 @@ export const QuizQuestion = ({
     index: number;
     setAnswer: (answer: string, index: number) => void;
 }) => {
-    const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+    const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string[] }>({});
 
     const handleAnswerPress = (answer: string) => {
+        const currentAnswers = selectedAnswers[index] || [];
         if (question.type === 'MULTIPLE_ANSWER') {
-            if (selectedAnswers.includes(answer)) {
-                setSelectedAnswers(selectedAnswers.filter((ans) => ans !== answer));
+            if (currentAnswers.includes(answer)) {
+                const newAnswers = currentAnswers.filter((ans) => ans !== answer);
+                setSelectedAnswers({ ...selectedAnswers, [index]: newAnswers });
+                setAnswer(newAnswers.join(','), index);
             } else {
-                setSelectedAnswers([...selectedAnswers, answer]);
+                const newAnswers = [...currentAnswers, answer];
+                setSelectedAnswers({ ...selectedAnswers, [index]: newAnswers });
+                setAnswer(newAnswers.join(','), index);
             }
-            setAnswer(answer, index);
         } else {
-            setSelectedAnswers([answer]);
+            setSelectedAnswers({ ...selectedAnswers, [index]: [answer] });
             setAnswer(answer, index);
         }
     };
+
+    const currentAnswers = selectedAnswers[index] || [];
 
     return (
         <View style={styles.container}>
@@ -48,7 +54,7 @@ export const QuizQuestion = ({
                     <Card
                         containerStyle={{
                             backgroundColor:
-                                selectedAnswers.includes(item) ? 'lightblue' : 'white',
+                                currentAnswers.includes(item) ? 'lightblue' : 'white',
                             width: width * 0.6,
                         }}
                     >
@@ -72,18 +78,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     question: {
-        fontSize: fontPixel(20),
+        fontSize: fontPixel(19),
         padding: 10,
-        margin: 10,
         borderRadius: 10,
-        marginBottom: 30,
-        width: '70%',
+        width: '75%',
         textAlign: 'center',
     },
     answer: {
         fontSize: fontPixel(15),
         padding: 10,
-        margin: 10,
+        margin: 5,
         borderRadius: 10,
         textAlign: 'center',
     },

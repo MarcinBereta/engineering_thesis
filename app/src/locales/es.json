@@ -1,5 +1,6 @@
 {
     "hello": "Hola",
+    "submit": "Enviar",
     "featured_courses": "Cursos destacados",
     "friends": "Amigos",
     "featured_quizzes": "Cuestionarios destacados",
@@ -19,7 +20,7 @@
     "friend_list": "Lista de amigos",
     "friend_request": "Solicitud de amistad",
     "add_friend": "Añadir amigo",
-    "course_create_description": "Todos los textos serán de tamaño completo una vez creados, puedes arrastrar y soltar todas las entradas e imágenes para corregir su posición ",
+    "course_create_description": "Todos los textos serán de tamaño completo una vez creados, puedes arrastrar y soltar todas las entradas e imágenes para corregir su posición. ",
     "course_name": "Nombre del curso",
     "MATH": "Matemáticas",
     "SCIENCE": "Ciencia",
@@ -109,5 +110,19 @@
     "choose_category": "Seleccionar categoría",
     "verify": "Verificar",
     "user_achievements": "Logros de usuario",
-    "my_achievements": "Mis logros"
+    "my_achievements": "Mis logros",
+    "go_back_to_courses": "Volver a los cursos",
+    "show_categories": "Mostrar categorías",
+    "generate_more_quizzes": "Generar más cuestionarios",
+    "additional_quiz_only_editable" : "El cuestionario adicional solo es editable, no se puede regenerar",
+    "enter_reason_for_verification": "Introduzca el motivo de la verificación",
+    "enter_reason_placeholder": "Introduzca el motivo",
+    "please_provide_reason": "Por favor, proporcione un motivo, describa sus habilidades, muestre su experiencia y conocimientos.",
+    "compare_achievements": "Comparar logros",
+    "compare_achievements_screen": "Logros comparados",
+    "friend": "Amigo",
+    "you": "Tú",
+    "achievement": "Logro",
+    "friend_achievements": "Logros de amigos",
+    "your_achievements": "Tus logros"
 }

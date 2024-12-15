@@ -145,6 +145,7 @@ const QuizzesList = (props: QuizzesList) => {
                     setSearch(text);
                     setPage(1);
                 }}
+                inputContainerStyle={{ height: 35 }}
             />
             <FlatList
                 data={data.getQuizzesWithPagination.filter(
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 10,
+        padding: 8,
     },
     title: {
         textAlign: 'center',

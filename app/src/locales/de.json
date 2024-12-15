@@ -1,5 +1,6 @@
 {
     "hello": "Hallo",
+    "submit": "Einreichen",
     "featured_courses": "Vorgestellte Kurse",
     "friends": "Freunde",
     "featured_quizzes": "Vorgestellte Quizze",
@@ -19,7 +20,7 @@
     "friend_list": "Freundesliste",
     "friend_request": "Freundschaftsanfrage",
     "add_friend": "Freund hinzufügen",
-    "course_create_description": "Alle Texte werden vollständig, sobald sie erstellt wurden, Sie können alle Eingaben und Bilder ziehen und ablegen, um ihre Position zu korrigieren ",
+    "course_create_description": "Alle Texte werden vollständig, sobald sie erstellt wurden, Sie können alle Eingaben und Bilder ziehen und ablegen, um ihre Position zu korrigieren.",
     "course_name": "Kursname",
     "MATH": "Mathematik",
     "SCIENCE": "Wissenschaft",
@@ -109,5 +110,19 @@
     "choose_category": "Kategorie auswählen",
     "verify": "Verifizieren",
     "user_achievements": "Benutzererfolge",
-    "my_achievements": "Meine Erfolge"
+    "my_achievements": "Meine Erfolge",
+    "go_back_to_courses": "Zurück zu den Kursen",
+    "show_categories": "Kategorien anzeigen",
+    "generate_more_quizzes": "Mehr Quizze generieren",
+    "additional_quiz_only_editable" : "Zusätzliches Quiz ist nur bearbeitbar, kann nicht neu generiert werden",
+    "enter_reason_for_verification": "Grund für die Verifizierung eingeben",
+    "enter_reason_placeholder": "Grund eingeben",
+    "please_provide_reason": "Bitte geben Sie einen Grund an, beschreiben Sie Ihre Fähigkeiten, zeigen Sie Ihre Erfahrung und Ihr Wissen.",
+    "compare_achievements": "Erfolge vergleichen",
+    "compare_achievements_screen": "Verglichene Erfolge",
+    "friend": "Freund",
+    "you": "Du",
+    "achievement": "Erfolg",
+    "friend_achievements": "Freund Erfolge",
+    "your_achievements": "Deine Erfolge"
 }

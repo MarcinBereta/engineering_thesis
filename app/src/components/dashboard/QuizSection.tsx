@@ -38,8 +38,8 @@ export const DashboardQuizSection = ({
     };
 
     function shortenCourseName(courseName: string) {
-        if (courseName.length > 20) {
-            return courseName.substring(0, 20) + '...';
+        if (courseName.length > 13) {
+            return courseName.substring(0, 13) + '...';
         }
         return courseName;
     }
@@ -76,6 +76,7 @@ export const DashboardQuizSection = ({
                                 width: width * 0.4,
                             }}
                         >
+
                             <Card.Title>{shortenCourseName(q.name)}
                                 {hasCompletedQuiz(q.name) && (
                                     <Icon

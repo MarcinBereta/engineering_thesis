@@ -117,8 +117,8 @@ export const UserSettings = (props: UserSettings) => {
                 <View style={styles.imageContainer}>
                     <Image
                         style={{
-                            width: 150,
-                            height: 150,
+                            width: 120,
+                            height: 120,
                             borderRadius: 60,
                             marginBottom: 10,
                         }}
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     header: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',

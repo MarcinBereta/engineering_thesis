@@ -1,5 +1,6 @@
 {
     "hello": "Salut",
+    "submit": "Soumettre",
     "featured_courses": "Cours en vedette",
     "friends": "Amis",
     "featured_quizzes": "Quiz en vedette",
@@ -19,7 +20,7 @@
     "friend_list": "Liste d'amis",
     "friend_request": "Demande d'ami",
     "add_friend": "Ajouter un ami",
-    "course_create_description": "Tous les textes seront de taille normale une fois créés, vous pouvez faire glisser et déposer toutes les entrées et images pour corriger leur position ",
+    "course_create_description": "Tous les textes seront de taille normale une fois créés, vous pouvez faire glisser et déposer toutes les entrées et images pour corriger leur position.",
     "course_name": "Nom du cours",
     "MATH": "Mathématiques",
     "SCIENCE": "Science",
@@ -109,5 +110,19 @@
     "choose_category": "Choisir une catégorie",
     "verify": "Vérifier",
     "user_achievements": "Réalisations de l'utilisateur",
-    "my_achievements": "Mes réalisations"
+    "my_achievements": "Mes réalisations",
+    "go_back_to_courses": "Retour aux cours",
+    "show_categories": "Afficher les catégories",
+    "generate_more_quizzes": "Générer plus de quiz",
+    "additional_quiz_only_editable": "Le quiz supplémentaire est uniquement modifiable, il ne peut pas être régénéré",
+    "enter_reason_for_verification": "Entrez la raison de la vérification",
+    "enter_reason_placeholder": "Entrez la raison",
+    "please_provide_reason": "Veuillez fournir une raison",
+    "compare_achievements": "Comparer les réalisations",
+    "compare_achievements_screen": "Réalisations comparées",
+    "friend": "Ami",
+    "you": "Vous",
+    "achievement": "Réalisations",
+    "friend_achievements": "Réalisations des amis",
+    "your_achievements": "Vos réalisations"
 }

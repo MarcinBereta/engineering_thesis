@@ -1,4 +1,4 @@
-import { View, Text, Button, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Button, TouchableOpacity, Dimensions, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { fontPixel } from '../utils/Normalize';
 import { useContext, useState } from 'react';
@@ -15,7 +15,7 @@ import {
 } from '@/services/friends/friends';
 import { Layout } from '../components/Layout';
 import { CustomButton } from '../components/CustomButton';
-import { Avatar, Card } from '@rneui/themed';
+import { Avatar, Card, Icon } from '@rneui/themed';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
@@ -76,6 +76,38 @@ const QuizMain = ({ route, navigation }: quiz) => {
 
         return extendedQuestions.sort(() => Math.random() - 0.5);
     });
+
+    const getQuizTypeIcon = (typeOfQuiz: string) => {
+        switch (typeOfQuiz) {
+            case 'general':
+                return <Icon type="font-awesome" name="globe" size={25} color="blue" />;
+            case 'specific':
+                return <Icon type="font-awesome" name="bullseye" size={25} color="blue" />;
+            case 'multiple_choice':
+                return <Icon type="font-awesome" name="list-ul" size={25} color="blue" />;
+            case 'true/false':
+                return <Icon type="font-awesome" name="adjust" size={25} color="blue" />;
+            default:
+                return null;
+        }
+    };
+
+    const extractQuizType = (quizName: string) => {
+        const lowerCaseName = quizName.toLowerCase();
+        if (lowerCaseName.includes('general')) {
+            return 'general';
+        } else if (lowerCaseName.includes('specific')) {
+            return 'specific';
+        } else if (lowerCaseName.includes('multiple_choice')) {
+            return 'multiple_choice';
+        } else if (lowerCaseName.includes('true/false')) {
+            return 'true/false';
+        } else {
+            return '';
+        }
+    };
+
+    const quizType = extractQuizType(quiz.name);
 
     const [start, setStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -268,14 +300,15 @@ const QuizMain = ({ route, navigation }: quiz) => {
 
     return (
         <Layout navigation={navigation} icon="quiz">
-            <Text
-                style={{
-                    fontSize: fontPixel(40),
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                }}
-            >
-                {quiz.name}
+            <View style={styles.iconContainer}>
+                {quizType && getQuizTypeIcon(quizType)}
+            </View>
+            <Text style={{
+                fontSize: fontPixel(40),
+                textAlign: 'center',
+                fontWeight: 'bold',
+            }}>
+                {quiz.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
             </Text>
             <View
                 style={{
@@ -304,8 +337,17 @@ const QuizMain = ({ route, navigation }: quiz) => {
                     title={t('fight_with_friend')}
                 />
             </View>
-        </Layout>
+        </Layout >
     );
 };
+
+const styles = StyleSheet.create({
+    iconContainer: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+    },
+});
+
 
 export default QuizMain;
