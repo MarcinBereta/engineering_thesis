@@ -7,6 +7,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationType } from '../Navbar';
 import { FriendUserFragmentGQL } from '@/services/friends/friends';
 import { useTranslation } from 'react-i18next';
+import constants from '../../../constants';
 
 export const DashboardFriendsSection = ({
     navigation,
@@ -17,6 +18,14 @@ export const DashboardFriendsSection = ({
 }) => {
     const { t } = useTranslation();
     const friendsList = readFragment(FriendUserFragmentGQL, friends);
+
+    function shortenName(courseName: string, length: number) {
+        if (courseName.length > length) {
+            return courseName.substring(0, length) + '...';
+        }
+        return courseName;
+    }
+
     return (
         <View style={{ display: 'flex', flexDirection: 'column' }}>
             <TouchableOpacity
@@ -64,12 +73,15 @@ export const DashboardFriendsSection = ({
                                 <Avatar
                                     source={{
                                         uri:
-                                            f.image ||
-                                            'https://cdn-icons-png.flaticon.com/512/6596/6596121.png',
+                                            f.image != null
+                                                ? constants.url +
+                                                '/files/avatars/' +
+                                                f.image
+                                                : 'https://randomuser.me/api/portraits/men/36.jpg',
                                     }}
                                 />
                             </View>
-                            <Card.Title>{f.username}</Card.Title>
+                            <Card.Title>{shortenName(f.username, 8)}</Card.Title>
                         </Card>
                     </TouchableOpacity>
                 ))}

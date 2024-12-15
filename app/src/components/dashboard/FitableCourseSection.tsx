@@ -33,7 +33,12 @@ export const DashboardFitableCourseSection = ({
     //     const completedQuizzes = userScore.filter((score) => uniqueQuizzes.has(score.quizName));
     //     return (completedQuizzes.length === uniqueQuizzes.size && uniqueQuizzes.size !== 0);
     // };
-
+    function shortenName(courseName: string, length: number) {
+        if (courseName.length > length) {
+            return courseName.substring(0, length) + '...';
+        }
+        return courseName;
+    }
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -67,7 +72,7 @@ export const DashboardFitableCourseSection = ({
                                     textAlign: 'center',
                                 }}
                             >
-                                {t('creator')}: {c.creator.username}
+                                {t('creator')}: {shortenName(c.creator.username, 10)}
                             </Card.FeaturedSubtitle>
                         </Card>
                     </TouchableOpacity>

@@ -19,6 +19,7 @@ import { Avatar, Card, Icon } from '@rneui/themed';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
+import constants from '../../constants';
 
 const shuffleArray = (array: string[]) => {
     return array.sort(() => Math.random() - 0.5);
@@ -276,8 +277,11 @@ const QuizMain = ({ route, navigation }: quiz) => {
                                 <Avatar
                                     source={{
                                         uri:
-                                            item.image ||
-                                            'https://randomuser.me/api/portraits/men/36.jpg',
+                                            item.image != null
+                                                ? constants.url +
+                                                '/files/avatars/' +
+                                                item.image
+                                                : 'https://randomuser.me/api/portraits/men/36.jpg',
                                     }}
                                     size="medium"
                                     rounded
