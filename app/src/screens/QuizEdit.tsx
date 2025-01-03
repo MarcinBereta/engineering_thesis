@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
 import { Button, Icon } from '@rneui/base';
+import { set } from 'react-hook-form';
 
 const allOptions = ['EXCLUDE_DATES', 'MULTIPLE_CHOICES', 'TRUE_FALSE'];
 
@@ -46,7 +47,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
     const [quiz, setQuiz] = useState(route.params.quiz);
     const [editActive, setEditActive] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
-
+    const [errorText, setErrorText] = useState('');
     const regenerateQuiz = useMutation({
         mutationFn: async (data: recreateQuizGQLDto) =>
             request(graphqlURL, recreateQuizGQL, data, {
@@ -87,13 +88,41 @@ const QuizEdit = ({ route, navigation }: quiz) => {
     const getQuizTypeIcon = (typeOfQuiz: string) => {
         switch (typeOfQuiz) {
             case 'general':
-                return <Icon type="font-awesome" name="globe" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="globe"
+                        size={25}
+                        color="blue"
+                    />
+                );
             case 'specific':
-                return <Icon type="font-awesome" name="bullseye" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="bullseye"
+                        size={25}
+                        color="blue"
+                    />
+                );
             case 'multiple_choice':
-                return <Icon type="font-awesome" name="list-ul" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="list-ul"
+                        size={25}
+                        color="blue"
+                    />
+                );
             case 'true/false':
-                return <Icon type="font-awesome" name="adjust" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="adjust"
+                        size={25}
+                        color="blue"
+                    />
+                );
             default:
                 return null;
         }
@@ -118,7 +147,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
         let value = parseInt(text);
         if (isNaN(value)) {
             value = 10;
-        } 
+        }
         setQuestionCount(value);
     };
 
@@ -327,12 +356,17 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                 <View style={styles.iconContainer}>
                     {quizType && getQuizTypeIcon(quizType)}
                 </View>
-                <Text style={{
-                    fontSize: fontPixel(40),
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                }}>
-                    {quiz.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
+                <Text
+                    style={{
+                        fontSize: fontPixel(40),
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                    }}
+                >
+                    {quiz.name.replace(
+                        /(general|specific|multiple_choice|true\/false)/i,
+                        ''
+                    )}
                 </Text>
                 <View>{generateQuestionLayout(currentIndex)}</View>
                 <View
@@ -369,10 +403,11 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                 });
                             }
                         }}
-                        title={`${currentIndex == quiz.questions.length - 1
-                            ? t('save_quiz')
-                            : t('next_question')
-                            }`}
+                        title={`${
+                            currentIndex == quiz.questions.length - 1
+                                ? t('save_quiz')
+                                : t('next_question')
+                        }`}
                     />
                 </View>
             </Layout>
@@ -384,12 +419,17 @@ const QuizEdit = ({ route, navigation }: quiz) => {
             <View style={styles.iconContainer}>
                 {quizType && getQuizTypeIcon(quizType)}
             </View>
-            <Text style={{
-                fontSize: fontPixel(40),
-                textAlign: 'center',
-                fontWeight: 'bold',
-            }}>
-                {quiz.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
+            <Text
+                style={{
+                    fontSize: fontPixel(40),
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                }}
+            >
+                {quiz.name.replace(
+                    /(general|specific|multiple_choice|true\/false)/i,
+                    ''
+                )}
             </Text>
 
             <View
@@ -399,16 +439,29 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                 }}
             >
                 {quizType ? (
-                    <Text style={{ textAlign: 'center', fontSize: fontPixel(20), color: 'red' }}>
+                    <Text
+                        style={{
+                            textAlign: 'center',
+                            fontSize: fontPixel(20),
+                            color: 'red',
+                        }}
+                    >
                         {t('additional_quiz_only_editable')}
                     </Text>
                 ) : (
                     <>
-                        <Text style={{ textAlign: 'center', fontSize: fontPixel(40) }}>
+                        <Text
+                            style={{
+                                textAlign: 'center',
+                                fontSize: fontPixel(40),
+                            }}
+                        >
                             {t('recreate_quiz')}
                         </Text>
                         <View style={styles.inputContainer}>
-                            <Text style={styles.label}>{t('question_count')}:</Text>
+                            <Text style={styles.label}>
+                                {t('question_count')}:
+                            </Text>
                             <TextInput
                                 keyboardType="numeric"
                                 onChangeText={handleQuestionCountChange}
@@ -417,7 +470,9 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                             />
                         </View>
                         <View style={styles.inputContainer}>
-                            <Text style={styles.label}>{t('answer_count')}:</Text>
+                            <Text style={styles.label}>
+                                {t('answer_count')}:
+                            </Text>
                             <TextInput
                                 keyboardType="numeric"
                                 onChangeText={handleAnswerCountChange}
@@ -439,7 +494,10 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                             </Text>
                             {types.map((c) => {
                                 return (
-                                    <TouchableOpacity key={c} onPress={() => { }}>
+                                    <TouchableOpacity
+                                        key={c}
+                                        onPress={() => {}}
+                                    >
                                         <Text>{c}</Text>
                                     </TouchableOpacity>
                                 );
@@ -474,7 +532,9 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                             borderRadius: 10,
                                         }}
                                     >
-                                        <Text>{t('select_categories_to_add')}</Text>
+                                        <Text>
+                                            {t('select_categories_to_add')}
+                                        </Text>
                                         {types.map((c) => {
                                             return (
                                                 <TouchableOpacity
@@ -493,7 +553,10 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                         })}
                                         <Text>{t('remaining_categories')}</Text>
                                         {allOptions
-                                            .filter((option) => !types.includes(option))
+                                            .filter(
+                                                (option) =>
+                                                    !types.includes(option)
+                                            )
                                             .map((c) => {
                                                 return (
                                                     <TouchableOpacity
@@ -504,12 +567,17 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                                                 'lightgray',
                                                             margin: 2,
                                                             display: 'flex',
-                                                            flexDirection: 'row',
-                                                            justifyContent: 'center',
+                                                            flexDirection:
+                                                                'row',
+                                                            justifyContent:
+                                                                'center',
                                                         }}
                                                         onPress={() => {
                                                             setTypes((typ) => {
-                                                                return [...typ, c];
+                                                                return [
+                                                                    ...typ,
+                                                                    c,
+                                                                ];
                                                             });
                                                         }}
                                                     >
@@ -531,6 +599,20 @@ const QuizEdit = ({ route, navigation }: quiz) => {
 
                         <CustomButton
                             onPress={() => {
+                                if (questionCount < 1 || answerCount < 1) {
+                                    setErrorText(
+                                        t('question_answer_count_error')
+                                    );
+                                    return;
+                                }
+                                if (questionCount > 20 || questionCount > 6) {
+                                    setErrorText(
+                                        t('question_answer_count_error')
+                                    );
+                                    return;
+                                }
+                                setErrorText('');
+
                                 regenerateQuiz.mutate({
                                     recreateQuiz: {
                                         quizId: quiz.id,
@@ -542,6 +624,17 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                             }}
                             title={t('recreate_quiz')}
                         />
+                        {errorText === '' ? null : (
+                            <Text
+                                style={{
+                                    fontSize: fontPixel(20),
+                                    color: 'red',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {errorText}
+                            </Text>
+                        )}
                     </>
                 )}
                 <View style={{ height: 10 }} />
@@ -598,7 +691,6 @@ const styles = StyleSheet.create({
         fontSize: fontPixel(20),
         marginLeft: 30,
         textAlign: 'right',
-        
     },
     input: {
         flex: 1,

@@ -120,6 +120,8 @@ const QuizMain = ({ route, navigation }: quiz) => {
             if (question.type === 'SINGLE' || question.type === 'TRUE_FALSE') {
                 return question.correct[0] === question.userAnswer[0];
             } else {
+                if(question.correct.length !== question.userAnswer.length) return false;
+
                 return question.correct.every((answer) =>
                     question.userAnswer.includes(answer)
                 );
