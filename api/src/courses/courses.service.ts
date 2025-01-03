@@ -139,6 +139,16 @@ export class CoursesService {
       select * from "Moderator" order by array_length(categories, 1) desc limit 1`;
             moderator = (await this.prismaService.$queryRaw(query))[0];
         }
+
+        const courseExists = await this.prismaService.course.findFirst({
+            where: {
+                name: course.name,
+            },
+        });
+        if (courseExists) {
+            throw new Error('Course with this name already exists');
+        }
+
         const newCourse = await this.prismaService.course.create({
             data: {
                 name: course.name,
@@ -306,6 +316,15 @@ export class CoursesService {
 
         if (courseToEdit.creatorId !== user.id) {
             throw new Error('User is not the creator of the course');
+        }
+
+         const courseExists = await this.prismaService.course.findFirst({
+            where: {
+                name: course.name,
+            },
+        });
+        if (courseExists) {
+            throw new Error('Course with this name already exists');
         }
 
         await this.prismaService.course.update({
@@ -724,9 +743,6 @@ export class CoursesService {
 
     async getMostPopularCourseByCategory(userID: string, category: string) {
         try {
-            const verifiedCourses = await this.prismaService.$queryRaw`
-                select id from "Course" where category::text = ${category} and verified = true`;
-
             const userQuizzes = await this.prismaService.$queryRaw`
                 select "quizId" from "UserScores" where "userId" = ${userID}`;
 

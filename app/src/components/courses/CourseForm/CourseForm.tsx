@@ -43,7 +43,7 @@ const isCoursePossible = (data: CourseItem[]) => {
             length += 1;
         }
     }
-    return length < 3000;
+    return length < 30000;
 }
 
 export type addCourseDto = VariablesOf<typeof addCourseGQL>;

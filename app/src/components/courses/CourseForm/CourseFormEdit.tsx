@@ -40,7 +40,7 @@ const isCoursePossible = (data: CourseItem[]) => {
             length += 1;
         }
     }
-    return length < 3000;
+    return length < 30000;
 }
 
 const generateRandomId = () => {
