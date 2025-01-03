@@ -113,6 +113,7 @@ const QuizMain = ({ route, navigation }: quiz) => {
     const [start, setStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const handleEndQuiz = async () => {
+        console.log(questions)
         if (userInfo == null) return;
 
         const correctAnswers = questions.filter((question) => {
@@ -147,19 +148,10 @@ const QuizMain = ({ route, navigation }: quiz) => {
         const newQuestions = questions.map((question, i) => {
             if (i === index) {
                 if (question.type === 'MULTIPLE_ANSWER') {
-                    if (question.userAnswer.includes(answer)) {
-                        return {
-                            ...question,
-                            userAnswer: question.userAnswer.filter(
-                                (ans) => ans !== answer
-                            ),
-                        };
-                    } else {
-                        return {
-                            ...question,
-                            userAnswer: [...question.userAnswer, answer],
-                        };
-                    }
+                    return {
+                        ...question,
+                        userAnswer: answer.split(','),
+                    };
                 } else {
                     return {
                         ...question,
@@ -170,11 +162,10 @@ const QuizMain = ({ route, navigation }: quiz) => {
             return question;
         });
         setQuestions(newQuestions);
-
         // Przechodzenie do następnego pytania tylko dla typów innych niż MULTIPLE_ANSWER
         if (questions[currentQuestion].type !== 'MULTIPLE_ANSWER') {
             if (currentQuestion + 1 == questions.length) {
-                handleEndQuiz();
+                // handleEndQuiz();
             } else {
                 setCurrentQuestion(currentQuestion + 1);
             }

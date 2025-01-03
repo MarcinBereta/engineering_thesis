@@ -118,21 +118,13 @@ const QuizEdit = ({ route, navigation }: quiz) => {
         let value = parseInt(text);
         if (isNaN(value)) {
             value = 10;
-        } else if (value < 10) {
-            value = 10;
-        } else if (value > 20) {
-            value = 20;
-        }
+        } 
         setQuestionCount(value);
     };
 
     const handleAnswerCountChange = (text: string) => {
         let value = parseInt(text);
         if (isNaN(value)) {
-            value = 2;
-        } else if (value < 2) {
-            value = 2;
-        } else if (value > 4) {
             value = 4;
         }
         setAnswerCount(value);
