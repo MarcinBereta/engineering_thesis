@@ -717,6 +717,11 @@ export class QuizService {
                 cachesToDelete.push(this.cacheManager.del(key));
             }
         }
+        await this.prismaService.userScores.deleteMany({
+            where: {
+                quizId: quiz.id,
+            },
+        });
         await Promise.all(cachesToDelete);
         this.cacheManager.del('all_quizzes/');
         return quiz;
@@ -758,6 +763,12 @@ export class QuizService {
                 cachesToDelete.push(this.cacheManager.del(key));
             }
         }
+
+        await this.prismaService.userScores.deleteMany({
+            where: {
+                quizId: quiz.id,
+            },
+        });
         await Promise.all(cachesToDelete);
         this.cacheManager.del('all_quizzes/');
         return updatedQuiz;

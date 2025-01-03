@@ -114,6 +114,30 @@ const QuizEdit = ({ route, navigation }: quiz) => {
         }
     };
 
+    const handleQuestionCountChange = (text: string) => {
+        let value = parseInt(text);
+        if (isNaN(value)) {
+            value = 10;
+        } else if (value < 10) {
+            value = 10;
+        } else if (value > 20) {
+            value = 20;
+        }
+        setQuestionCount(value);
+    };
+
+    const handleAnswerCountChange = (text: string) => {
+        let value = parseInt(text);
+        if (isNaN(value)) {
+            value = 2;
+        } else if (value < 2) {
+            value = 2;
+        } else if (value > 4) {
+            value = 4;
+        }
+        setAnswerCount(value);
+    };
+
     const quizType = extractQuizType(quiz.name);
 
     const generateQuestionLayout = (index: number) => {
@@ -391,26 +415,24 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                         <Text style={{ textAlign: 'center', fontSize: fontPixel(40) }}>
                             {t('recreate_quiz')}
                         </Text>
-                        <TextInput
-                            placeholder={t('question_count')}
-                            keyboardType="numeric"
-                            onChangeText={(text) => setQuestionCount(parseInt(text))}
-                            style={{
-                                width: '100%',
-                                textAlign: 'center',
-                                fontSize: fontPixel(20),
-                            }}
-                        />
-                        <TextInput
-                            placeholder={t('answer_count')}
-                            keyboardType="numeric"
-                            onChangeText={(text) => setAnswerCount(parseInt(text))}
-                            style={{
-                                width: '100%',
-                                textAlign: 'center',
-                                fontSize: fontPixel(20),
-                            }}
-                        />
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>{t('question_count')}:</Text>
+                            <TextInput
+                                keyboardType="numeric"
+                                onChangeText={handleQuestionCountChange}
+                                style={styles.input}
+                                value={questionCount.toString()}
+                            />
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>{t('answer_count')}:</Text>
+                            <TextInput
+                                keyboardType="numeric"
+                                onChangeText={handleAnswerCountChange}
+                                style={styles.input}
+                                value={answerCount.toString()}
+                            />
+                        </View>
                         <View style={{ padding: 5 }}>
                             <Text
                                 style={{
@@ -421,7 +443,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                     textAlign: 'center',
                                 }}
                             >
-                                {t('moderator_categories')}
+                                {t('options')}
                             </Text>
                             {types.map((c) => {
                                 return (
@@ -547,6 +569,51 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    quizName: {
+        fontSize: fontPixel(40),
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    innerContainer: {
+        justifyContent: 'center',
+        width: '100%',
+        alignItems: 'center',
+    },
+    additionalQuizMessage: {
+        textAlign: 'center',
+        fontSize: fontPixel(20),
+        color: 'red',
+    },
+    recreateQuizMessage: {
+        textAlign: 'center',
+        fontSize: fontPixel(40),
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        justifyContent: 'center',
+        width: '80%',
+    },
+    label: {
+        fontSize: fontPixel(20),
+        marginLeft: 30,
+        textAlign: 'right',
+        
+    },
+    input: {
+        flex: 1,
+        textAlign: 'center',
+        fontSize: fontPixel(20),
+        color: 'grey',
+        padding: 10,
     },
 });
 
