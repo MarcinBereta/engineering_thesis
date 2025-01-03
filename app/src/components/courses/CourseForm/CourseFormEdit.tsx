@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Button, Dimensions, FlatList, Text, View } from 'react-native';
+import { Alert, Button, Dimensions, FlatList, Text, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { DragItem } from './CourseDragItem';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
@@ -30,6 +30,18 @@ export type CourseItem = {
     id: string;
     imageType?: string;
 };
+
+const isCoursePossible = (data: CourseItem[]) => {
+    let length = 0;
+    for (let item of data) {
+        if (item.type === 'text') {
+            length += item.value.length;
+        } else {
+            length += 1;
+        }
+    }
+    return length < 3000;
+}
 
 const generateRandomId = () => {
     return Math.random().toString(36).substring(7);
@@ -165,12 +177,14 @@ export const CourseEditForm = ({ route, navigation }: EditCourse) => {
     };
 
     const uploadCourse = async () => {
+        if (!isCoursePossible(dragData)) {
+            Alert.alert(t('error'), t('course_is_too_long'));
+            return
+        }
         editCourseMutation.mutate({
             EditCourseInput: parseData(),
         });
     };
-
-    console.log(dragData.length);
 
     return (
         <ScrollView style={{ flex: 1, flexDirection: 'column' }}>

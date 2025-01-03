@@ -11,7 +11,11 @@ import { DashboardFitableCourseSection } from '@/components/dashboard/FitableCou
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import request from 'graphql-request';
 import { graphqlURL } from '@/services/settings';
-import { dashboardDataGQL, getUserScoreGQL, mostFitableCourseGQL } from '@/services/quiz/quiz';
+import {
+    dashboardDataGQL,
+    getUserScoreGQL,
+    mostFitableCourseGQL,
+} from '@/services/quiz/quiz';
 import { DashboardFriendsSection } from '@/components/dashboard/FriendsSection';
 import { CustomButton } from '@/components/CustomButton';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +44,7 @@ const DashboardScreen = (props: DashboardScreen) => {
                 }
             ),
     });
+
     const { data: mostFitableCourseData } = useQuery({
         queryKey: ['MostFitableCourse'],
         queryFn: async () =>
@@ -50,7 +55,7 @@ const DashboardScreen = (props: DashboardScreen) => {
                 {
                     Authorization: 'Bearer ' + userInfo?.token,
                 }
-            )
+            ),
     });
     const { data: scoresData } = useQuery({
         queryKey: ['UserScore'],
@@ -62,7 +67,7 @@ const DashboardScreen = (props: DashboardScreen) => {
                 {
                     Authorization: 'Bearer ' + userInfo?.token,
                 }
-            )
+            ),
     });
     useEffect(() => {
         setNavigationRef(props.navigation);
@@ -88,8 +93,12 @@ const DashboardScreen = (props: DashboardScreen) => {
                         size={width * 0.1}
                         rounded
                         source={{
-                            uri: userInfo.image != null ? constants.url + '/files/avatars/' + userInfo.image :
-                                'https://randomuser.me/api/portraits/men/36.jpg',
+                            uri:
+                                userInfo.image != null
+                                    ? constants.url +
+                                      '/files/avatars/' +
+                                      userInfo.image
+                                    : 'https://randomuser.me/api/portraits/men/36.jpg',
                         }}
                         onPress={() => {
                             props.navigation.navigate('UserProfile');
@@ -126,10 +135,15 @@ const DashboardScreen = (props: DashboardScreen) => {
                         }}
                     >
                         {t('hello')}
-                        <Text style={{
-                            color: '#4A90E2',
-                            fontWeight: 'bold',
-                        }}> {userInfo.username}</Text>
+                        <Text
+                            style={{
+                                color: '#4A90E2',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {' '}
+                            {userInfo.username}
+                        </Text>
                         !
                     </Text>
                 </View>
@@ -191,7 +205,7 @@ const DashboardScreen = (props: DashboardScreen) => {
                     />
                 </View>
             </View>
-        </Layout >
+        </Layout>
     );
 };
 

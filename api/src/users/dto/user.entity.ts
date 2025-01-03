@@ -22,7 +22,7 @@ export class User {
     username: string;
     @Field()
     email: string;
-    @Field()
+    @Field({ nullable: true })
     password: string;
     @Field(() => Date, { nullable: true })
     createdAt: Date;

@@ -35,6 +35,9 @@ export class AuthService {
         });
 
         if (userExists.length > 0) {
+            console.log(await this.Prisma.user.findMany());
+            console.log(user)
+            console.log(userExists)
             throw new GraphQLError('Account already exists');
         }
 

@@ -49,7 +49,6 @@ export class SocketService {
                 socket: socket,
             });
         } else {
-            //get 1st user in queue
             const user = quiz.shift();
             this.createRoom(
                 [

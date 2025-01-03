@@ -19,7 +19,7 @@ type User {
   id: String!
   username: String!
   email: String!
-  password: String!
+  password: String
   createdAt: DateTime
   updatedAt: DateTime
   role: String!

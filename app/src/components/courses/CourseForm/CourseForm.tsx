@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Dimensions, Text, View } from 'react-native';
+import { Alert, Dimensions, Text, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { DragItem } from './CourseDragItem';
 import { TextInput } from 'react-native-gesture-handler';
@@ -33,6 +33,19 @@ export type CourseItem = {
 const generateRandomId = () => {
     return Math.random().toString(36).substring(7);
 };
+
+const isCoursePossible = (data: CourseItem[]) => {
+    let length = 0;
+    for (let item of data) {
+        if (item.type === 'text') {
+            length += item.value.length;
+        } else {
+            length += 1;
+        }
+    }
+    return length < 3000;
+}
+
 export type addCourseDto = VariablesOf<typeof addCourseGQL>;
 export type AppFile = File & {
     uri: string;
@@ -172,7 +185,11 @@ export const CourseForm = (props: CourseForm) => {
     };
 
     const uploadCourse = async () => {
-        console.log('CREATE');
+        if (!isCoursePossible(dragData)) {
+            Alert.alert(t('error'), t('course_is_too_long'));
+            return
+        }
+        
         addCourseMutation.mutate({
             CourseInput: parseData(),
         });

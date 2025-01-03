@@ -126,7 +126,7 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
                 <Text style={endStyles.message}>Game ended</Text>
                 <Text style={endStyles.subMessage}>Players:</Text>
                 <FlatList
-                    data={room.users}
+                    data={room.users.sort((a, b) => b.score - a.score)}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <View style={endStyles.playerContainer}>
