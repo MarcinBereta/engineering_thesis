@@ -1,16 +1,14 @@
 import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
-import { getQuizzesWithPaginationGQL, getUserScoreGQL } from '@/services/quiz/quiz';
+import {
+    getQuizzesWithPaginationGQL,
+    getUserScoreGQL,
+} from '@/services/quiz/quiz';
 import { Card, Icon } from '@rneui/themed';
 import { NavigationType } from '../Navbar';
 import { ResultOf } from 'gql.tada';
 import { useTranslation } from 'react-i18next';
-import { Touchable } from 'react-native';
 import { AuthContext } from '@/contexts/AuthContext';
-import React, { useContext, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import request from 'graphql-request';
-import { graphqlURL } from '@/services/settings';
-import { getMyCoursesGQL } from '@/services/courses/courses';
+import React, { useContext } from 'react';
 import Course from '../courses/course/CourseItem';
 
 const QuizzesListItem = ({
@@ -36,7 +34,9 @@ const QuizzesListItem = ({
         if (userScore === undefined) {
             return '';
         }
-        const quizResult = userScore.find(score => score.quizName === quizName);
+        const quizResult = userScore.find(
+            (score) => score.quizName === quizName
+        );
         if (quizResult === undefined) {
             return '';
         }
@@ -47,23 +47,47 @@ const QuizzesListItem = ({
 
     const { userInfo } = useContext(AuthContext);
     const isAuthorized = () => {
-        return (
-            userInfo?.role === 'ADMIN' ||
-            userInfo?.role === 'MODERATOR' ||
-            userInfo?.id === item.course?.creatorId
-        );
+        return userInfo?.id === item.course?.creatorId;
     };
 
     const getQuizTypeIcon = (typeOfQuiz: string) => {
         switch (typeOfQuiz) {
             case 'general':
-                return <Icon type="font-awesome" name="globe" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="globe"
+                        size={25}
+                        color="blue"
+                    />
+                );
             case 'specific':
-                return <Icon type="font-awesome" name="bullseye" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="bullseye"
+                        size={25}
+                        color="blue"
+                    />
+                );
             case 'multiple_choice':
-                return <Icon type="font-awesome" name="list-ul" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="list-ul"
+                        size={25}
+                        color="blue"
+                    />
+                );
             case 'true/false':
-                return <Icon type="font-awesome" name="adjust" size={25} color="blue" />;
+                return (
+                    <Icon
+                        type="font-awesome"
+                        name="adjust"
+                        size={25}
+                        color="blue"
+                    />
+                );
             default:
                 return null;
         }
@@ -87,9 +111,7 @@ const QuizzesListItem = ({
     const quizType = extractQuizType(item.name);
 
     return (
-        <Card
-            containerStyle={styles.cardContainer}
-        >
+        <Card containerStyle={styles.cardContainer}>
             <TouchableOpacity
                 onPress={() => {
                     navigation.push('quiz', { quiz: item });
@@ -100,7 +122,10 @@ const QuizzesListItem = ({
                 </View>
                 <Card.Title style={styles.cardTitle}>
                     <Text style={{ marginLeft: 0 }}>
-                        {item.name.replace(/(general|specific|multiple_choice|true\/false)/i, '')}
+                        {item.name.replace(
+                            /(general|specific|multiple_choice|true\/false)/i,
+                            ''
+                        )}
                     </Text>
                     {hasCompletedQuiz(item.name) && (
                         <Icon
@@ -118,15 +143,11 @@ const QuizzesListItem = ({
                 <Card.Divider />
                 <View style={styles.infoContainer}>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>
-                            {t('course')}:
-                        </Text>
+                        <Text style={styles.infoLabel}>{t('course')}:</Text>
                         <Text> {item.course?.name}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>
-                            {t('category')}:
-                        </Text>
+                        <Text style={styles.infoLabel}>{t('category')}:</Text>
                         <Text> {t(item.course?.category as string)}</Text>
                     </View>
                 </View>
