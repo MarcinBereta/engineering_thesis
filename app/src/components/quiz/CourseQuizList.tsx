@@ -84,8 +84,6 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
 
     const isAuthorized = () => {
         return (
-            userInfo?.role === 'ADMIN' ||
-            userInfo?.role === 'MODERATOR' ||
             userInfo?.id === data?.getQuizzesByCourseId[0]?.course?.creatorId
         );
     };
@@ -137,7 +135,7 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                 )}
             />
             {isAuthorized() && (
-                <View style={{ width: '80%', left:'10%' }}>
+                <View style={{ width: '80%', left: '10%' }}>
                     <CustomButton
                         title={t('generate_more_quizzes')}
                         onPress={() => setModalVisible(true)}
