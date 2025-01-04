@@ -18,6 +18,7 @@ import { normalizeText } from '@rneui/base';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthenticatedRootStackParamList } from './Navigator';
+import { Alert } from 'react-native';
 const { height } = Dimensions.get('window');
 
 type UnVerifiedCourses = NativeStackScreenProps<
@@ -111,6 +112,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
         },
         onError: () => {
             setIsLoading(false);
+            Alert.alert(t('error'), t('failed_to_generate_quiz'));
             setProgress(0);
         },
     });
@@ -177,7 +179,7 @@ const UnVerifiedCoursesList = (props: UnVerifiedCourses) => {
     if (isLoading || data == undefined) {
         return (
             <View>
-                <Text>Removing course...</Text>
+                <Text>Procesing course...</Text>
                 <ProgressBar progress={progress} />
             </View>
         );

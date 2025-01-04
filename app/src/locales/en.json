@@ -20,7 +20,7 @@
     "friend_list": "Friend list",
     "friend_request": "Friend request",
     "add_friend": "Add friend",
-    "course_create_description": "All the texts will be full size once created, you can drag and drop all inputs and images to correct their position. ",
+    "course_create_description": "All the texts will be full size once created, you can drag and drop all inputs and images to correct their position. Text must be shorter than 30k characters.",
     "course_name": "Course name",
     "MATH": "Math",
     "SCIENCE": "Science",
@@ -127,5 +127,11 @@
     "your_achievements": "Your achievements",
     "wants_to_play_with_you_in": "wants to play with you in",
     "options": "Options",
-    "save_quiz": "Save quiz"
+    "save_quiz": "Save quiz",
+    "error": "Error",
+    "failed_to_generate_quiz": "Failed to generate quiz",
+    "course_is_too_long": "Course is too long",
+    "failed_to_generate_quiz_name_must_be_unique": "Failed to generate quiz, name must be unique",
+    "select_quiz_types": "Select quiz types",
+    "generate": "Generate"
 }

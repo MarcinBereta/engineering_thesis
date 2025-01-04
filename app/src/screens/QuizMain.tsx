@@ -117,7 +117,7 @@ const QuizMain = ({ route, navigation }: quiz) => {
         if (userInfo == null) return;
 
         const correctAnswers = questions.filter((question) => {
-            if (question.type === 'SINGLE' || question.type === 'TRUE_FALSE') {
+            if (question.type === 'SINGLE_ANSWER' || question.type === 'TRUE_FALSE') {
                 return question.correct[0] === question.userAnswer[0];
             } else {
                 if(question.correct.length !== question.userAnswer.length) return false;

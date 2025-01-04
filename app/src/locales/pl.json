@@ -20,7 +20,7 @@
     "friend_list": "Lista znajomych",
     "friend_request": "Zaproszenie do znajomych",
     "add_friend": "Dodaj znajomego",
-    "course_create_description": "Wszystkie teksty będą pełnowymiarowe po utworzeniu, możesz przeciągać i upuszczać wszystkie pola tekstowe i obrazy, aby poprawić ich położenie.",
+    "course_create_description": "Wszystkie teksty będą pełnowymiarowe po utworzeniu, możesz przeciągać i upuszczać wszystkie pola tekstowe i obrazy, aby poprawić ich położenie. Tekst musi być krótszy niż 30 tys. znaków.",
     "course_name": "Nazwa kursu",
     "MATH": "Matematyka",
     "SCIENCE": "Nauki ścisłe",
@@ -127,5 +127,11 @@
     "your_achievements": "Twoje osiągnięcia",
     "wants_to_play_with_you_in": "chce zagrać z tobą w",
     "options": "Opcje",
-    "save_quiz": "Zapisz quiz"
+    "save_quiz": "Zapisz quiz",
+    "error": "Błąd",
+    "failed_to_generate_quiz": "Nie udało się wygenerować quizu",
+    "course_is_too_long": "Kurs jest zbyt długi",
+    "failed_to_generate_quiz_name_must_be_unique": "Nie udało się wygenerować quizu, nazwa musi być unikalna",
+    "select_quiz_types": "Wybierz typy quizów",
+    "generate": "Generuj"
 }

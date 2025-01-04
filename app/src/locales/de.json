@@ -20,7 +20,7 @@
     "friend_list": "Freundesliste",
     "friend_request": "Freundschaftsanfrage",
     "add_friend": "Freund hinzufügen",
-    "course_create_description": "Alle Texte werden vollständig, sobald sie erstellt wurden, Sie können alle Eingaben und Bilder ziehen und ablegen, um ihre Position zu korrigieren.",
+    "course_create_description": "Alle Texte werden vollständig, sobald sie erstellt wurden, Sie können alle Eingaben und Bilder ziehen und ablegen, um ihre Position zu korrigieren. Text muss kürzer als 30k Zeichen sein.",
     "course_name": "Kursname",
     "MATH": "Mathematik",
     "SCIENCE": "Wissenschaft",
@@ -127,5 +127,11 @@
     "your_achievements": "Deine Erfolge",
     "wants_to_play_with_you_in": "möchte mit dir spielen in",
     "options": "Optionen",
-    "save_quiz": "Quiz speichern"
+    "save_quiz": "Quiz speichern",
+    "error": "Fehler",
+    "failed_to_generate_quiz": "Quiz konnte nicht generiert werden",
+    "course_is_too_long": "Kurs ist zu lang",
+    "failed_to_generate_quiz_name_must_be_unique": "Quiz konnte nicht generiert werden, Name muss eindeutig sein",
+    "select_quiz_types": "Quiztypen auswählen",
+    "generate": "Generieren"
 }

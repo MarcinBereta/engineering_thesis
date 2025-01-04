@@ -251,12 +251,12 @@ export class QuizService {
     }
     async getNumberOfQuestions(
         textLenght: number,
-        baseLength: number = 2000
+        baseLength: number = 2500
     ): Promise<number> {
         if (textLenght < baseLength) {
             return 10;
         }
-        return Math.min(Math.floor(textLenght / 1000) + 10, 20); // for longer courses we add more questions
+        return Math.min(Math.floor(textLenght / 1500) + 10, 20); // for longer courses we add more questions
     }
 
     async generateQuestions(courseId: string): Promise<string> {
