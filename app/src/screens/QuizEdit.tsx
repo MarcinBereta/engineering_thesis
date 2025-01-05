@@ -325,22 +325,93 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                 <CustomButton
                                     title={t('set_correct')}
                                     onPress={() => {
-                                        setQuiz((q) => {
-                                            return {
-                                                ...q,
-                                                questions: q.questions.map(
-                                                    (question, i) => {
-                                                        if (i === index) {
-                                                            return {
-                                                                ...question,
-                                                                correct: [ans],
-                                                            };
+                                        if (
+                                            quiz.questions[index].type ===
+                                            'MULTIPLE_ANSWER'
+                                        ) {
+                                            if (
+                                                quiz.questions[
+                                                    index
+                                                ].correct.includes(ans)
+                                            )
+                                                setQuiz((q) => {
+                                                    return {
+                                                        ...q,
+                                                        questions:
+                                                            q.questions.map(
+                                                                (
+                                                                    question,
+                                                                    i
+                                                                ) => {
+                                                                    if (
+                                                                        i ===
+                                                                        index
+                                                                    ) {
+                                                                        return {
+                                                                            ...question,
+                                                                            correct:
+                                                                                question.correct.filter(
+                                                                                    (
+                                                                                        c
+                                                                                    ) =>
+                                                                                        c !==
+                                                                                        ans
+                                                                                ),
+                                                                        };
+                                                                    }
+                                                                    return question;
+                                                                }
+                                                            ),
+                                                    };
+                                                });
+                                            else {
+                                                setQuiz((q) => {
+                                                    return {
+                                                        ...q,
+                                                        questions:
+                                                            q.questions.map(
+                                                                (
+                                                                    question,
+                                                                    i
+                                                                ) => {
+                                                                    if (
+                                                                        i ===
+                                                                        index
+                                                                    ) {
+                                                                        return {
+                                                                            ...question,
+                                                                            correct:
+                                                                                [
+                                                                                    ...question.correct,
+                                                                                    ans,
+                                                                                ],
+                                                                        };
+                                                                    }
+                                                                    return question;
+                                                                }
+                                                            ),
+                                                    };
+                                                });
+                                            }
+                                        } else
+                                            setQuiz((q) => {
+                                                return {
+                                                    ...q,
+                                                    questions: q.questions.map(
+                                                        (question, i) => {
+                                                            if (i === index) {
+                                                                return {
+                                                                    ...question,
+                                                                    correct: [
+                                                                        ans,
+                                                                    ],
+                                                                };
+                                                            }
+                                                            return question;
                                                         }
-                                                        return question;
-                                                    }
-                                                ),
-                                            };
-                                        });
+                                                    ),
+                                                };
+                                            });
                                     }}
                                 />
                             </View>
