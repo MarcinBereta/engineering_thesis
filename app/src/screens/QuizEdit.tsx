@@ -242,6 +242,7 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                         style={{
                             fontSize: fontPixel(20),
                             textAlign: 'center',
+                            width: '90%',
                         }}
                         multiline
                         placeholder="Question"
@@ -275,10 +276,12 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                                     padding: 10,
                                     width: '90%',
                                     borderWidth: 2,
-                                    borderColor:
-                                        ans === quiz.questions[index].correct[0]
-                                            ? 'green'
-                                            : 'transparent',
+                                    marginBottom: 5,
+                                    borderColor: quiz.questions[
+                                        index
+                                    ].correct.includes(ans)
+                                        ? 'green'
+                                        : 'transparent',
                                     borderRadius: 20,
                                 }}
                             >
@@ -432,6 +435,8 @@ const QuizEdit = ({ route, navigation }: quiz) => {
                         fontSize: fontPixel(40),
                         textAlign: 'center',
                         fontWeight: 'bold',
+                        width: '80%',
+                        marginLeft: '10%',
                     }}
                 >
                     {quiz.name.replace(
