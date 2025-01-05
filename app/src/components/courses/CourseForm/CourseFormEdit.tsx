@@ -74,6 +74,9 @@ export const CourseEditForm = ({ route, navigation }: EditCourse) => {
             const course = readFragment(courseFragment, data.editCourse);
             uploadPhotos(course);
         },
+        onError: (error, variables, context) => {
+            Alert.alert(t('error'), t('failed_to_generate_quiz_name_must_be_unique'));
+        },
     });
 
     const updateItemValue = (index: string, value: string) => {

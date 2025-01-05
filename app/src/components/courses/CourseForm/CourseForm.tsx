@@ -77,6 +77,9 @@ export const CourseForm = (props: CourseForm) => {
 
             uploadPhotos(course);
         },
+        onError: (error, variables, context) => {
+            Alert.alert(t('error'), t('failed_to_generate_quiz_name_must_be_unique'));
+        },
     });
 
     const updateItemValue = (index: string, value: string) => {
@@ -189,7 +192,7 @@ export const CourseForm = (props: CourseForm) => {
             Alert.alert(t('error'), t('course_is_too_long'));
             return
         }
-        
+
         addCourseMutation.mutate({
             CourseInput: parseData(),
         });

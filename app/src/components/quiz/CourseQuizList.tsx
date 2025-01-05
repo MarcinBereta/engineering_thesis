@@ -24,6 +24,7 @@ import { CheckBox, normalizeText } from '@rneui/base';
 import { QuizzesListItem } from './QuizListItem';
 import { Layout } from '../Layout';
 import { CustomButton } from '../CustomButton';
+import { Alert } from 'react-native';
 
 type CourseQuizzesListProps = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
@@ -99,6 +100,7 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                 }
             ),
         onError: (err: any) => {
+            Alert.alert(t('error'), t('failed_to_generate_quiz'));
             console.error('Error:', err);
         },
         onSuccess: (data) => {
