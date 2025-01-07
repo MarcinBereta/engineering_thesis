@@ -46,7 +46,7 @@ export const QuizQuestion = ({
     const currentAnswers = selectedAnswers[index] || [];
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {width:'100%', height:700}]}>
             <Text style={styles.question}>{question.question}</Text>
             <FlatList
                 data={question.answers}

@@ -26,6 +26,27 @@ import { Layout } from '../Layout';
 import { CustomButton } from '../CustomButton';
 import { Alert } from 'react-native';
 
+const ProgressBar = ({ progress }: { progress: number }) => {
+    return (
+        <View
+            style={{
+                width: '100%',
+                backgroundColor: '#e0e0df',
+                borderRadius: 5,
+            }}
+        >
+            <View
+                style={{
+                    width: `${progress}%`,
+                    height: 10,
+                    backgroundColor: '#76c7c0',
+                    borderRadius: 5,
+                }}
+            ></View>
+        </View>
+    );
+};
+
 type CourseQuizzesListProps = NativeStackScreenProps<
     AuthenticatedRootStackParamList,
     'CourseQuizzesList'
@@ -44,7 +65,8 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
     const { courseId } = props.route.params;
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-
+    const [isCreating, setIsCreating] = useState(false);
+    const [progress, setProgress] = useState(0);
     const fetchQuizzes = async (courseId: string) => {
         return request(
             graphqlURL,
@@ -103,12 +125,69 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
             Alert.alert(t('error'), t('failed_to_generate_quiz'));
             console.error('Error:', err);
         },
+        onMutate: () => {
+            setIsCreating(true);
+            setProgress(0);
+            const interval = setInterval(() => {
+                setProgress((prev) => {
+                    if (prev < 90) {
+                        return prev + 10;
+                    } else {
+                        clearInterval(interval);
+                        return prev;
+                    }
+                });
+            }, 500);
+        },
         onSuccess: (data) => {
+            setProgress(100); // Complete progress
+
             console.log('Generated quizzes:', data);
             props.navigation.push('DashboardScreen');
             refetch();
         },
     });
+
+    const extractQuizType = (quizName: string): string => {
+        const lowerCaseName = quizName.toLowerCase();
+        if (lowerCaseName.includes('general')) {
+            return 'general';
+        } else if (lowerCaseName.includes('specific')) {
+            return 'specific';
+        } else if (lowerCaseName.includes('multiple_choice')) {
+            return 'multiple';
+        } else if (lowerCaseName.includes('true/false')) {
+            return 'truefalse';
+        } else {
+            return '';
+        }
+    };
+
+    const handleQuizCreate = () => {
+        const generatedQuizTypes =
+            data?.getQuizzesByCourseId.map((quiz) => {
+                return extractQuizType(quiz.name);
+            }) || [];
+        console.log('Generated quiz types:', generatedQuizTypes);
+        console.log('Selected options:', selectedOptions);
+        if(selectedOptions.length === 0) {
+            Alert.alert(t('error'), t('select_at_least_one_quiz_type'));
+            return;
+        }
+        for (const option of selectedOptions) {
+            if (generatedQuizTypes.includes(option)) {
+                Alert.alert(t('error'), t('quiz_type_already_exists'));
+                return;
+            }
+        }
+
+        generateMoreQuizzes.mutate({
+            generateMoreQuestions: {
+                courseId,
+                quizOptions: selectedOptions,
+            },
+        });
+    };
 
     if (!userInfo || !data || !scoresData) {
         return null;
@@ -151,65 +230,76 @@ const CourseQuizzesList = (props: CourseQuizzesListProps) => {
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>
-                            {t('select_quiz_types')}
-                        </Text>
-                        <View style={styles.checkboxContainer}>
-                            <CheckBox
-                                checked={selectedOptions.includes('truefalse')}
-                                onPress={() => toggleOption('truefalse')}
-                                style={styles.checkbox}
-                            />
-                            <Text style={styles.label}>{t('truefalse')}</Text>
+                    {isCreating ? (
+                        <ProgressBar progress={progress} />
+                    ) : (
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>
+                                {t('select_quiz_types')}
+                            </Text>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    checked={selectedOptions.includes(
+                                        'truefalse'
+                                    )}
+                                    onPress={() => toggleOption('truefalse')}
+                                    style={styles.checkbox}
+                                />
+                                <Text style={styles.label}>
+                                    {t('truefalse')}
+                                </Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    checked={selectedOptions.includes(
+                                        'specific'
+                                    )}
+                                    onPress={() => toggleOption('specific')}
+                                    style={styles.checkbox}
+                                />
+                                <Text style={styles.label}>
+                                    {t('specific')}
+                                </Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    checked={selectedOptions.includes(
+                                        'general'
+                                    )}
+                                    onPress={() => toggleOption('general')}
+                                    style={styles.checkbox}
+                                />
+                                <Text style={styles.label}>{t('general')}</Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    checked={selectedOptions.includes(
+                                        'multiple'
+                                    )}
+                                    onPress={() => toggleOption('multiple')}
+                                    style={styles.checkbox}
+                                />
+                                <Text style={styles.label}>
+                                    {t('multiple')}
+                                </Text>
+                            </View>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <CustomButton
+                                    title={t('generate')}
+                                    onPress={handleQuizCreate}
+                                />
+                                <CustomButton
+                                    title={t('cancel')}
+                                    onPress={() => setModalVisible(false)}
+                                />
+                            </View>
                         </View>
-                        <View style={styles.checkboxContainer}>
-                            <CheckBox
-                                checked={selectedOptions.includes('specific')}
-                                onPress={() => toggleOption('specific')}
-                                style={styles.checkbox}
-                            />
-                            <Text style={styles.label}>{t('specific')}</Text>
-                        </View>
-                        <View style={styles.checkboxContainer}>
-                            <CheckBox
-                                checked={selectedOptions.includes('general')}
-                                onPress={() => toggleOption('general')}
-                                style={styles.checkbox}
-                            />
-                            <Text style={styles.label}>{t('general')}</Text>
-                        </View>
-                        <View style={styles.checkboxContainer}>
-                            <CheckBox
-                                checked={selectedOptions.includes('multiple')}
-                                onPress={() => toggleOption('multiple')}
-                                style={styles.checkbox}
-                            />
-                            <Text style={styles.label}>{t('multiple')}</Text>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                            }}
-                        >
-                            <CustomButton
-                                title={t('generate')}
-                                onPress={() =>
-                                    generateMoreQuizzes.mutate({
-                                        generateMoreQuestions: {
-                                            courseId,
-                                            quizOptions: selectedOptions,
-                                        },
-                                    })
-                                }
-                            />
-                            <CustomButton
-                                title={t('cancel')}
-                                onPress={() => setModalVisible(false)}
-                            />
-                        </View>
-                    </View>
+                    )}
                 </View>
             </Modal>
         </Layout>

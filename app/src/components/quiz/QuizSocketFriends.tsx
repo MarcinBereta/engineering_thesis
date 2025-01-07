@@ -115,7 +115,11 @@ const QuizFriends = ({ route, navigation }: QuizWithFriends) => {
 
     if (gameStage == 'question' && question) {
         return (
-            <View>
+            <View style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
                 <QuizQuestion
                     question={question}
                     index={0}

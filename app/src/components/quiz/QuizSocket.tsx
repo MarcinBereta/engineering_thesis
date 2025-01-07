@@ -63,14 +63,14 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
                 setQuestionAnswered(false);
             });
 
-            socket.on('questionEnd', (correct: string) => {
-                setGameStage('answer');
-            });
+            // socket.on('questionEnd', (correct: string) => {
+            //     setGameStage('answer');
+            // });
 
-            socket.on('gameEnd', (room: any) => {
-                setGameStage('end');
-                setRoom(room);
-            });
+            // socket.on('gameEnd', (room: any) => {
+            //     setGameStage('end');
+            //     setRoom(room);
+            // });
         }
     }, []);
 
@@ -79,7 +79,9 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
             <View style={styles.container}>
                 <View style={styles.answerContainer}>
                     <Text style={styles.message}>Correct answer is:</Text>
-                    <Text style={styles.correctAnswer}>{question?.correct}</Text>
+                    <Text style={styles.correctAnswer}>
+                        {question?.correct}
+                    </Text>
                 </View>
             </View>
         );
@@ -93,7 +95,9 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
                 <FlatList
                     data={room.users}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => <Text style={styles.player}>{item.username}</Text>}
+                    renderItem={({ item }) => (
+                        <Text style={styles.player}>{item.username}</Text>
+                    )}
                 />
             </View>
         );
@@ -101,7 +105,13 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
 
     if (gameStage == 'question' && question) {
         return (
-            <View>
+            <View
+                style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                }}
+            >
                 <QuizQuestion
                     question={question}
                     index={0}
@@ -130,8 +140,12 @@ const QuizSocket = ({ route, navigation }: QuizSearch) => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <View style={endStyles.playerContainer}>
-                            <Text style={endStyles.playerName}>{item.username}</Text>
-                            <Text style={endStyles.playerScore}>{item.score}</Text>
+                            <Text style={endStyles.playerName}>
+                                {item.username}
+                            </Text>
+                            <Text style={endStyles.playerScore}>
+                                {item.score}
+                            </Text>
                         </View>
                     )}
                 />

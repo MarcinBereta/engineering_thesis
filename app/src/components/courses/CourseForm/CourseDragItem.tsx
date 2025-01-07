@@ -56,7 +56,8 @@ export const DragItem = ({
                 ) : (
                     <Image
                         style={{ width: '100%', height: 300 }}
-                        resizeMethod="resize"
+                        // resizeMethod="resize"
+                        resizeMode='contain'
                         source={{
                             uri: (item.value as string).includes(
                                 'files/courses/'
