@@ -74,6 +74,7 @@ export const UserSettings = (props: UserSettings) => {
         await AsyncStorage.setItem('language', lang);
         await i18n.changeLanguage(lang);
         setLanguage(lang);
+        // props.navigation.navigate('DashboardScreen');
     };
 
     const uploadFile = async () => {
@@ -160,7 +161,6 @@ export const UserSettings = (props: UserSettings) => {
                             { label: t('France'), value: 'fr' },
                             { label: t('German'), value: 'de' },
                         ]}
-                        value={language}
                         style={pickerSelectStyles}
                     />
                 </View>
