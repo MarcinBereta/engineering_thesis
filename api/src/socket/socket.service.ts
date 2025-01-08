@@ -30,7 +30,7 @@ export class SocketService {
         }
     > = new Map();
     private rooms: Map<string, Room> = new Map();
-    constructor(private prismaService: PrismaService) {}
+    constructor(private prismaService: PrismaService) { }
     @WebSocketServer() server: Server;
 
     getQueues() {
@@ -206,5 +206,11 @@ export class SocketService {
             const user = room.users.find((user) => user.id === userId);
             user.score++;
         }
+    }
+
+    async refreshUserData(userId: string) {
+        console.log('refreshing user data');
+        console.log(userId);
+        this.server.to(userId).emit('refreshUserData')
     }
 }

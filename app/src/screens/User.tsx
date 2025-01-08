@@ -19,7 +19,7 @@ type UserPage = NativeStackScreenProps<AuthenticatedRootStackParamList, 'User'>;
 const UserPage = ({ route, navigation }: UserPage) => {
     const { t } = useTranslation();
 
-    const { userInfo } = useContext(AuthContext);
+    const { userInfo, socket } = useContext(AuthContext);
     const user = route.params.user;
     console.log(user)
     const [tempCategories, setTempCategories] = useState<
@@ -91,6 +91,9 @@ const UserPage = ({ route, navigation }: UserPage) => {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
         onSuccess: (data, variables, context) => {
+            socket?.emit('refreshUserData', {
+                userId: variables.UserEdit.id
+            })
             setUserData({ ...data.updateUser });
             setUserRole(data.updateUser.role);
         },
@@ -186,7 +189,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
                             return (
                                 <TouchableOpacity
                                     key={c.value}
-                                    onPress={() => {}}
+                                    onPress={() => { }}
                                 >
                                     <Text>{t(c.label)}</Text>
                                 </TouchableOpacity>

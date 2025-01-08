@@ -26,8 +26,9 @@ type VerifyUsers = NativeStackScreenProps<
 >;
 
 const VerifyUsers = (props: VerifyUsers) => {
-    const { userInfo } = useContext(AuthContext);
+    const { userInfo, socket } = useContext(AuthContext);
     const { t } = useTranslation();
+    const [userId, setUserId] = useState('')
     const { data, isLoading, refetch, error } = useQuery({
         queryKey: ['userId'],
         queryFn: async () =>
@@ -49,6 +50,9 @@ const VerifyUsers = (props: VerifyUsers) => {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
         onSuccess: (data, variables, context) => {
+            socket?.emit('refreshUserData', {
+                userId: userId
+            })
             props.navigation.push('CoursesList');
         },
     });
@@ -59,6 +63,9 @@ const VerifyUsers = (props: VerifyUsers) => {
                 Authorization: 'Bearer ' + userInfo?.token,
             }),
         onSuccess: (data, variables, context) => {
+            socket?.emit('refreshUserData', {
+                userId: userId
+            })
             props.navigation.push('CoursesList');
         },
     });
@@ -222,6 +229,7 @@ const VerifyUsers = (props: VerifyUsers) => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                             handleClick(item.id);
+                                            setUserId(item.userId)
                                         }}
                                         title="Verify"
                                     />
@@ -232,6 +240,7 @@ const VerifyUsers = (props: VerifyUsers) => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                             declineClick(item.id);
+                                            setUserId(item.userId)
                                         }}
                                         backgroundColor="red"
                                         title="Decline"

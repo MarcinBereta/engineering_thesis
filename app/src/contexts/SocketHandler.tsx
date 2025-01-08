@@ -6,7 +6,7 @@ import { CustomButton } from '@/components/CustomButton';
 import { fontPixel } from '@/utils/Normalize';
 
 export const SocketHandler = () => {
-    const { socket, userInfo } = useContext(AuthContext);
+    const { socket, userInfo, refreshUserData } = useContext(AuthContext);
 
     function shortenName(courseName: string, length: number) {
         if (courseName.length > length) {
@@ -28,12 +28,17 @@ export const SocketHandler = () => {
         if (socket && userInfo) {
             socket.connect();
             console.log('connected to socket');
+            console.log(userInfo.id)
             socket.emit('connectToOwnRoom', {
                 userId: userInfo.id,
             });
             socket.on('fightWithFriend', (data: any) => {
                 console.log(data);
                 setGameRequest(data);
+            });
+            socket.on('refreshUserData', () => {
+                console.log('refreshing user data');
+                refreshUserData();
             });
             return () => {
                 socket.disconnect();

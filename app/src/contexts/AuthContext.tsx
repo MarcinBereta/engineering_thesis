@@ -35,6 +35,7 @@ interface AuthContext {
     logout: () => Promise<void>;
     updateUserImage: (image: string) => void;
     updateUserData: (userName: string, email: string) => void;
+    refreshUserData: () => void;
 }
 
 export const AuthContext = React.createContext<AuthContext>({} as any);
@@ -119,6 +120,12 @@ export const AuthProvider = ({
         },
         onError: async (data, variables, context) => { },
     });
+
+    const refreshUserData = async () => {
+        if (userInfo != null) {
+            refreshMutation.mutate(userInfo.token);
+        }
+    }
 
     const refreshTokenMutation = useMutation({
         mutationFn: async (refreshToken: string) =>
@@ -390,6 +397,7 @@ export const AuthProvider = ({
                 logout,
                 updateUserImage,
                 updateUserData,
+                refreshUserData
             }}
         >
             {children}

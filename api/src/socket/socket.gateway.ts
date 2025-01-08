@@ -85,4 +85,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             payload.answer
         );
     }
+
+    @SubscribeMessage('refreshUserData')
+    @UseGuards(SocketGuard)
+    async handleRefreshUserData(socket: Socket, payload: any) {
+        this.socketService.refreshUserData(payload.userId);
+    }
 }
