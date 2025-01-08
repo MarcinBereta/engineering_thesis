@@ -27,7 +27,7 @@ export const CourseListItem = ({ course: item }: { course: courseItem }) => {
             ) : (
                 <Image
                     style={{ width: width * 0.9, height: 300 }}
-                    resizeMode='stretch'
+                    resizeMode='contain'
                     source={{ uri: constants.url + '/' + item.value }}
                 />
             )}

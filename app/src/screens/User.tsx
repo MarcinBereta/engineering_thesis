@@ -21,7 +21,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
 
     const { userInfo, socket } = useContext(AuthContext);
     const user = route.params.user;
-    console.log(user)
+    console.log(user);
     const [tempCategories, setTempCategories] = useState<
         { value: string; label: string; checked: boolean }[]
     >(() => {
@@ -38,8 +38,9 @@ const UserPage = ({ route, navigation }: UserPage) => {
         ];
         const cats = [];
         if (user.role == 'USER') return [];
-        console.log()
-        const userCategories: string[] = user.Moderator != null ? user.Moderator.categories : [];
+        console.log();
+        const userCategories: string[] =
+            user.Moderator != null ? user.Moderator.categories : [];
         // const userCategories:string[] = []
         for (let dbCat of dbCategories) {
             if (userCategories.includes(dbCat))
@@ -68,9 +69,10 @@ const UserPage = ({ route, navigation }: UserPage) => {
         ];
         const cats = [];
         if (user.role == 'USER') return [];
-        const userCategories: string[] = user.Moderator != null ? user.Moderator.categories : [];
-        console.log(user.Moderator != null)
-        console.log(user.Moderator)
+        const userCategories: string[] =
+            user.Moderator != null ? user.Moderator.categories : [];
+        console.log(user.Moderator != null);
+        console.log(user.Moderator);
         // const userCategories:string[] = []
 
         for (let dbCat of dbCategories) {
@@ -92,8 +94,8 @@ const UserPage = ({ route, navigation }: UserPage) => {
             }),
         onSuccess: (data, variables, context) => {
             socket?.emit('refreshUserData', {
-                userId: variables.UserEdit.id
-            })
+                userId: variables.UserEdit.id,
+            });
             setUserData({ ...data.updateUser });
             setUserRole(data.updateUser.role);
         },
@@ -110,6 +112,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
             },
         });
     };
+    console.log(userData.verified)
 
     return (
         <Layout navigation={navigation} icon="admin">
@@ -167,7 +170,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
                     { label: t('verified'), value: 'VERIFIED' },
                     { label: t('not_verified'), value: 'NOT_VERIFIED' },
                 ]}
-                value={userData.verified ? t('verified') : t('not_verified')}
+                value={userData.verified ? 'VERIFIRED' : 'NOT_VERIFIED'}
             />
 
             {userRole == 'MODERATOR' || userRole == 'ADMIN' ? (
@@ -189,7 +192,7 @@ const UserPage = ({ route, navigation }: UserPage) => {
                             return (
                                 <TouchableOpacity
                                     key={c.value}
-                                    onPress={() => { }}
+                                    onPress={() => {}}
                                 >
                                     <Text>{t(c.label)}</Text>
                                 </TouchableOpacity>
@@ -223,9 +226,19 @@ const UserPage = ({ route, navigation }: UserPage) => {
                                     padding: 20,
                                     margin: 20,
                                     borderRadius: 10,
+                                    width: '90%',
+                                    height: '70%',
                                 }}
                             >
-                                <Text>{t('select_categories_to_add')}</Text>
+                                <Text
+                                    style={{
+                                        fontSize: fontPixel(28),
+                                        textAlign: 'center',
+                                        fontWeight: '700',
+                                    }}
+                                >
+                                    {t('select_categories_to_add')}
+                                </Text>
                                 {tempCategories.map((c) => {
                                     return (
                                         <TouchableOpacity
@@ -238,8 +251,23 @@ const UserPage = ({ route, navigation }: UserPage) => {
                                                     );
                                                 });
                                             }}
+                                            style={{
+                                                backgroundColor: 'lightgray',
+                                                padding: 5,
+                                                margin: 5,
+                                                borderRadius: 15,
+                                            }}
                                         >
-                                            <Text>{c.label}</Text>
+                                            <Text
+                                                style={{
+                                                    textAlign: 'center',
+                                                    fontWeight: 'bold',
+                                                    fontSize: fontPixel(18),
+                                                    padding: 5,
+                                                }}
+                                            >
+                                                {c.label}
+                                            </Text>
                                         </TouchableOpacity>
                                     );
                                 })}
@@ -259,13 +287,11 @@ const UserPage = ({ route, navigation }: UserPage) => {
                                             <TouchableOpacity
                                                 key={c.value}
                                                 style={{
-                                                    padding: 5,
                                                     backgroundColor:
                                                         'lightgray',
-                                                    margin: 2,
-                                                    display: 'flex',
-                                                    flexDirection: 'row',
-                                                    justifyContent: 'center',
+                                                    padding: 5,
+                                                    margin: 5,
+                                                    borderRadius: 15,
                                                 }}
                                                 onPress={() => {
                                                     setTempCategories((dt) => {
@@ -279,7 +305,16 @@ const UserPage = ({ route, navigation }: UserPage) => {
                                                     });
                                                 }}
                                             >
-                                                <Text>{c.label}</Text>
+                                                <Text
+                                                    style={{
+                                                        textAlign: 'center',
+                                                        fontWeight: 'bold',
+                                                        fontSize: fontPixel(18),
+                                                        padding: 5,
+                                                    }}
+                                                >
+                                                    {c.label}
+                                                </Text>
                                             </TouchableOpacity>
                                         );
                                     })}

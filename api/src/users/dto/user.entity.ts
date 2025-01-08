@@ -6,10 +6,10 @@ export class SimpleModerator {
     id: string;
     @Field()
     userId: string;
-    @Field()
-    createdAt: Date;
-    @Field()
-    updatedAt: Date;
+    @Field({nullable:true})
+    createdAt?: Date;
+    @Field({nullable:true})
+    updatedAt?: Date;
     @Field(() => [String])
     categories: string[];
 }

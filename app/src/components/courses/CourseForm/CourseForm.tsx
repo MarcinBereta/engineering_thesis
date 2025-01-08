@@ -44,7 +44,7 @@ const isCoursePossible = (data: CourseItem[]) => {
         }
     }
     return length < 30000;
-}
+};
 
 export type addCourseDto = VariablesOf<typeof addCourseGQL>;
 export type AppFile = File & {
@@ -78,7 +78,10 @@ export const CourseForm = (props: CourseForm) => {
             uploadPhotos(course);
         },
         onError: (error, variables, context) => {
-            Alert.alert(t('error'), t('failed_to_generate_quiz_name_must_be_unique'));
+            Alert.alert(
+                t('error'),
+                t('failed_to_generate_quiz_name_must_be_unique')
+            );
         },
     });
 
@@ -190,7 +193,19 @@ export const CourseForm = (props: CourseForm) => {
     const uploadCourse = async () => {
         if (!isCoursePossible(dragData)) {
             Alert.alert(t('error'), t('course_is_too_long'));
-            return
+            return;
+        }
+
+        if (courseName.length < 3) {
+            Alert.alert(t('error'), t('course_name_is_too_short'));
+        }
+
+        if (courseName.length > 50) {
+            Alert.alert(t('error'), t('course_name_is_too_long'));
+        }
+
+        if (category === '') {
+            Alert.alert(t('error'), t('category_is_required'));
         }
 
         addCourseMutation.mutate({
@@ -218,9 +233,7 @@ export const CourseForm = (props: CourseForm) => {
                     value={courseName}
                     onChangeText={(text) => setCourseName(text)}
                 />
-                <Text
-                    style={{ fontSize: fontPixel(20) }}
-                >{t('category')}</Text>
+                <Text style={{ fontSize: fontPixel(20) }}>{t('category')}</Text>
                 <RNPickerSelect
                     onValueChange={handleCategoryChange}
                     items={[
@@ -237,9 +250,7 @@ export const CourseForm = (props: CourseForm) => {
                     ]}
                     value={category}
                 />
-                <Text
-                    style={{ fontSize: fontPixel(20) }}
-                >{t('language')}</Text>
+                <Text style={{ fontSize: fontPixel(20) }}>{t('language')}</Text>
                 <RNPickerSelect
                     onValueChange={(value) => {
                         setLanguage(value);

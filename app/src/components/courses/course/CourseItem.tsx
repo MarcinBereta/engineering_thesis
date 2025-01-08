@@ -12,8 +12,8 @@ type course = NativeStackScreenProps<AuthenticatedRootStackParamList, 'course'>;
 
 const Course = ({ route, navigation }: course) => {
     const { course } = route.params;
-    const {t} = useTranslation()
-    console.log(course)
+    const { t } = useTranslation();
+    console.log(course);
     return (
         <Layout navigation={navigation} icon="course">
             <Text style={{ fontSize: fontPixel(40), textAlign: 'center' }}>
@@ -24,12 +24,22 @@ const Course = ({ route, navigation }: course) => {
                 renderItem={({ item }) => <CourseListItem course={item} />}
                 keyExtractor={(item) => item.id}
             />
-            <CustomButton
-                title={t('course_quizzes_list')}
-                onPress={()=>{
-                    navigation.navigate('CourseQuizzesList', {courseId: course.id})
+            <View
+                style={{
+                    width: '80%',
+                    margin: 20,
+                    left: '10%',
                 }}
-            />
+            >
+                <CustomButton
+                    title={t('course_quizzes_list')}
+                    onPress={() => {
+                        navigation.navigate('CourseQuizzesList', {
+                            courseId: course.id,
+                        });
+                    }}
+                />
+            </View>
         </Layout>
     );
 };

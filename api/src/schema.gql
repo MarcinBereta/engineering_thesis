@@ -5,8 +5,8 @@
 type SimpleModerator {
   id: String!
   userId: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
   categories: [String!]!
 }
 
