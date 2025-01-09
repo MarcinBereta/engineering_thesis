@@ -832,21 +832,21 @@ export class CoursesService {
         try {
             randomCourse = await this.getRandomCourseNotPlayed(userID);
         } catch (e) {
-            console.log('Failed to find random course');
+            // console.log('Failed to find random course');
             randomCourse = await this.getRandomCourse();
-            console.log(randomCourse);
+            // console.log(randomCourse);
         }
         try {
             //get most popular category by user with userID from past 5 days
             const bestCategoryFromLast5days =
                 await this.getBestCategoryFromLast5days(userID);
             // get tag with most games played in Category by user with userID from past 5 days
-            console.log(`${bestCategoryFromLast5days[0].category}`);
+            // console.log(`${bestCategoryFromLast5days[0].category}`);
             const bestTagFromLast5days = await this.getBestTagFromLast5days(
                 userID,
                 bestCategoryFromLast5days[0].category
             );
-            console.log(`${bestTagFromLast5days[0].tag}`);
+            // console.log(`${bestTagFromLast5days[0].tag}`);
             if ((bestTagFromLast5days as any[]).length == 0) {
                 const mostPopularCourseByCategoryFromLast5days =
                     await this.getMostPopularCourseByCategory(
@@ -854,7 +854,7 @@ export class CoursesService {
                         bestCategoryFromLast5days[0].category
                     );
                 if (mostPopularCourseByCategoryFromLast5days != null) {
-                    console.log(mostPopularCourseByCategoryFromLast5days);
+                    // console.log(mostPopularCourseByCategoryFromLast5days);
                     return mostPopularCourseByCategoryFromLast5days;
                 }
             }
@@ -865,7 +865,7 @@ export class CoursesService {
                     bestTagFromLast5days[0].tag,
                     bestCategoryFromLast5days[0].category
                 );
-            console.log(mostPopularCourseFromLast5days);
+            // console.log(mostPopularCourseFromLast5days);
             if (mostPopularCourseFromLast5days != null) {
                 return mostPopularCourseFromLast5days;
             }
@@ -903,21 +903,21 @@ export class CoursesService {
                 }
                 return randomCourse;
             }
-            console.log(bestTag[0].tag);
+            // console.log(bestTag[0].tag);
             // get most popular course (most games played) for this tag, but user didn't play it, but if not course with tag check only by category of all time
             const mostPopularCourse = await this.getMostPopularCourse(
                 userID,
                 bestTag[0].tag,
                 bestCategory[0].category
             );
-            console.log(mostPopularCourse)
+            // console.log(mostPopularCourse)
             if (mostPopularCourse == null) {
                 const mostPopularCourseByCategory =
                     await this.getMostPopularCourseByCategory(
                         userID,
                         bestCategory[0].category
                     );
-                console.log(mostPopularCourseByCategory)
+                // console.log(mostPopularCourseByCategory)
                 if (mostPopularCourseByCategory == null) {
                     return randomCourse;
                 }

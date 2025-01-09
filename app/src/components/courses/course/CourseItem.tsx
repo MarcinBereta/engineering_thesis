@@ -13,7 +13,7 @@ type course = NativeStackScreenProps<AuthenticatedRootStackParamList, 'course'>;
 const Course = ({ route, navigation }: course) => {
     const { course } = route.params;
     const { t } = useTranslation();
-    console.log(course);
+    // console.log(course);
     return (
         <Layout navigation={navigation} icon="course">
             <Text style={{ fontSize: fontPixel(40), textAlign: 'center' }}>

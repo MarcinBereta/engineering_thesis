@@ -27,7 +27,7 @@ export const QuizQuestion = ({
     const handleAnswerPress = (answer: string) => {
         const currentAnswers = selectedAnswers[index] || [];
         if (question.type === 'MULTIPLE_ANSWER') {
-            console.log(currentAnswers)
+            // console.log(currentAnswers)
             if (currentAnswers.includes(answer)) {
                 const newAnswers = currentAnswers.filter((ans) => ans !== answer);
                 setSelectedAnswers({ ...selectedAnswers, [index]: newAnswers });
