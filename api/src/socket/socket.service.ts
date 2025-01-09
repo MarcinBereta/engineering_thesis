@@ -170,7 +170,7 @@ export class SocketService {
         const room = this.rooms.get(roomId);
         const question = room.questions[room.questionIndex];
         this.server.to(roomId).emit('question', question);
-        await delay(5000);
+        await delay(10000);
         this.handleRoundEnd(roomId);
     }
 
