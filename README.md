@@ -18,10 +18,14 @@ Początkowo należy zainstalowć wskazane powyżej programy oraz narzędzia. Nas
 
 W sytuacji jeśli, klucz API od OpenAI znajdujący się w pliku .env wygaśnie, bądź przesatnie działać należy zastąpić go nowym. Potrzebne będzie do tego konto na stronie OpenAI, gdzie będzie można dodać wygenerować nowy klucz (do wykonywania zapytań potrzebne będą dostępne środki na koncie).
 
-#### Katalog api
+#### Katalog główny projektu
 Przygotowanie do uruchomienia:
 - `npm install`
 - `docker compose up -d inzynierka`
+
+#### Katalog api
+Przygotowanie do uruchomienia:
+- `npm install`
 - `npx prisma db push`
 Uruchomienie backendu:
 `npm run dev`
@@ -32,3 +36,5 @@ Przygotowanie do uruchomienia:
 
 Uruchomienie frontendu:
 `npm run android`
+
+Dodatkowo w tym katalog w pliku constans.ts należy zmienić adres IP na swój adres IPv4, który można znaleźć wykorzystująć komendę ipconfig w system Windows.
