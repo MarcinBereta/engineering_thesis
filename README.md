@@ -16,17 +16,18 @@ QuizGenius został stworzony z wykorzystaniem popularnych technologii. Interfejs
 ### Kroki i komendy potrzebne do uruchomienia aplikacji
 Początkowo należy zainstalowć wskazane powyżej programy oraz narzędzia. Następnie warto uruchomić Android Studio, wybrać w nim odpowiedni katalog oraz dodać emulator, na którym uruchamiana będzie aplikacja. W tym samym czasie należy uruchomić terminale oraz Docker Desktop, w dzięki któremu uruchomione będą kontenery związane z projektem. Kolejnym krokiem jest wykonanie w terminalach komend przygotowujących do uruchomienia. Jeśli sie to powiedzie i nie pojawią się żadne błędy środowiskowe można użyć komend uruchamiających backend oraz frontend w odpowiednich katalogach.
 
-W sytuacji jeśli, klucz API od OpenAI znajdujący się w pliku .env wygaśnie, bądź przesatnie działać należy zastąpić go nowym. Potrzebne będzie do tego konto na stronie OpenAI, gdzie będzie można dodać wygenerować nowy klucz (do wykonywania zapytań potrzebne będą dostępne środki na koncie).
+W sytuacji jeśli, klucz API od OpenAI znajdujący się w pliku .env wygaśnie, bądź przesatnie działać należy zastąpić go nowym. Potrzebne będzie do tego konto na stronie OpenAI, gdzie będzie można dodać wygenerować nowy klucz (do wykonywania zapytań potrzebne będą dostępne środki na koncie). W tym pliku są dostępne również klucze dostępów do baz, które z czasem również mogą ulec przedawnieniu i będzie trzeba je zastąpić nowymi, które możemy uzyskać zakładając konto na platformie supabase.
 
 #### Katalog główny projektu
 Przygotowanie do uruchomienia:
 - `npm install`
-- `docker compose up -d inzynierka`
+- `docker compose up -d postgresql redis`
 
 #### Katalog api
 Przygotowanie do uruchomienia:
 - `npm install`
 - `npx prisma db push`
+
 Uruchomienie backendu:
 `npm run dev`
 
