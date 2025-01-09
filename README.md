@@ -14,9 +14,9 @@ QuizGenius został stworzony z wykorzystaniem popularnych technologii. Interfejs
 - NPM (Node Package Manager)
 
 ### Kroki i komendy potrzebne do uruchomienia aplikacji
-Początkowo należy zainstalowć wskazane powyżej programy oraz narzędzia. Następnie warto uruchomić Android Studio, wybrać w nim odpowiedni katalog oraz dodać emulator, na którym uruchamiana będzie aplikacja. W tym samym czasie należy uruchomić terminale oraz Docker Desktop, w dzięki któremu uruchomione będą kontenery związane z projektem. Kolejnym krokiem jest wykonanie w terminalach komend przygotowujących do uruchomienia. Jeśli sie to powiedzie i nie pojawią się żadne błędy środowiskowe można użyć komend uruchamiających backend oraz frontend w odpowiednich katalogach.
+Początkowo należy zainstalować wskazane powyżej programy oraz narzędzia. Następnie warto uruchomić Android Studio, wybrać w nim odpowiedni katalog oraz dodać emulator, na którym uruchamiana będzie aplikacja. W tym samym czasie należy uruchomić terminale oraz Docker Desktop, w dzięki któremu uruchomione będą kontenery związane z projektem. Kolejnym krokiem jest wykonanie w terminalach komend przygotowujących do uruchomienia. Jeśli się to powiedzie i nie pojawią się żadne błędy środowiskowe można użyć komend uruchamiających backend oraz frontend w odpowiednich katalogach.
 
-W sytuacji jeśli, klucz API od OpenAI znajdujący się w pliku .env wygaśnie, bądź przesatnie działać należy zastąpić go nowym. Potrzebne będzie do tego konto na stronie OpenAI, gdzie będzie można dodać wygenerować nowy klucz (do wykonywania zapytań potrzebne będą dostępne środki na koncie). W tym pliku są dostępne również klucze dostępów do baz, które z czasem również mogą ulec przedawnieniu i będzie trzeba je zastąpić nowymi, które możemy uzyskać zakładając konto na platformie supabase.
+W sytuacji jeśli, klucz API od OpenAI znajdujący się w pliku .env wygaśnie, bądź przestanie działać należy zastąpić go nowym. Potrzebne będzie do tego konto na stronie OpenAI, gdzie będzie można dodać wygenerować nowy klucz (do wykonywania zapytań potrzebne będą dostępne środki na koncie). W tym pliku są dostępne również klucze dostępów do baz, które z czasem również mogą ulec przedawnieniu i będzie trzeba je zastąpić nowymi, które możemy uzyskać zakładając konto na platformie supabase.
 
 #### Katalog główny projektu
 Przygotowanie do uruchomienia:
@@ -38,4 +38,4 @@ Przygotowanie do uruchomienia:
 Uruchomienie frontendu:
 `npm run android`
 
-Dodatkowo w tym katalog w pliku constans.ts należy zmienić adres IP na swój adres IPv4, który można znaleźć wykorzystująć komendę ipconfig w system Windows.
+Dodatkowo w tym katalog w pliku constans.ts należy zmienić adres IP na swój adres IPv4, który można znaleźć wykorzystując komendę ipconfig w system Windows.
