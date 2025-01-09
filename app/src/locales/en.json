@@ -133,5 +133,6 @@
     "course_is_too_long": "Course is too long",
     "failed_to_generate_quiz_name_must_be_unique": "Failed to generate quiz, name must be unique",
     "select_quiz_types": "Select quiz types",
-    "generate": "Generate"
+    "generate": "Generate",
+    "unverified_courses_list": "Unverified courses list"
 }

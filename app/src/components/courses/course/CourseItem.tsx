@@ -28,10 +28,11 @@ const Course = ({ route, navigation }: course) => {
                 style={{
                     width: '80%',
                     margin: 20,
-                    left: '10%',
+                    alignSelf: 'center',
                 }}
             >
                 <CustomButton
+                style={{alignSelf: 'center'}}
                     title={t('course_quizzes_list')}
                     onPress={() => {
                         navigation.navigate('CourseQuizzesList', {
